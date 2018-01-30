@@ -1,33 +1,19 @@
----
-DELETE ME<br/>
-You don't need to adhere to the template strictly. Feel free to leave out information you feel is not important or does not make sense.
+## As a X, I want to Y, so I can Z
 
-If you are submitting a feature request, please read [this](https://github.com/AntennaPod/AntennaPod/blob/develop/CONTRIBUTING.md#how-to-submit-a-feature-request).
-In particular, please not only tell us that you want something (*what*), but also make suggestions *how* it should be implemented.
+- **Number of story points:** 
+- **Priority:** 
+- **Risk:**  
+- _**Estimation of the ideal time**_ :
 
----
+### Tasks TO DO: 
 
-**App version:** 1.x (from Google Play/F-Droid/Custom build)
+- [ ] task1
 
-**Android version**: 5.x [Please mention if you are using a custom rom!]
+### TO DO before closing the issue: 
+- [ ] Assign story to a feature (label)
+- [ ] Assign an Iteration (milestone)
+- [ ] Link all commits, arch diagrams, summaries of discussions, etc
+- [ ] Write unit tests
+- [ ] Write demo steps 
+- [ ] Get TA signoff 
 
-**Device model**:
-
-**Expected behaviour**:
-
-**Current behaviour**:
-
-**First occured**: Version 1.x / about x days/weeks ago
-
-**Steps to reproduce**:
-
-1. This
-1. Than that
-1. Then
-
-**Environment**: [Settings you have changed, e.g. Auto Download. "Unusual" devices you use, e.g. Bluetooth headphones. Do you still use Prestissimo?]
-
-**Stacktrace/Logcat**: 
-```
-[if available]
-```
