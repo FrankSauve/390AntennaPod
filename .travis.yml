@@ -13,6 +13,7 @@ before_script:
     - ./ci/wait_for_emulator.sh
 
 script:
+    - gradle assembleDebug
     - gradle connectedAndroidTest
     
 dist: precise
