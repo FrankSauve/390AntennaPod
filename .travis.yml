@@ -1,11 +1,16 @@
 language: android
-android:
-  components:
-    - tools # to get the new `repository-11.xml`
-    - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
-    - platform-tools
-    - build-tools-26.0.1
-    - android-26
+jdk: oraclejdk8
+
+env:
+  matrix:
+    - ANDROID_SDKS=android-25,sysimg-25 ANDROID_TARGET=android-25 ANDROID_ABI=armeabi-v7a
+before_install:
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
+
+before_script:
+    - chmod -R 777 ./ci/wait_for_emulator.sh
+    - ./ci/wait_for_emulator.sh
 
 script:
-   - gradle connectedAndroidTest
+    - gradle connectedAndroidTest
