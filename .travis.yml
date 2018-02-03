@@ -16,4 +16,4 @@ before_script:
 script:
     - gradle connectedAndroidTest
     
-os: osx
+dist: precise
