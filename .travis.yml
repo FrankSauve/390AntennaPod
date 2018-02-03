@@ -7,7 +7,6 @@ env:
 before_install:
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
-  - cp src/de/danoeh/antennapod/util/flattr/FlattrConfig.java.example src/de/danoeh/antennapod/util/flattr/FlattrConfig.java
 
 before_script:
     - chmod -R 777 ./ci/wait_for_emulator.sh
