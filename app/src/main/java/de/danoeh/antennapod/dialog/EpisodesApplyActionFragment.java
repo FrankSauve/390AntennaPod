@@ -41,6 +41,8 @@ public class EpisodesApplyActionFragment extends Fragment {
     public static final int ACTION_REMOVE = 16;
     public static final int ACTION_ALL = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
             | ACTION_DOWNLOAD | ACTION_REMOVE;
+    public static final int ACTION_DOWNLOAD_PAGE = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
+            | ACTION_REMOVE;
 
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
