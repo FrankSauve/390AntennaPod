@@ -140,7 +140,7 @@ public class NavListAdapter extends BaseAdapter
                 icon = R.attr.ic_folder;
                 break;
             case TrendingFragment.TAG:
-                icon = R.attr.ic_folder;
+                icon = R.attr.ic_trending;
                 break;
             case AddFeedFragment.TAG:
                 icon = R.attr.content_new;
