@@ -39,10 +39,13 @@ public class EpisodesApplyActionFragment extends Fragment {
     public static final int ACTION_MARK_UNPLAYED = 4;
     public static final int ACTION_DOWNLOAD = 8;
     public static final int ACTION_REMOVE = 16;
+    //will verify if int 20 conclficts with anything else
+    public static final int ACTION_ADD_TO_FAVORITES = 20;
     public static final int ACTION_ALL = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
             | ACTION_DOWNLOAD | ACTION_REMOVE;
+    //add ACTION_ADD_TO_FAVORITES to icon list
     public static final int ACTION_DOWNLOAD_PAGE = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
-            | ACTION_REMOVE;
+            | ACTION_REMOVE | ACTION_ADD_TO_FAVORITES;
 
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
