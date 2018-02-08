@@ -160,7 +160,7 @@ public class CompletedDownloadsFragment extends ListFragment {
         switch (item.getItemId()) {
             case R.id.episode_actions:
                 EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
-                        .newInstance(items, EpisodesApplyActionFragment.ACTION_REMOVE);
+                        .newInstance(items, EpisodesApplyActionFragment.ACTION_DOWNLOAD_PAGE);
                 ((MainActivity) getActivity()).loadChildFragment(fragment);
                 return true;
             default:

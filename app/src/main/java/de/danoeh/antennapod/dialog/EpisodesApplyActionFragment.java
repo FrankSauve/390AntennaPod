@@ -39,8 +39,13 @@ public class EpisodesApplyActionFragment extends Fragment {
     public static final int ACTION_MARK_UNPLAYED = 4;
     public static final int ACTION_DOWNLOAD = 8;
     public static final int ACTION_REMOVE = 16;
+    //will verify if int 20 conclficts with anything else
+    public static final int ACTION_ADD_TO_FAVORITES = 20;
     public static final int ACTION_ALL = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
             | ACTION_DOWNLOAD | ACTION_REMOVE;
+    //add ACTION_ADD_TO_FAVORITES to icon list
+    public static final int ACTION_DOWNLOAD_PAGE = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
+            | ACTION_REMOVE | ACTION_ADD_TO_FAVORITES;
 
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
@@ -50,6 +55,7 @@ public class EpisodesApplyActionFragment extends Fragment {
     private Button btnMarkAsUnplayed;
     private Button btnDownload;
     private Button btnDelete;
+    private Button btnAddToFavorites;
 
     private final Map<Long,FeedItem> idMap = new ArrayMap<>();
     private final List<FeedItem> episodes = new ArrayList<>();
@@ -146,6 +152,14 @@ public class EpisodesApplyActionFragment extends Fragment {
             if(lastVisibleDiv > 0) {
                 view.findViewById(lastVisibleDiv).setVisibility(View.GONE);
             }
+        }
+        btnAddToFavorites = (Button) view.findViewById(R.id.btnAddToFavorites);
+        if((actions & ACTION_ADD_TO_FAVORITES) != 0) {
+            btnAddToFavorites.setOnClickListener(v -> addToFav());
+            //lastVisibleDiv = R.id.divider5;
+        } else {
+            btnAddToFavorites.setVisibility(View.GONE);
+            //view.findViewById(R.id.divider5).setVisibility(View.GONE);
         }
 
         return view;
@@ -396,6 +410,17 @@ public class EpisodesApplyActionFragment extends Fragment {
 
     private void markedCheckedPlayed() {
         DBWriter.markItemPlayed(FeedItem.PLAYED, checkedIds.toArray());
+        close();
+    }
+
+    //add selected items to favorites
+    private void addToFav() {
+        for(long id : checkedIds.toArray()) {
+            FeedItem episode = idMap.get(id);
+            if(episode.hasMedia()) {
+                DBWriter.addFavoriteItemById(episode.getMedia().getId());
+            }
+        }
         close();
     }
 
