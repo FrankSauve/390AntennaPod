@@ -41,6 +41,7 @@ import de.danoeh.antennapod.fragment.NewEpisodesFragment;
 import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
 import de.danoeh.antennapod.fragment.QueueFragment;
 import de.danoeh.antennapod.fragment.SubscriptionFragment;
+import de.danoeh.antennapod.fragment.TrendingFragment;
 
 /**
  * BaseAdapter for the navigation drawer
@@ -137,6 +138,9 @@ public class NavListAdapter extends BaseAdapter
                 break;
             case SubscriptionFragment.TAG:
                 icon = R.attr.ic_folder;
+                break;
+            case TrendingFragment.TAG:
+                icon = R.attr.ic_trending;
                 break;
             case AddFeedFragment.TAG:
                 icon = R.attr.content_new;
