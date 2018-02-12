@@ -20,7 +20,7 @@ test:
     - circle-android wait-for-boot
     # run tests  against the emulator.
     - ./gradlew assembleDebug
-    - ./gradlew connectedAndroidTest
+    - ./gradlew connectedFreeDebugAndroidTest
 
   post:
       - mkdir -p $CIRCLE_TEST_REPORTS/junit/
