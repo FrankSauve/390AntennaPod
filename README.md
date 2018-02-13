@@ -1,4 +1,4 @@
-# SOEN 390 Projet - Team Omega - AntennaPod 
+# SOEN 390 Project - Team Omega - AntennaPod 
 For our 390 project, we chose to use AntennaPod, an easy-to-use, flexible and open-source podcast manager for Android.
 
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png"
