@@ -1,6 +1,7 @@
 package de.danoeh.antennapod.fragment;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,6 +21,11 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import android.graphics.Color;
+
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.List;
@@ -36,6 +42,7 @@ import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.feed.FeedMedia;
+import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.DownloadService;
 import de.danoeh.antennapod.core.service.download.Downloader;
 import de.danoeh.antennapod.core.storage.DBReader;
@@ -48,6 +55,7 @@ import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
 import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 import de.greenrobot.event.EventBus;
+import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -176,92 +184,42 @@ public class AllEpisodesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
         if(!isAdded()) {
             return;
         }
         super.onCreateOptionsMenu(menu, inflater);
-        if (itemsLoaded) {
-            inflater.inflate(R.menu.episodes, menu);
-
-            MenuItem searchItem = menu.findItem(R.id.action_search);
-            final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
-            MenuItemUtils.adjustTextColor(getActivity(), sv);
-            sv.setQueryHint(getString(R.string.search_hint));
-            sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String s) {
-                    sv.clearFocus();
-                    ((MainActivity) getActivity()).loadChildFragment(SearchFragment.newInstance(s));
-                    return true;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String s) {
-                    return false;
-                }
-            });
-            isUpdatingFeeds = MenuItemUtils.updateRefreshMenuItem(menu, R.id.refresh_item, updateRefreshMenuItemChecker);
+        if(episodes != null) {
+            inflater.inflate(R.menu.downloads_completed, menu);
+            MenuItem episodeActions = menu.findItem(R.id.episode_actions);
+            if(episodes.size() > 0) {
+                int[] attrs = {R.attr.action_bar_icon_color};
+                TypedArray ta = getActivity().obtainStyledAttributes(UserPreferences.getTheme(), attrs);
+                int textColor = ta.getColor(0, Color.GRAY);
+                ta.recycle();
+                episodeActions.setIcon(new IconDrawable(getActivity(),
+                        FontAwesomeIcons.fa_gears).color(textColor).actionBarSize());
+                episodeActions.setVisible(true);
+            } else {
+                episodeActions.setVisible(false);
+            }
         }
-    }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        MenuItem markAllRead = menu.findItem(R.id.mark_all_read_item);
-        if (markAllRead != null) {
-            markAllRead.setVisible(!showOnlyNewEpisodes() && episodes != null && !episodes.isEmpty());
-        }
-        MenuItem markAllSeen = menu.findItem(R.id.mark_all_seen_item);
-        if(markAllSeen != null) {
-            markAllSeen.setVisible(showOnlyNewEpisodes() && episodes != null && !episodes.isEmpty());
-        }
+
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (!super.onOptionsItemSelected(item)) {
-            switch (item.getItemId()) {
-                case R.id.refresh_item:
-                    List<Feed> feeds = ((MainActivity) getActivity()).getFeeds();
-                    if (feeds != null) {
-                        DBTasks.refreshAllFeeds(getActivity(), feeds);
-                    }
-                    return true;
-                case R.id.mark_all_read_item:
-                    ConfirmationDialog markAllReadConfirmationDialog = new ConfirmationDialog(getActivity(),
-                            R.string.mark_all_read_label,
-                            R.string.mark_all_read_confirmation_msg) {
-
-                        @Override
-                        public void onConfirmButtonPressed(DialogInterface dialog) {
-                            dialog.dismiss();
-                            DBWriter.markAllItemsRead();
-                            Toast.makeText(getActivity(), R.string.mark_all_read_msg, Toast.LENGTH_SHORT).show();
-                        }
-                    };
-                    markAllReadConfirmationDialog.createNewDialog().show();
-                    return true;
-                case R.id.mark_all_seen_item:
-                    ConfirmationDialog markAllSeenConfirmationDialog = new ConfirmationDialog(getActivity(),
-                            R.string.mark_all_seen_label,
-                            R.string.mark_all_seen_confirmation_msg) {
-
-                        @Override
-                        public void onConfirmButtonPressed(DialogInterface dialog) {
-                            dialog.dismiss();
-                            DBWriter.markNewItemsSeen();
-                            Toast.makeText(getActivity(), R.string.mark_all_seen_msg, Toast.LENGTH_SHORT).show();
-                        }
-                    };
-                    markAllSeenConfirmationDialog.createNewDialog().show();
-                    return true;
-                default:
-                    return false;
-            }
-        } else {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.episode_actions:
+                EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
+                        .newInstance(episodes, EpisodesApplyActionFragment.ACTION_DOWNLOAD_PAGE);
+                ((MainActivity) getActivity()).loadChildFragment(fragment);
+                return true;
+            default:
+                return false;
         }
-
     }
 
     @Override
