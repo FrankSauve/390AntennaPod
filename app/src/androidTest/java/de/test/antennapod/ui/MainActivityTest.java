@@ -296,5 +296,23 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(solo.searchText("Trump Stories: Collusion"));
     }
 
+    public void testAddToQueueFromEpisodes(){
+        this.downloadEpisode();
+
+        solo.clickOnText(solo.getString(R.string.episodes_label));
+        solo.sleep(5000);
+
+        //Click on multiple selection (Works on nexus 5, not sure about other devices)
+        solo.clickOnScreen(1015, 152);
+
+        solo.clickOnText(solo.getString(R.string.add_to_queue_label));
+
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.queue_label));
+
+        //Assert that the podcast was added to queue
+        assertTrue(solo.searchText("Trump Stories: Collusion"));
+    }
+
 
 }
