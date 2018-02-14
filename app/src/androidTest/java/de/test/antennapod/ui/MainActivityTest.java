@@ -240,4 +240,61 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals(1 - 1 /** Added -1 because of broken behavior*/, hidden.size());
 //        assertTrue(hidden.contains(DownloadsFragment.TAG));
     }
+
+    /**
+     * Downloads a single podcast episode
+     */
+    public void downloadEpisode(){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+        solo.clickOnText("Embedded - NPR"); //  To be changed if this podcast is not trending anymore
+
+        //Needs to be clicked twice for some reason
+        solo.clickOnText(solo.getString(R.string.subscribe_label));
+        solo.waitForText(solo.getString(R.string.subscribe_label));
+        solo.clickOnText(solo.getString(R.string.subscribe_label));
+
+        solo.waitForText(solo.getString(R.string.open_podcast));
+        solo.clickOnText(solo.getString(R.string.open_podcast));
+
+        // To be changed if this episode does not appear anymore
+        solo.waitForText("Trump Stories: Collusion");
+        solo.clickOnText("Trump Stories: Collusion");
+
+        solo.waitForText(solo.getString(R.string.download_label));
+        solo.clickOnText(solo.getString(R.string.download_label));
+
+        // Wait for download to finish
+        while(solo.searchText(solo.getString(R.string.cancel_label))){
+            solo.sleep(10000);
+        }
+
+        // Go back
+        solo.clickOnImageButton(0);
+
+        openNavDrawer();
+
+        // Go to downloads tab
+        solo.clickOnText(solo.getString(R.string.downloads_label));
+    }
+
+    public void testAddToQueueFromDownloads(){
+        this.downloadEpisode();
+
+        solo.clickOnText(solo.getString(R.string.downloads_completed_label));
+        solo.sleep(5000);
+
+        //Click on multiple selection (Works on nexus 5, not sure about other devices)
+        solo.clickOnScreen(1015, 152);
+
+        solo.clickOnText(solo.getString(R.string.add_to_queue_label));
+
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.queue_label));
+
+        //Assert that the podcast was added to queue
+        assertTrue(solo.searchText("Trump Stories: Collusion"));
+    }
+
+
 }
