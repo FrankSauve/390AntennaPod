@@ -62,4 +62,14 @@ public class FeedItemTest extends AndroidTestCase {
         assertTrue(originalImage == original.getImage());
     }
 
+    public void testMarkAsPlayed(){
+        original.setPlayed(true);
+        assertTrue(original.isPlayed());
+    }
+
+    public void testMarkAsUnplayed(){
+        original.setPlayed(false);
+        assertFalse(original.isPlayed());
+    }
+    
 }
