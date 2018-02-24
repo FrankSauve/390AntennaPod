@@ -257,6 +257,11 @@
     <string name="descending">Descending</string>
     <string name="clear_queue_confirmation_msg">Please confirm that you want to clear the queue of ALL of the episodes in it</string>
 
+    <!-- iTunes Sort -->
+    <string name="category">Category</string>
+    <string name="author">Author</string>
+    <string name="release_title">Release Title</string>
+
     <!-- Flattr -->
     <string name="flattr_auth_label">Flattr sign-in</string>
     <string name="flattr_auth_explanation">Press the button below to start the authentication process. You will be forwarded to the flattr login screen in your browser and be asked to give AntennaPod the permission to flattr things. After you have given permission, you will return to this screen automatically.</string>
