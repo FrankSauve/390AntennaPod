@@ -227,7 +227,7 @@ public class TrendingFragment extends Fragment {
         });
     }
 
-    private void loadToplist() {
+    public void loadToplist() {
         if (subscription != null) {
             subscription.unsubscribe();
         }
@@ -358,6 +358,10 @@ public class TrendingFragment extends Fragment {
                     butRetry.setOnClickListener(v -> search(query));
                     butRetry.setVisibility(View.VISIBLE);
                 });
+    }
+
+    public List<Podcast> getTopList(){
+        return this.topList;
     }
 
 }
