@@ -256,7 +256,7 @@ public class ItunesSearchFragment extends Fragment {
                         }
                         if(response.isSuccessful()) {
                             String resultString = response.body().string();
-                            System.out.println(resultString);
+                            //System.out.println(resultString);
                             JSONObject result = new JSONObject(resultString);
                             JSONObject feed = result.getJSONObject("feed");
                             JSONArray entries = feed.getJSONArray("entry");
@@ -293,7 +293,7 @@ public class ItunesSearchFragment extends Fragment {
                 });
     }
 
-    private void search(String query) {
+    public void search(String query) {
         if (subscription != null) {
             subscription.unsubscribe();
         }
@@ -364,5 +364,10 @@ public class ItunesSearchFragment extends Fragment {
     public List<Podcast> getTopList(){
         return this.topList;
     }
+
+    public List<Podcast> getSearchResults(){
+        return this.searchResults;
+    }
+
 
 }

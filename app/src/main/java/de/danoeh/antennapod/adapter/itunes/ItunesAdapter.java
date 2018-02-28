@@ -105,17 +105,45 @@ public class ItunesAdapter extends ArrayAdapter<ItunesAdapter.Podcast> {
          */
         @Nullable
         public final String imageUrl;
+
         /**
          * URL of the podcast feed
          */
         @Nullable
         public final String feedUrl;
 
+        /**
+         * Category of the podcast feed
+         */
+        @Nullable
+        public final String category;
 
-        private Podcast(String title, @Nullable String imageUrl, @Nullable String feedUrl) {
+        /**
+         * Arstist of the podcast feed
+         */
+        @Nullable
+        public final String artist;
+
+        /**
+         * Language of the podcast feed
+         */
+        @Nullable
+        public final String lang;
+
+        private Podcast(String title, @Nullable String imageUrl, @Nullable String feedUrl, @Nullable String category,
+                        @Nullable String artist, @Nullable String lang) {
             this.title = title;
             this.imageUrl = imageUrl;
             this.feedUrl = feedUrl;
+            this.category = category;
+            this.artist = artist;
+            this.lang = lang;
+        }
+
+        public String getPodcastInfo(){
+
+            return "\ntitle: " + this.title + "\nimageUrl: " + this.imageUrl + "\nfeedUrl: " + this.feedUrl + "\ncategory: " +
+                    this.category + "\nartist: " + this.artist + "\nlang: " + this.lang;
         }
 
         /**
@@ -128,11 +156,15 @@ public class ItunesAdapter extends ArrayAdapter<ItunesAdapter.Podcast> {
             String title = json.optString("collectionName", "");
             String imageUrl = json.optString("artworkUrl100", null);
             String feedUrl = json.optString("feedUrl", null);
-            return new Podcast(title, imageUrl, feedUrl);
+            String category = json.optString("primaryGenreName", "");
+            String artist = json.optString("artistName", "");
+            String lang = json.optString("country", "").toLowerCase().substring(0,2);
+            return new Podcast(title, imageUrl, feedUrl, category , artist, lang);
         }
 
         public static Podcast fromSearch(SearchHit searchHit) {
-            return new Podcast(searchHit.getTitle(), searchHit.getImageUrl(), searchHit.getXmlUrl());
+            return new Podcast(searchHit.getTitle(), searchHit.getImageUrl(), searchHit.getXmlUrl(), searchHit.getCategories().get(searchHit).toString(),
+                    searchHit.getAuthor(), searchHit.getLanguage());
         }
 
         /**
@@ -154,10 +186,14 @@ public class ItunesAdapter extends ArrayAdapter<ItunesAdapter.Podcast> {
             }
             String feedUrl = "https://itunes.apple.com/lookup?id=" +
                     json.getJSONObject("id").getJSONObject("attributes").getString("im:id");
-            return new Podcast(title, imageUrl, feedUrl);
+            String category = json.getJSONObject("category").getJSONObject("attributes").getString("label");
+            String artist = json.getJSONObject("im:artist").getString("label");
+            String lang = json.getJSONObject("category").getJSONObject("attributes").getString("scheme").substring(25,27);
+            return new Podcast(title, imageUrl, feedUrl, category, artist, lang);
         }
 
     }
+
 
     /**
      * View holder object for the GridView
