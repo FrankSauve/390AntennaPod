@@ -1,7 +1,9 @@
 package de.danoeh.antennapod.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
@@ -31,10 +33,17 @@ import java.util.List;
 import java.util.Locale;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.activity.OnlineFeedViewActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
+import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
+import de.danoeh.antennapod.core.feed.Feed;
+import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
+import de.danoeh.antennapod.core.storage.DBTasks;
+import de.danoeh.antennapod.core.storage.DBWriter;
+import de.danoeh.antennapod.core.util.QueueSorter;
 import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -53,6 +62,24 @@ public class ItunesSearchFragment extends Fragment {
 
     private static final String API_URL = "https://itunes.apple.com/search?media=podcast&term=%s";
 
+    //itunes api genre ids to search podcasts by category
+    public static final int ARTS_GENRE_ID = 1301;
+    public static final int COMEDY_GENRE_ID = 1303;
+    public static final int EDUCATION_GENRE_ID = 1304;
+    public static final int KIDS_AND_FAMILY_GENRE_ID = 1305;
+    public static final int HEALTH_GENRE_ID = 1307;
+    public static final int TV_AND_FILM_GENRE_ID = 1309;
+    public static final int MUSIC_GENRE_ID = 1310;
+    public static final int NEWS_AND_POLITICS_GENRE_ID = 1311;
+    public static final int RELIGION_AND_SPIRITUALITY_GENRE_ID = 1314;
+    public static final int SCIENCE_AND_MEDECINE_GENRE_ID = 1315;
+    public static final int SPORTS_AND_RECREATION_GENRE_ID = 1316;
+    public static final int TECHNOLOGY_GENRE_ID = 1318;
+    public static final int BUSINESS_GENRE_ID = 1321;
+    public static final int GAMES_AND_HOBBIES_GENRE_ID = 1323;
+    public static final int SOCIETY_AND_CULTURE_GENRE_ID = 1324;
+    public static final int GOVERNMENT_AND_ORGANIZATION_GENRE_ID = 1325;
+
 
     /**
      * Adapter responsible with the search results
@@ -68,6 +95,7 @@ public class ItunesSearchFragment extends Fragment {
      * List of podcasts retreived from the search
      */
     private List<Podcast> searchResults;
+    private List<Podcast> categorySearchResults;
     private List<Podcast> topList;
     private Subscription subscription;
 
@@ -227,6 +255,67 @@ public class ItunesSearchFragment extends Fragment {
         });
     }
 
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (!super.onOptionsItemSelected(item)) {
+            switch (item.getItemId()) {
+                //Categoy items
+                case R.id.search_arts:
+                    loadCategory(ARTS_GENRE_ID);
+                    return true;
+                case R.id.search_comedy:
+                    loadCategory(COMEDY_GENRE_ID);
+                    return true;
+                case R.id.search_news_politics:
+                    loadCategory(NEWS_AND_POLITICS_GENRE_ID);
+                    return true;
+                case R.id.search_kids_family:
+                    loadCategory(KIDS_AND_FAMILY_GENRE_ID);
+                    return true;
+                case R.id.search_games_hobbies:
+                    loadCategory(GAMES_AND_HOBBIES_GENRE_ID);
+                    return true;
+                case R.id.search_government_organization:
+                    loadCategory(GOVERNMENT_AND_ORGANIZATION_GENRE_ID);
+                    return true;
+                case R.id.search_technology:
+                    loadCategory(TECHNOLOGY_GENRE_ID);
+                    return true;
+                case R.id.search_tv_film:
+                    loadCategory(TV_AND_FILM_GENRE_ID);
+                    return true;
+                case R.id.search_education:
+                    loadCategory(EDUCATION_GENRE_ID);
+                    return true;
+                case R.id.search_health:
+                    loadCategory(HEALTH_GENRE_ID);
+                    return true;
+                case R.id.search_science_medecine:
+                    loadCategory(SCIENCE_AND_MEDECINE_GENRE_ID);
+                    return true;
+                case R.id.search_society_culture:
+                    loadCategory(SOCIETY_AND_CULTURE_GENRE_ID);
+                    return true;
+                case R.id.search_music:
+                    loadCategory(MUSIC_GENRE_ID);
+                    return true;
+                case R.id.search_religion_spirituality:
+                    loadCategory(RELIGION_AND_SPIRITUALITY_GENRE_ID);
+                    return true;
+                case R.id.search_sports_recreation:
+                    loadCategory(SPORTS_AND_RECREATION_GENRE_ID);
+                    return true;
+                case R.id.search_business:
+                    loadCategory(BUSINESS_GENRE_ID);
+                    return true;
+                //Language items
+                default:
+                    return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
     public void loadToplist() {
         if (subscription != null) {
             subscription.unsubscribe();
@@ -360,6 +449,73 @@ public class ItunesSearchFragment extends Fragment {
                 });
     }
 
+    //Load top 100 podcasts by the category corresponding to the genreId passed in
+    public void loadCategory(int genreId){
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+        gridView.setVisibility(View.GONE);
+        txtvError.setVisibility(View.GONE);
+        butRetry.setVisibility(View.GONE);
+        txtvEmpty.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        subscription = Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
+            String lang = Locale.getDefault().getLanguage();
+            String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+            OkHttpClient client = AntennapodHttpClient.getHttpClient();
+            Request.Builder httpReq = new Request.Builder()
+                    .url(url)
+                    .header("User-Agent", ClientConfig.USER_AGENT);
+            List<Podcast> results = new ArrayList<>();
+            try {
+                Response response = client.newCall(httpReq.build()).execute();
+                if(!response.isSuccessful()) {
+                    // toplist for language does not exist, fall back to united states
+                    url = "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+                    httpReq = new Request.Builder()
+                            .url(url)
+                            .header("User-Agent", ClientConfig.USER_AGENT);
+                    response = client.newCall(httpReq.build()).execute();
+                }
+                if(response.isSuccessful()) {
+                    String resultString = response.body().string();
+                    //System.out.println(resultString);
+                    JSONObject result = new JSONObject(resultString);
+                    JSONObject feed = result.getJSONObject("feed");
+                    JSONArray entries = feed.getJSONArray("entry");
+
+                    for(int i=0; i < entries.length(); i++) {
+                        JSONObject json = entries.getJSONObject(i);
+                        Podcast podcast = Podcast.fromToplist(json);
+                        results.add(podcast);
+                    }
+                }
+                else {
+                    String prefix = getString(R.string.error_msg_prefix);
+                    subscriber.onError(new IOException(prefix + response));
+                }
+            } catch (IOException | JSONException e) {
+                subscriber.onError(e);
+            }
+            subscriber.onNext(results);
+            subscriber.onCompleted();
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(podcasts -> {
+                    progressBar.setVisibility(View.GONE);
+                    categorySearchResults = podcasts;
+                    updateData(categorySearchResults);
+                }, error -> {
+                    Log.e(TAG, Log.getStackTraceString(error));
+                    progressBar.setVisibility(View.GONE);
+                    txtvError.setText(error.toString());
+                    txtvError.setVisibility(View.VISIBLE);
+                    butRetry.setOnClickListener(v -> loadToplist());
+                    butRetry.setVisibility(View.VISIBLE);
+                });
+
+    }
 
     public List<Podcast> getTopList(){
         return this.topList;
@@ -369,5 +525,7 @@ public class ItunesSearchFragment extends Fragment {
         return this.searchResults;
     }
 
-
+    public List<Podcast> getCategorySearchResults(){
+        return this.categorySearchResults;
+    }
 }

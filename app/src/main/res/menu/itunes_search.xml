@@ -31,6 +31,9 @@
                         android:id="@+id/search_arts"
                         android:title="@string/arts"/>
                     <item
+                        android:id="@+id/search_business"
+                        android:title="@string/business"/>
+                    <item
                         android:id="@+id/search_comedy"
                         android:title="@string/comedy"/>
                     <item
