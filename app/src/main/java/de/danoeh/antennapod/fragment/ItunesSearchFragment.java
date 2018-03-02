@@ -33,17 +33,10 @@ import java.util.List;
 import java.util.Locale;
 
 import de.danoeh.antennapod.R;
-import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.activity.OnlineFeedViewActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
-import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
-import de.danoeh.antennapod.core.feed.Feed;
-import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
-import de.danoeh.antennapod.core.storage.DBTasks;
-import de.danoeh.antennapod.core.storage.DBWriter;
-import de.danoeh.antennapod.core.util.QueueSorter;
 import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -96,6 +89,7 @@ public class ItunesSearchFragment extends Fragment {
      */
     private List<Podcast> searchResults;
     private List<Podcast> categorySearchResults;
+    private List<Podcast> languageSearchResults;
     private List<Podcast> topList;
     private Subscription subscription;
 
@@ -308,6 +302,36 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(BUSINESS_GENRE_ID);
                     return true;
                 //Language items
+                case R.id.search_fr:
+                    loadByLanguage("fr");
+                    return true;
+                case R.id.search_es:
+                    loadByLanguage("es");
+                    return true;
+                case R.id.search_us:
+                    loadByLanguage("us");
+                    return true;
+                case R.id.search_ca:
+                    loadByLanguage("ca");
+                    return true;
+                case R.id.search_ar:
+                    loadByLanguage("ar");
+                    return true;
+                case R.id.search_de:
+                    loadByLanguage("de");
+                    return true;
+                case R.id.search_nl:
+                    loadByLanguage("nl");
+                    return true;
+                case R.id.search_pt:
+                    loadByLanguage("pt");
+                    return true;
+                case R.id.search_it:
+                    loadByLanguage("it");
+                    return true;
+                case R.id.search_ru:
+                    loadByLanguage("ru");
+                    return true;
                 default:
                     return false;
             }
@@ -517,6 +541,64 @@ public class ItunesSearchFragment extends Fragment {
 
     }
 
+    //Load top 100 podcasts in the language passed in
+    public void loadByLanguage(String lang){
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+        gridView.setVisibility(View.GONE);
+        txtvError.setVisibility(View.GONE);
+        butRetry.setVisibility(View.GONE);
+        txtvEmpty.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        subscription = Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
+            String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=100/json";
+            OkHttpClient client = AntennapodHttpClient.getHttpClient();
+            Request.Builder httpReq = new Request.Builder()
+                    .url(url)
+                    .header("User-Agent", ClientConfig.USER_AGENT);
+            List<Podcast> results = new ArrayList<>();
+            try {
+                Response response = client.newCall(httpReq.build()).execute();
+                if(response.isSuccessful()) {
+                    String resultString = response.body().string();
+                    JSONObject result = new JSONObject(resultString);
+                    JSONObject feed = result.getJSONObject("feed");
+                    JSONArray entries = feed.getJSONArray("entry");
+
+                    for(int i=0; i < entries.length(); i++) {
+                        JSONObject json = entries.getJSONObject(i);
+                        Podcast podcast = Podcast.fromToplist(json);
+                        results.add(podcast);
+                    }
+                }
+                else {
+                    String prefix = getString(R.string.error_msg_prefix);
+                    subscriber.onError(new IOException(prefix + response));
+                }
+            } catch (IOException | JSONException e) {
+                subscriber.onError(e);
+            }
+            subscriber.onNext(results);
+            subscriber.onCompleted();
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(podcasts -> {
+                    progressBar.setVisibility(View.GONE);
+                    languageSearchResults = podcasts;
+                    updateData(languageSearchResults);
+                }, error -> {
+                    Log.e(TAG, Log.getStackTraceString(error));
+                    progressBar.setVisibility(View.GONE);
+                    txtvError.setText(error.toString());
+                    txtvError.setVisibility(View.VISIBLE);
+                    butRetry.setOnClickListener(v -> loadToplist());
+                    butRetry.setVisibility(View.VISIBLE);
+                });
+
+    }
+
     public List<Podcast> getTopList(){
         return this.topList;
     }
@@ -527,5 +609,9 @@ public class ItunesSearchFragment extends Fragment {
 
     public List<Podcast> getCategorySearchResults(){
         return this.categorySearchResults;
+    }
+
+    public List<Podcast> getLanguageSearchResults(){
+        return this.languageSearchResults;
     }
 }
