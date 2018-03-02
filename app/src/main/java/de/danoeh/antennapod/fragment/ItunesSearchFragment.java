@@ -220,14 +220,16 @@ public class ItunesSearchFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.itunes_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
+        //MenuItem advancedSearchItem = menu.findItem(R.id.itunes_advanced_search);
         final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
+        //MenuItemCompat.setActionView(advancedSearchItem, View.GONE);
         MenuItemUtils.adjustTextColor(getActivity(), sv);
         sv.setQueryHint(getString(R.string.search_itunes_label));
         sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 sv.clearFocus();
-                search(s);
+                search(s, searchItem);
                 return true;
             }
 
@@ -260,12 +262,13 @@ public class ItunesSearchFragment extends Fragment {
                 case R.id.itunes_search_artist:
                     final SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
                     MenuItemUtils.adjustTextColor(getActivity(), sv);
+
                     sv.setQueryHint(getString(R.string.artist_search));
                     sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
                         @Override
                         public boolean onQueryTextSubmit(String s) {
                             sv.clearFocus();
-                            searchArtists(s);
+                            search(s, item);
                             return true;
                         }
 
@@ -444,7 +447,7 @@ public class ItunesSearchFragment extends Fragment {
                 });
     }
 
-    public void search(String query) {
+    public void search(String query, MenuItem item) {
         if (subscription != null) {
             subscription.unsubscribe();
         }
@@ -455,6 +458,7 @@ public class ItunesSearchFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         subscription = rx.Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
                     String encodedQuery = null;
+                    String formattedUrl = null;
                     try {
                         encodedQuery = URLEncoder.encode(query, "UTF-8");
                     } catch (UnsupportedEncodingException e) {
@@ -464,8 +468,16 @@ public class ItunesSearchFragment extends Fragment {
                         encodedQuery = query; // failsafe
                     }
 
-                    //Spaces in the query need to be replaced with '+' character.
-                    String formattedUrl = String.format(API_URL, query).replace(' ', '+');
+                    //If it is an artist search we use the API url for artist search
+                    if(item.getTitle().equals("Artist")){
+                        //Spaces in the query need to be replaced with '+' character.
+                        formattedUrl = String.format(API_URL_ARTIST_SEARCH, query).replace(' ', '+');
+                    }
+                    else{
+                        //Spaces in the query need to be replaced with '+' character.
+                        formattedUrl = String.format(API_URL, query).replace(' ', '+');
+                    }
+
 
                     OkHttpClient client = AntennapodHttpClient.getHttpClient();
                     Request.Builder httpReq = new Request.Builder()
@@ -506,74 +518,7 @@ public class ItunesSearchFragment extends Fragment {
                     progressBar.setVisibility(View.GONE);
                     txtvError.setText(error.toString());
                     txtvError.setVisibility(View.VISIBLE);
-                    butRetry.setOnClickListener(v -> search(query));
-                    butRetry.setVisibility(View.VISIBLE);
-                });
-    }
-
-    public void searchArtists(String query) {
-        if (subscription != null) {
-            subscription.unsubscribe();
-        }
-        gridView.setVisibility(View.GONE);
-        txtvError.setVisibility(View.GONE);
-        butRetry.setVisibility(View.GONE);
-        txtvEmpty.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-        subscription = rx.Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
-            String encodedQuery = null;
-            try {
-                encodedQuery = URLEncoder.encode(query, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                // this won't ever be thrown
-            }
-            if (encodedQuery == null) {
-                encodedQuery = query; // failsafe
-            }
-
-            //Spaces in the query need to be replaced with '+' character.
-            String formattedUrl = String.format(API_URL_ARTIST_SEARCH, query).replace(' ', '+');
-
-            OkHttpClient client = AntennapodHttpClient.getHttpClient();
-            Request.Builder httpReq = new Request.Builder()
-                    .url(formattedUrl)
-                    .header("User-Agent", ClientConfig.USER_AGENT);
-            List<Podcast> podcasts = new ArrayList<>();
-            try {
-                Response response = client.newCall(httpReq.build()).execute();
-
-                if(response.isSuccessful()) {
-                    String resultString = response.body().string();
-                    JSONObject result = new JSONObject(resultString);
-                    JSONArray j = result.getJSONArray("results");
-
-                    for (int i = 0; i < j.length(); i++) {
-                        JSONObject podcastJson = j.getJSONObject(i);
-                        Podcast podcast = Podcast.fromSearch(podcastJson);
-                        podcasts.add(podcast);
-                    }
-                }
-                else {
-                    String prefix = getString(R.string.error_msg_prefix);
-                    subscriber.onError(new IOException(prefix + response));
-                }
-            } catch (IOException | JSONException e) {
-                subscriber.onError(e);
-            }
-            subscriber.onNext(podcasts);
-            subscriber.onCompleted();
-        })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(podcasts -> {
-                    progressBar.setVisibility(View.GONE);
-                    updateData(podcasts);
-                }, error -> {
-                    Log.e(TAG, Log.getStackTraceString(error));
-                    progressBar.setVisibility(View.GONE);
-                    txtvError.setText(error.toString());
-                    txtvError.setVisibility(View.VISIBLE);
-                    butRetry.setOnClickListener(v -> searchArtists(query));
+                    butRetry.setOnClickListener(v -> search(query, item));
                     butRetry.setVisibility(View.VISIBLE);
                 });
     }
@@ -718,5 +663,9 @@ public class ItunesSearchFragment extends Fragment {
 
     public List<Podcast> getLanguageSearchResults(){
         return this.languageSearchResults;
+    }
+
+    public List<Podcast> getArtistsSearchResults() {
+        return this.artistsSearchResults;
     }
 }
