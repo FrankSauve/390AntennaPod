@@ -93,7 +93,6 @@ public class ItunesSearchFragment extends Fragment {
     private List<Podcast> searchResults;
     private List<Podcast> categorySearchResults;
     private List<Podcast> languageSearchResults;
-    private List<Podcast> artistsSearchResults;
     private List<Podcast> topList;
     private Subscription subscription;
 
@@ -262,7 +261,6 @@ public class ItunesSearchFragment extends Fragment {
                 case R.id.itunes_search_artist:
                     final SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
                     MenuItemUtils.adjustTextColor(getActivity(), sv);
-
                     sv.setQueryHint(getString(R.string.artist_search));
                     sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
                         @Override
@@ -663,9 +661,5 @@ public class ItunesSearchFragment extends Fragment {
 
     public List<Podcast> getLanguageSearchResults(){
         return this.languageSearchResults;
-    }
-
-    public List<Podcast> getArtistsSearchResults() {
-        return this.artistsSearchResults;
     }
 }
