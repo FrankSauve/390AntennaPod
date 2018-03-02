@@ -262,6 +262,7 @@
     <string name="artist">Artist</string>
     <string name="lang">Language</string>
     <string name="advanced_search">Advanced Search</string>
+    <string name="artist_search">Search Artist Name</string>
     <string name="arts">Arts</string>
     <string name="business">Business</string>
     <string name="comedy">Comedy</string>

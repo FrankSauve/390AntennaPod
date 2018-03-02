@@ -55,6 +55,9 @@ public class ItunesSearchFragment extends Fragment {
 
     private static final String API_URL = "https://itunes.apple.com/search?media=podcast&term=%s";
 
+    //itunes api url to search podcasts by artist name
+    private static final String API_URL_ARTIST_SEARCH  = "https://itunes.apple.com/search?entity=podcast&attribute=artistTerm&term=%s";
+
     //itunes api genre ids to search podcasts by category
     public static final int ARTS_GENRE_ID = 1301;
     public static final int COMEDY_GENRE_ID = 1303;
@@ -90,6 +93,7 @@ public class ItunesSearchFragment extends Fragment {
     private List<Podcast> searchResults;
     private List<Podcast> categorySearchResults;
     private List<Podcast> languageSearchResults;
+    private List<Podcast> artistsSearchResults;
     private List<Podcast> topList;
     private Subscription subscription;
 
@@ -252,6 +256,40 @@ public class ItunesSearchFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (!super.onOptionsItemSelected(item)) {
             switch (item.getItemId()) {
+                //Artist item
+                case R.id.itunes_search_artist:
+                    final SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
+                    MenuItemUtils.adjustTextColor(getActivity(), sv);
+                    sv.setQueryHint(getString(R.string.artist_search));
+                    sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String s) {
+                            sv.clearFocus();
+                            searchArtists(s);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String s) {
+                            return false;
+                        }
+                    });
+                    MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(MenuItem item) {
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(MenuItem item) {
+                            if(searchResults != null) {
+                                searchResults = null;
+                                updateData(topList);
+                            }
+                            return true;
+                        }
+                    });
+                    return true;
                 //Categoy items
                 case R.id.search_arts:
                     loadCategory(ARTS_GENRE_ID);
@@ -469,6 +507,73 @@ public class ItunesSearchFragment extends Fragment {
                     txtvError.setText(error.toString());
                     txtvError.setVisibility(View.VISIBLE);
                     butRetry.setOnClickListener(v -> search(query));
+                    butRetry.setVisibility(View.VISIBLE);
+                });
+    }
+
+    public void searchArtists(String query) {
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+        gridView.setVisibility(View.GONE);
+        txtvError.setVisibility(View.GONE);
+        butRetry.setVisibility(View.GONE);
+        txtvEmpty.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        subscription = rx.Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
+            String encodedQuery = null;
+            try {
+                encodedQuery = URLEncoder.encode(query, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // this won't ever be thrown
+            }
+            if (encodedQuery == null) {
+                encodedQuery = query; // failsafe
+            }
+
+            //Spaces in the query need to be replaced with '+' character.
+            String formattedUrl = String.format(API_URL_ARTIST_SEARCH, query).replace(' ', '+');
+
+            OkHttpClient client = AntennapodHttpClient.getHttpClient();
+            Request.Builder httpReq = new Request.Builder()
+                    .url(formattedUrl)
+                    .header("User-Agent", ClientConfig.USER_AGENT);
+            List<Podcast> podcasts = new ArrayList<>();
+            try {
+                Response response = client.newCall(httpReq.build()).execute();
+
+                if(response.isSuccessful()) {
+                    String resultString = response.body().string();
+                    JSONObject result = new JSONObject(resultString);
+                    JSONArray j = result.getJSONArray("results");
+
+                    for (int i = 0; i < j.length(); i++) {
+                        JSONObject podcastJson = j.getJSONObject(i);
+                        Podcast podcast = Podcast.fromSearch(podcastJson);
+                        podcasts.add(podcast);
+                    }
+                }
+                else {
+                    String prefix = getString(R.string.error_msg_prefix);
+                    subscriber.onError(new IOException(prefix + response));
+                }
+            } catch (IOException | JSONException e) {
+                subscriber.onError(e);
+            }
+            subscriber.onNext(podcasts);
+            subscriber.onCompleted();
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(podcasts -> {
+                    progressBar.setVisibility(View.GONE);
+                    updateData(podcasts);
+                }, error -> {
+                    Log.e(TAG, Log.getStackTraceString(error));
+                    progressBar.setVisibility(View.GONE);
+                    txtvError.setText(error.toString());
+                    txtvError.setVisibility(View.VISIBLE);
+                    butRetry.setOnClickListener(v -> searchArtists(query));
                     butRetry.setVisibility(View.VISIBLE);
                 });
     }

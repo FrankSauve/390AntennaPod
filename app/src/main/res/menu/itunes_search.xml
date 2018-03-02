@@ -19,6 +19,7 @@
             <item
                 android:id="@+id/itunes_search_artist"
                 android:title="@string/artist"
+                custom:showAsAction="collapseActionView|ifRoom"
                 custom:actionViewClass="android.support.v7.widget.SearchView">
             </item>
 
