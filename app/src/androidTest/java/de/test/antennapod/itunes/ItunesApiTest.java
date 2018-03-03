@@ -30,6 +30,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     private List<ItunesAdapter.Podcast> searchResults;
     private List<ItunesAdapter.Podcast> categorySearchResults;
     private List<ItunesAdapter.Podcast> languageSearchResults;
+    private String query = "Laura";
 
     MenuItem searchItem = new MenuItem() {
         public CharSequence title;
@@ -285,22 +286,6 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     public void testItunesStandardSearch() throws InterruptedException {
         //Request to itunes API
         searchItem.setTitle("Search iTunes");
-        String query = "Laura";
-        itunesSearchFragment.search(query, searchItem);
-
-        //Wait for request
-        Thread.sleep(5000);
-
-        searchResults = itunesSearchFragment.getSearchResults();
-
-        //Assertions
-        assertNotNull(searchResults);
-    }
-
-    public void testItunesTitleSearch() throws InterruptedException {
-        //Request to itunes API
-        searchItem.setTitle("Title");
-        String query = "Laura";
         itunesSearchFragment.search(query, searchItem);
 
         //Wait for request
@@ -311,7 +296,27 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         //Assertions
         assertNotNull(searchResults);
         for(int i = 0; i < searchResults.size(); i++){
-            //Assert that podcast object variable artist contains the query searched
+            //Assert that podcast object variable title or artist contains the query searched as part of the standard search
+            String title = searchResults.get(i).title;
+            String artist = searchResults.get(i).artist;
+            assertTrue(title.contains(query) || artist.contains(query));
+        }
+    }
+
+    public void testItunesTitleSearch() throws InterruptedException {
+        //Request to itunes API
+        searchItem.setTitle("Title");
+        itunesSearchFragment.search(query, searchItem);
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        searchResults = itunesSearchFragment.getSearchResults();
+
+        //Assertions
+        assertNotNull(searchResults);
+        for(int i = 0; i < searchResults.size(); i++){
+            //Assert that podcast object variable title contains the query searched
             assertTrue(searchResults.get(i).title.contains(query));
         }
     }
@@ -319,7 +324,6 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     public void testItunesArtistSearch() throws InterruptedException {
         //Request to itunes API
         searchItem.setTitle("Artist");
-        String query = "Laura";
         itunesSearchFragment.search(query, searchItem);
 
         //Wait for request
@@ -370,7 +374,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         assertNotNull(languageSearchResults);
         assertEquals(100, languageSearchResults.size()); //limit = 100
         for(int i = 0; i < languageSearchResults.size(); i++){
-            //Assert that podcast object variable category contains the category and sub-categories searched
+            //Assert that podcast object variable language contains the language selected
             String language = languageSearchResults.get(i).lang;
             assertTrue(language.contains(lang));
         }

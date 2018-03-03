@@ -480,6 +480,7 @@ public class ItunesSearchFragment extends Fragment {
                 });
     }
 
+    //query has to be lowercase to only get podcast objects in the search
     public void search(String query, MenuItem item) {
         if (subscription != null) {
             subscription.unsubscribe();
@@ -498,22 +499,23 @@ public class ItunesSearchFragment extends Fragment {
                         // this won't ever be thrown
                     }
                     if (encodedQuery == null) {
-                        encodedQuery = query; // failsafe
+                        encodedQuery = query.toLowerCase(); // failsafe
                     }
 
                     //If it is an artist search we use the API url for artist search
                     if(item.getTitle().equals("Artist")){
                         //Spaces in the query need to be replaced with '+' character.
-                        formattedUrl = String.format(API_URL_ARTIST_SEARCH, query).replace(' ', '+');
+                        //query has to be lowercase to only get podcasts objects
+                        formattedUrl = String.format(API_URL_ARTIST_SEARCH, query.toLowerCase()).replace(' ', '+');
                     }
                     //If it is a title search we use the API url for title search
                     else if(item.getTitle().equals("Title")){
                         //Spaces in the query need to be replaced with '+' character.
-                        formattedUrl = String.format(API_URL_TITLE_SEARCH, query).replace(' ', '+');
+                        formattedUrl = String.format(API_URL_TITLE_SEARCH, query.toLowerCase()).replace(' ', '+');
                     }
                     //Else use standard API search url
                     else{
-                        formattedUrl = String.format(API_URL, query).replace(' ', '+');
+                        formattedUrl = String.format(API_URL, query.toLowerCase()).replace(' ', '+');
                     }
 
 
