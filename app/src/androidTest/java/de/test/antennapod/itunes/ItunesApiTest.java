@@ -282,6 +282,21 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         assertEquals( 25, topList.size());
     }
 
+    public void testItunesStandardSearch() throws InterruptedException {
+        //Request to itunes API
+        searchItem.setTitle("Search iTunes");
+        String query = "Laura";
+        itunesSearchFragment.search(query, searchItem);
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        searchResults = itunesSearchFragment.getSearchResults();
+
+        //Assertions
+        assertNotNull(searchResults);
+    }
+
     public void testItunesTitleSearch() throws InterruptedException {
         //Request to itunes API
         searchItem.setTitle("Title");

@@ -53,6 +53,8 @@ public class ItunesSearchFragment extends Fragment {
 
     private static final String TAG = "ItunesSearchFragment";
 
+    private static final String API_URL = "https://itunes.apple.com/search?media=podcast&term=%s";
+
     //itunes api url to search podcasts by title name
     private static final String API_URL_TITLE_SEARCH = "https://itunes.apple.com/search?entity=podcast&attribute=titleTerm&term=%s";
 
@@ -219,10 +221,8 @@ public class ItunesSearchFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.itunes_search, menu);
-        /*MenuItem searchItem = menu.findItem(R.id.action_search);
-        //MenuItem advancedSearchItem = menu.findItem(R.id.itunes_advanced_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
-        //MenuItemCompat.setActionView(advancedSearchItem, View.GONE);
         MenuItemUtils.adjustTextColor(getActivity(), sv);
         sv.setQueryHint(getString(R.string.search_itunes_label));
         sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
@@ -252,7 +252,7 @@ public class ItunesSearchFragment extends Fragment {
                 }
                 return true;
             }
-        });*/
+        });
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -510,6 +510,10 @@ public class ItunesSearchFragment extends Fragment {
                     else if(item.getTitle().equals("Title")){
                         //Spaces in the query need to be replaced with '+' character.
                         formattedUrl = String.format(API_URL_TITLE_SEARCH, query).replace(' ', '+');
+                    }
+                    //Else use standard API search url
+                    else{
+                        formattedUrl = String.format(API_URL, query).replace(' ', '+');
                     }
 
 
