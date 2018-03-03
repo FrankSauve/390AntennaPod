@@ -260,9 +260,11 @@
     <!-- iTunes Search -->
     <string name="category">Category</string>
     <string name="artist">Artist</string>
+    <string name="title">Title</string>
     <string name="lang">Language</string>
     <string name="advanced_search">Advanced Search</string>
-    <string name="artist_search">Search Artist Name</string>
+    <string name="artist_search">Search Artist</string>
+    <string name="title_search">Search Title</string>
     <string name="arts">Arts</string>
     <string name="business">Business</string>
     <string name="comedy">Comedy</string>

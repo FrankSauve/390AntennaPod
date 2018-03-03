@@ -55,6 +55,9 @@ public class ItunesSearchFragment extends Fragment {
 
     private static final String API_URL = "https://itunes.apple.com/search?media=podcast&term=%s";
 
+    //itunes api url to search podcasts by title name
+    private static final String API_URL_TITLE_SEARCH = "https://itunes.apple.com/search?entity=podcast&attribute=titleTerm&term=%s";
+
     //itunes api url to search podcasts by artist name
     private static final String API_URL_ARTIST_SEARCH  = "https://itunes.apple.com/search?entity=podcast&attribute=artistTerm&term=%s";
 
@@ -219,9 +222,7 @@ public class ItunesSearchFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.itunes_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        //MenuItem advancedSearchItem = menu.findItem(R.id.itunes_advanced_search);
         final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
-        //MenuItemCompat.setActionView(advancedSearchItem, View.GONE);
         MenuItemUtils.adjustTextColor(getActivity(), sv);
         sv.setQueryHint(getString(R.string.search_itunes_label));
         sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
@@ -259,9 +260,43 @@ public class ItunesSearchFragment extends Fragment {
             switch (item.getItemId()) {
                 //Artist item
                 case R.id.itunes_search_artist:
-                    final SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
+                    SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
                     MenuItemUtils.adjustTextColor(getActivity(), sv);
                     sv.setQueryHint(getString(R.string.artist_search));
+                    sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String s) {
+                            sv.clearFocus();
+                            search(s, item);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String s) {
+                            return false;
+                        }
+                    });
+                    MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(MenuItem item) {
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(MenuItem item) {
+                            if(searchResults != null) {
+                                searchResults = null;
+                                updateData(topList);
+                            }
+                            return true;
+                        }
+                    });
+                    return true;
+                //Title item
+                case R.id.itunes_search_title:
+                    sv = (SearchView) MenuItemCompat.getActionView(item);
+                    MenuItemUtils.adjustTextColor(getActivity(), sv);
+                    sv.setQueryHint(getString(R.string.title_search));
                     sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
                         @Override
                         public boolean onQueryTextSubmit(String s) {
@@ -445,6 +480,7 @@ public class ItunesSearchFragment extends Fragment {
                 });
     }
 
+    //query has to be lowercase to only get podcast objects in the search
     public void search(String query, MenuItem item) {
         if (subscription != null) {
             subscription.unsubscribe();
@@ -463,17 +499,23 @@ public class ItunesSearchFragment extends Fragment {
                         // this won't ever be thrown
                     }
                     if (encodedQuery == null) {
-                        encodedQuery = query; // failsafe
+                        encodedQuery = query.toLowerCase(); // failsafe
                     }
 
                     //If it is an artist search we use the API url for artist search
                     if(item.getTitle().equals("Artist")){
                         //Spaces in the query need to be replaced with '+' character.
-                        formattedUrl = String.format(API_URL_ARTIST_SEARCH, query).replace(' ', '+');
+                        //query has to be lowercase to only get podcasts objects
+                        formattedUrl = String.format(API_URL_ARTIST_SEARCH, query.toLowerCase()).replace(' ', '+');
                     }
-                    else{
+                    //If it is a title search we use the API url for title search
+                    else if(item.getTitle().equals("Title")){
                         //Spaces in the query need to be replaced with '+' character.
-                        formattedUrl = String.format(API_URL, query).replace(' ', '+');
+                        formattedUrl = String.format(API_URL_TITLE_SEARCH, query.toLowerCase()).replace(' ', '+');
+                    }
+                    //Else use standard API search url
+                    else{
+                        formattedUrl = String.format(API_URL, query.toLowerCase()).replace(' ', '+');
                     }
 
 
