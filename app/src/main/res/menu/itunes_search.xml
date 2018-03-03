@@ -10,4 +10,119 @@
         custom:actionViewClass="android.support.v7.widget.SearchView"
         android:title="@string/search_label"/>
 
+    <item
+        android:id="@+id/itunes_advanced_search"
+        android:title="@string/advanced_search">
+
+        <menu>
+
+            <item
+                android:id="@+id/itunes_search_title"
+                custom:showAsAction="collapseActionView|ifRoom"
+                custom:actionViewClass="android.support.v7.widget.SearchView"
+                android:title="@string/title">
+            </item>
+
+            <item
+                android:id="@+id/itunes_search_artist"
+                android:title="@string/artist"
+                custom:showAsAction="collapseActionView|ifRoom"
+                custom:actionViewClass="android.support.v7.widget.SearchView">
+            </item>
+
+            <item
+                android:id="@+id/itunes_search_category"
+                android:title="@string/category">
+
+                <menu>
+                    <item
+                        android:id="@+id/search_arts"
+                        android:title="@string/arts"/>
+                    <item
+                        android:id="@+id/search_business"
+                        android:title="@string/business"/>
+                    <item
+                        android:id="@+id/search_comedy"
+                        android:title="@string/comedy"/>
+                    <item
+                        android:id="@+id/search_education"
+                        android:title="@string/education"/>
+                    <item
+                        android:id="@+id/search_games_hobbies"
+                        android:title="@string/games_hobbies"/>
+                    <item
+                        android:id="@+id/search_government_organization"
+                        android:title="@string/government_organization"/>
+                    <item
+                        android:id="@+id/search_health"
+                        android:title="@string/health"/>
+                    <item
+                        android:id="@+id/search_kids_family"
+                        android:title="@string/kids_family"/>
+                    <item
+                        android:id="@+id/search_music"
+                        android:title="@string/music"/>
+                    <item
+                        android:id="@+id/search_news_politics"
+                        android:title="@string/news_politics"/>
+                    <item
+                        android:id="@+id/search_religion_spirituality"
+                        android:title="@string/religion_spirituality"/>
+                    <item
+                        android:id="@+id/search_science_medecine"
+                        android:title="@string/science_medecine"/>
+                    <item
+                        android:id="@+id/search_society_culture"
+                        android:title="@string/society_culture"/>
+                    <item
+                        android:id="@+id/search_sports_recreation"
+                        android:title="@string/sports_recreation"/>
+                    <item
+                        android:id="@+id/search_tv_film"
+                        android:title="@string/tv_film"/>
+                    <item
+                        android:id="@+id/search_technology"
+                        android:title="@string/technology"/>
+                </menu>
+            </item>
+
+            <item
+                android:id="@+id/itunes_search_language"
+                android:title="@string/lang">
+                <menu>
+                    <item
+                        android:id="@+id/search_fr"
+                        android:title="@string/fr"/>
+                    <item
+                        android:id="@+id/search_de"
+                        android:title="@string/de"/>
+                    <item
+                        android:id="@+id/search_ru"
+                        android:title="@string/ru"/>
+                    <item
+                        android:id="@+id/search_es"
+                        android:title="@string/es"/>
+                    <item
+                        android:id="@+id/search_it"
+                        android:title="@string/it"/>
+                    <item
+                        android:id="@+id/search_pt"
+                        android:title="@string/pt"/>
+                    <item
+                        android:id="@+id/search_ar"
+                        android:title="@string/ar"/>
+                    <item
+                        android:id="@+id/search_ca"
+                        android:title="@string/ca"/>
+                    <item
+                        android:id="@+id/search_us"
+                        android:title="@string/us"/>
+                    <item
+                        android:id="@+id/search_nl"
+                        android:title="@string/nl"/>
+                </menu>
+            </item>
+        </menu>
+    </item>
+
 </menu>

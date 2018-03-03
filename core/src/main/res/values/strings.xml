@@ -257,6 +257,41 @@
     <string name="descending">Descending</string>
     <string name="clear_queue_confirmation_msg">Please confirm that you want to clear the queue of ALL of the episodes in it</string>
 
+    <!-- iTunes Search -->
+    <string name="category">Category</string>
+    <string name="artist">Artist</string>
+    <string name="title">Title</string>
+    <string name="lang">Language</string>
+    <string name="advanced_search">Advanced Search</string>
+    <string name="artist_search">Search Artist</string>
+    <string name="title_search">Search Title</string>
+    <string name="arts">Arts</string>
+    <string name="business">Business</string>
+    <string name="comedy">Comedy</string>
+    <string name="education">Education</string>
+    <string name="games_hobbies">Games And Hobbies</string>
+    <string name="government_organization">Government And Organization</string>
+    <string name="health">Health</string>
+    <string name="kids_family">Kids And Family</string>
+    <string name="music">Music</string>
+    <string name="news_politics">News And Politics</string>
+    <string name="religion_spirituality">Religion And Spirituality</string>
+    <string name="science_medecine">Science And Medecine</string>
+    <string name="society_culture">Society And Culture</string>
+    <string name="sports_recreation">Sports And Recreation</string>
+    <string name="tv_film">TV And Film</string>
+    <string name="technology">Technology</string>
+    <string name="fr">French</string>
+    <string name="de">German</string>
+    <string name="es">Spanish</string>
+    <string name="it">Italian</string>
+    <string name="ca">Canadian</string>
+    <string name="nl">Netherlands</string>
+    <string name="ru">Russian</string>
+    <string name="us">USA</string>
+    <string name="pt">Portuguese</string>
+    <string name="ar">Arabic</string>
+
     <!-- Flattr -->
     <string name="flattr_auth_label">Flattr sign-in</string>
     <string name="flattr_auth_explanation">Press the button below to start the authentication process. You will be forwarded to the flattr login screen in your browser and be asked to give AntennaPod the permission to flattr things. After you have given permission, you will return to this screen automatically.</string>
