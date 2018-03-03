@@ -282,6 +282,25 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         assertEquals( 25, topList.size());
     }
 
+    public void testItunesTitleSearch() throws InterruptedException {
+        //Request to itunes API
+        searchItem.setTitle("Title");
+        String query = "Laura";
+        itunesSearchFragment.search(query, searchItem);
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        searchResults = itunesSearchFragment.getSearchResults();
+
+        //Assertions
+        assertNotNull(searchResults);
+        for(int i = 0; i < searchResults.size(); i++){
+            //Assert that podcast object variable artist contains the query searched
+            assertTrue(searchResults.get(i).title.contains(query));
+        }
+    }
+
     public void testItunesArtistSearch() throws InterruptedException {
         //Request to itunes API
         searchItem.setTitle("Artist");

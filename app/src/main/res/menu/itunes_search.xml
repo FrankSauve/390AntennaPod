@@ -4,17 +4,17 @@
       xmlns:custom="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_search"
-        android:icon="?attr/action_search"
-        custom:showAsAction="collapseActionView|ifRoom"
-        custom:actionViewClass="android.support.v7.widget.SearchView"
-        android:title="@string/search_label"/>
-
-    <item
         android:id="@+id/itunes_advanced_search"
         android:title="@string/advanced_search">
 
         <menu>
+
+            <item
+                android:id="@+id/itunes_search_title"
+                custom:showAsAction="collapseActionView|ifRoom"
+                custom:actionViewClass="android.support.v7.widget.SearchView"
+                android:title="@string/title">
+            </item>
 
             <item
                 android:id="@+id/itunes_search_artist"
