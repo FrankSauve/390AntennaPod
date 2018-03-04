@@ -199,7 +199,7 @@ public class ItunesSearchFragment extends Fragment {
      * @param result List of Podcast objects containing search results
      */
     void appendData(List<Podcast> result) {
-        this.searchResults = result;
+        this.searchResults.addAll(result);
         if (result != null && result.size() > 0) {
             gridView.setVisibility(View.VISIBLE);
             txtvEmpty.setVisibility(View.GONE);
@@ -351,7 +351,7 @@ public class ItunesSearchFragment extends Fragment {
         });
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)  {
         if (!super.onOptionsItemSelected(item)) {
             subgenreIds.clear();
             switch (item.getItemId()) {
@@ -713,7 +713,7 @@ public class ItunesSearchFragment extends Fragment {
     }
 
     //Load top 100 podcasts by the category corresponding to the genreId passed in
-    public void loadCategory(int genreId){
+    public void loadCategory(int genreId) {
         if (subscription != null) {
             subscription.unsubscribe();
         }
@@ -782,7 +782,10 @@ public class ItunesSearchFragment extends Fragment {
         }
         else{
             for(int i = 0; i < subgenreIds.size(); i++){
-                if(i == 0) adapter.clear();
+                if(i == 0) {
+                    this.searchResults.clear();
+                    adapter.clear();
+                }
                 loadSubCategories(subgenreIds.get(i));
             }
 
