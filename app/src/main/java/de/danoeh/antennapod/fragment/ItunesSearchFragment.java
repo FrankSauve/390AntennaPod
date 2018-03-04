@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.activity.OnlineFeedViewActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
@@ -432,6 +433,7 @@ public class ItunesSearchFragment extends Fragment {
                 //Categoy items
 
                 case R.id.search_arts:
+                    ((MainActivity)getActivity()).setActionBarTitle("Arts");
                     subgenreIds.add(FOOD_GENRE_ID);
                     subgenreIds.add(LITERATURE_GENRE_ID);
                     subgenreIds.add(DESIGN_GENRE_ID);
@@ -441,15 +443,19 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(ARTS_GENRE_ID);
                     return true;
                 case R.id.search_comedy:
+                    ((MainActivity)getActivity()).setActionBarTitle("Comedy");
                     loadCategory(COMEDY_GENRE_ID);
                     return true;
                 case R.id.search_news_politics:
+                    ((MainActivity)getActivity()).setActionBarTitle("News & Politics");
                     loadCategory(NEWS_AND_POLITICS_GENRE_ID);
                     return true;
                 case R.id.search_kids_family:
+                    ((MainActivity)getActivity()).setActionBarTitle("Kids & Family");
                     loadCategory(KIDS_AND_FAMILY_GENRE_ID);
                     return true;
                 case R.id.search_games_hobbies:
+                    ((MainActivity)getActivity()).setActionBarTitle("Games & Hobbies");
                     subgenreIds.add(VIDEOGAMES_GENRE_ID);
                     subgenreIds.add(AUTOMOTIVE_GENRE_ID);
                     subgenreIds.add(AVIATION_GENRE_ID);
@@ -458,6 +464,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(GAMES_AND_HOBBIES_GENRE_ID);
                     return true;
                 case R.id.search_government_organization:
+                    ((MainActivity)getActivity()).setActionBarTitle("Governments & Organizations");
                     subgenreIds.add(NATIONAL_GENRE_ID);
                     subgenreIds.add(REGIONAL_GENRE_ID);
                     subgenreIds.add(LOCAL_GENRE_ID);
@@ -465,6 +472,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(GOVERNMENT_AND_ORGANIZATION_GENRE_ID);
                     return true;
                 case R.id.search_technology:
+                    ((MainActivity)getActivity()).setActionBarTitle("Technology");
                     subgenreIds.add(GADGETS_GENRE_ID);
                     subgenreIds.add(TECHNEWS_GENRE_ID);
                     subgenreIds.add(PODCASTING_GENRE_ID);
@@ -472,9 +480,11 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(TECHNOLOGY_GENRE_ID);
                     return true;
                 case R.id.search_tv_film:
+                    ((MainActivity)getActivity()).setActionBarTitle("TV and Film");
                     loadCategory(TV_AND_FILM_GENRE_ID);
                     return true;
                 case R.id.search_education:
+                    ((MainActivity)getActivity()).setActionBarTitle("Education");
                     subgenreIds.add(K12_GENRE_ID);
                     subgenreIds.add(HIGHER_EDUCATION_GENRE_ID);
                     subgenreIds.add(EDUCATIONAL_TECHNOLOGY_GENRE_ID);
@@ -483,6 +493,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(EDUCATION_GENRE_ID);
                     return true;
                 case R.id.search_health:
+                    ((MainActivity)getActivity()).setActionBarTitle("Health");
                     subgenreIds.add(FITNESS_AND_NUTRITION_GENRE_ID);
                     subgenreIds.add(SELFHELP_GENRE_ID);
                     subgenreIds.add(SEXUALITY_GENRE_ID);
@@ -490,12 +501,14 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(HEALTH_GENRE_ID);
                     return true;
                 case R.id.search_science_medecine:
+                    ((MainActivity)getActivity()).setActionBarTitle("Science & Medicine");
                     subgenreIds.add(NATURAL_SCIENCES_GENRE_ID);
                     subgenreIds.add(MEDECINE_GENRE_ID);
                     subgenreIds.add(SOCIAL_SCIENCES_GENRE_ID);
                     loadCategory(SCIENCE_AND_MEDECINE_GENRE_ID);
                     return true;
                 case R.id.search_society_culture:
+                    ((MainActivity)getActivity()).setActionBarTitle("Society & Culture");
                     subgenreIds.add(PERSONAL_JOURNALS_GENRE_ID);
                     subgenreIds.add(PLACES_AND_TRAVEL_GENRE_ID);
                     subgenreIds.add(PHILOSOPHY_GENRE_ID);
@@ -503,9 +516,11 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(SOCIETY_AND_CULTURE_GENRE_ID);
                     return true;
                 case R.id.search_music:
+                    ((MainActivity)getActivity()).setActionBarTitle("Music");
                     loadCategory(MUSIC_GENRE_ID);
                     return true;
                 case R.id.search_religion_spirituality:
+                    ((MainActivity)getActivity()).setActionBarTitle("Religion & Spirituality");
                     subgenreIds.add(BUDDHISM_GENRE_ID);
                     subgenreIds.add(CHRISTIANITY_GENRE_ID);
                     subgenreIds.add(ISLAM_GENRE_ID);
@@ -516,6 +531,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(RELIGION_AND_SPIRITUALITY_GENRE_ID);
                     return true;
                 case R.id.search_sports_recreation:
+                    ((MainActivity)getActivity()).setActionBarTitle("Sports & Recreation");
                     subgenreIds.add(OUTDOOR_GENRE_ID);
                     subgenreIds.add(PROFESSIONAL_GENRE_ID);
                     subgenreIds.add(COLLEGE_AND_HIGHSCHOOL_GENRE_ID);
@@ -523,6 +539,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(SPORTS_AND_RECREATION_GENRE_ID);
                     return true;
                 case R.id.search_business:
+                    ((MainActivity)getActivity()).setActionBarTitle("Business");
                     subgenreIds.add(CAREERS_GENRE_ID);
                     subgenreIds.add(INVESTING_GENRE_ID);
                     subgenreIds.add(MANAGEMENT_AND_MARKETING_GENRE_ID);
