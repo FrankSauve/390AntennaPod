@@ -79,6 +79,81 @@ public class ItunesSearchFragment extends Fragment {
     public static final int SOCIETY_AND_CULTURE_GENRE_ID = 1324;
     public static final int GOVERNMENT_AND_ORGANIZATION_GENRE_ID = 1325;
 
+    private List<Integer> subgenreIds = new ArrayList<Integer>();
+
+    //Arts subgenres
+    public static final int FOOD_GENRE_ID = 1306;
+    public static final int LITERATURE_GENRE_ID = 1401;
+    public static final int DESIGN_GENRE_ID = 1402;
+    public static final int PERFORMING_ARTS_GENRE_ID = 1405;
+    public static final int VISUAL_ARTS_GENRE_ID = 1406;
+    public static final int FASHION_AND_BEAUTY_GENRE_ID = 1459;
+
+    //Education subgenres
+    public static final int K12_GENRE_ID = 1415;
+    public static final int HIGHER_EDUCATION_GENRE_ID = 1416;
+    public static final int EDUCATIONAL_TECHNOLOGY_GENRE_ID = 1468;
+    public static final int LANGUAGE_COURSES_GENRE_ID = 1469;
+    public static final int TRAINING_GENRE_ID = 1470;
+
+    //Health subgenres
+    public static final int FITNESS_AND_NUTRITION_GENRE_ID = 1417;
+    public static final int SELFHELP_GENRE_ID = 1420;
+    public static final int SEXUALITY_GENRE_ID = 1421;
+    public static final int ALTERNATIVE_HEALTH_GENRE_ID = 1481;
+
+    //Religion & spirituality subgenres
+    public static final int BUDDHISM_GENRE_ID = 1438;
+    public static final int CHRISTIANITY_GENRE_ID = 1439;
+    public static final int ISLAM_GENRE_ID = 1440;
+    public static final int JUDAISM_GENRE_ID = 1441;
+    public static final int SPIRITUALITY_GENRE_ID = 1444;
+    public static final int HINDUISM_GENRE_ID = 1463;
+    public static final int OTHER_GENRE_ID = 1464;
+
+    //Science & medicine subgenres
+    public static final int NATURAL_SCIENCES_GENRE_ID = 1477;
+    public static final int MEDECINE_GENRE_ID = 1478;
+    public static final int SOCIAL_SCIENCES_GENRE_ID = 1479;
+
+    //Sports & recreation subgenres
+    public static final int OUTDOOR_GENRE_ID = 1456;
+    public static final int PROFESSIONAL_GENRE_ID = 1465;
+    public static final int COLLEGE_AND_HIGHSCHOOL_GENRE_ID = 1466;
+    public static final int AMATEUR_GENRE_ID = 1467;
+
+    //Technology subgenres
+    public static final int GADGETS_GENRE_ID = 1446;
+    public static final int TECHNEWS_GENRE_ID = 1448;
+    public static final int PODCASTING_GENRE_ID = 1450;
+    public static final int SOFTWARE_HOW_TO_GENRE_ID = 1480;
+
+    //Business subgenres
+    public static final int CAREERS_GENRE_ID = 1410;
+    public static final int INVESTING_GENRE_ID = 1412;
+    public static final int MANAGEMENT_AND_MARKETING_GENRE_ID = 1413;
+    public static final int BUSINESS_NEWS_GENRE_ID = 1471;
+    public static final int SHOPPING_GENRE_ID = 1472;
+
+    //Games & hobbies subgenres
+    public static final int VIDEOGAMES_GENRE_ID = 1404;
+    public static final int AUTOMOTIVE_GENRE_ID = 1454;
+    public static final int AVIATION_GENRE_ID = 1455;
+    public static final int HOBBIES_GENRE_ID = 1460;
+    public static final int OTHER_GAMES_GENRE_ID = 1461;
+
+    //Society & culture subgenres
+    public static final int PERSONAL_JOURNALS_GENRE_ID = 1302;
+    public static final int PLACES_AND_TRAVEL_GENRE_ID = 1320;
+    public static final int PHILOSOPHY_GENRE_ID = 1443;
+    public static final int HISTORY_GENRE_ID = 1462;
+
+    //Government & organizations subgenres
+    public static final int NATIONAL_GENRE_ID = 1473;
+    public static final int REGIONAL_GENRE_ID = 1474;
+    public static final int LOCAL_GENRE_ID = 1475;
+    public static final int NON_PROFIT_GENRE_ID = 1476;
+
 
     /**
      * Adapter responsible with the search results
@@ -118,6 +193,27 @@ public class ItunesSearchFragment extends Fragment {
             txtvEmpty.setVisibility(View.VISIBLE);
         }
     }
+
+    /**
+     * Append adapter data with provided search results from SearchTask.
+     * @param result List of Podcast objects containing search results
+     */
+    void appendData(List<Podcast> result) {
+        this.searchResults = result;
+        if (result != null && result.size() > 0) {
+            gridView.setVisibility(View.VISIBLE);
+            txtvEmpty.setVisibility(View.GONE);
+            for (Podcast p : result) {
+                adapter.add(p);
+            }
+            adapter.notifyDataSetInvalidated();
+        } else {
+            gridView.setVisibility(View.GONE);
+            txtvEmpty.setVisibility(View.VISIBLE);
+        }
+    }
+
+
 
     /**
      * Constructor
@@ -257,6 +353,7 @@ public class ItunesSearchFragment extends Fragment {
 
     public boolean onOptionsItemSelected(MenuItem item) {
         if (!super.onOptionsItemSelected(item)) {
+            subgenreIds.clear();
             switch (item.getItemId()) {
                 //Artist item
                 case R.id.itunes_search_artist:
@@ -327,7 +424,14 @@ public class ItunesSearchFragment extends Fragment {
                     });
                     return true;
                 //Categoy items
+
                 case R.id.search_arts:
+                    subgenreIds.add(FOOD_GENRE_ID);
+                    subgenreIds.add(LITERATURE_GENRE_ID);
+                    subgenreIds.add(DESIGN_GENRE_ID);
+                    subgenreIds.add(PERFORMING_ARTS_GENRE_ID);
+                    subgenreIds.add(VISUAL_ARTS_GENRE_ID);
+                    subgenreIds.add(FASHION_AND_BEAUTY_GENRE_ID);
                     loadCategory(ARTS_GENRE_ID);
                     return true;
                 case R.id.search_comedy:
@@ -340,39 +444,84 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(KIDS_AND_FAMILY_GENRE_ID);
                     return true;
                 case R.id.search_games_hobbies:
+                    subgenreIds.add(VIDEOGAMES_GENRE_ID);
+                    subgenreIds.add(AUTOMOTIVE_GENRE_ID);
+                    subgenreIds.add(AVIATION_GENRE_ID);
+                    subgenreIds.add(HOBBIES_GENRE_ID);
+                    subgenreIds.add(OTHER_GAMES_GENRE_ID);
                     loadCategory(GAMES_AND_HOBBIES_GENRE_ID);
                     return true;
                 case R.id.search_government_organization:
+                    subgenreIds.add(NATIONAL_GENRE_ID);
+                    subgenreIds.add(REGIONAL_GENRE_ID);
+                    subgenreIds.add(LOCAL_GENRE_ID);
+                    subgenreIds.add(NON_PROFIT_GENRE_ID);
                     loadCategory(GOVERNMENT_AND_ORGANIZATION_GENRE_ID);
                     return true;
                 case R.id.search_technology:
+                    subgenreIds.add(GADGETS_GENRE_ID);
+                    subgenreIds.add(TECHNEWS_GENRE_ID);
+                    subgenreIds.add(PODCASTING_GENRE_ID);
+                    subgenreIds.add(SOFTWARE_HOW_TO_GENRE_ID);
                     loadCategory(TECHNOLOGY_GENRE_ID);
                     return true;
                 case R.id.search_tv_film:
                     loadCategory(TV_AND_FILM_GENRE_ID);
                     return true;
                 case R.id.search_education:
+                    subgenreIds.add(K12_GENRE_ID);
+                    subgenreIds.add(HIGHER_EDUCATION_GENRE_ID);
+                    subgenreIds.add(EDUCATIONAL_TECHNOLOGY_GENRE_ID);
+                    subgenreIds.add(LANGUAGE_COURSES_GENRE_ID);
+                    subgenreIds.add(TRAINING_GENRE_ID);
                     loadCategory(EDUCATION_GENRE_ID);
                     return true;
                 case R.id.search_health:
+                    subgenreIds.add(FITNESS_AND_NUTRITION_GENRE_ID);
+                    subgenreIds.add(SELFHELP_GENRE_ID);
+                    subgenreIds.add(SEXUALITY_GENRE_ID);
+                    subgenreIds.add(ALTERNATIVE_HEALTH_GENRE_ID);
                     loadCategory(HEALTH_GENRE_ID);
                     return true;
                 case R.id.search_science_medecine:
+                    subgenreIds.add(NATURAL_SCIENCES_GENRE_ID);
+                    subgenreIds.add(MEDECINE_GENRE_ID);
+                    subgenreIds.add(SOCIAL_SCIENCES_GENRE_ID);
                     loadCategory(SCIENCE_AND_MEDECINE_GENRE_ID);
                     return true;
                 case R.id.search_society_culture:
+                    subgenreIds.add(PERSONAL_JOURNALS_GENRE_ID);
+                    subgenreIds.add(PLACES_AND_TRAVEL_GENRE_ID);
+                    subgenreIds.add(PHILOSOPHY_GENRE_ID);
+                    subgenreIds.add(HISTORY_GENRE_ID);
                     loadCategory(SOCIETY_AND_CULTURE_GENRE_ID);
                     return true;
                 case R.id.search_music:
                     loadCategory(MUSIC_GENRE_ID);
                     return true;
                 case R.id.search_religion_spirituality:
+                    subgenreIds.add(BUDDHISM_GENRE_ID);
+                    subgenreIds.add(CHRISTIANITY_GENRE_ID);
+                    subgenreIds.add(ISLAM_GENRE_ID);
+                    subgenreIds.add(JUDAISM_GENRE_ID);
+                    subgenreIds.add(SPIRITUALITY_GENRE_ID);
+                    subgenreIds.add(HINDUISM_GENRE_ID);
+                    subgenreIds.add(OTHER_GENRE_ID);
                     loadCategory(RELIGION_AND_SPIRITUALITY_GENRE_ID);
                     return true;
                 case R.id.search_sports_recreation:
+                    subgenreIds.add(OUTDOOR_GENRE_ID);
+                    subgenreIds.add(PROFESSIONAL_GENRE_ID);
+                    subgenreIds.add(COLLEGE_AND_HIGHSCHOOL_GENRE_ID);
+                    subgenreIds.add(AMATEUR_GENRE_ID);
                     loadCategory(SPORTS_AND_RECREATION_GENRE_ID);
                     return true;
                 case R.id.search_business:
+                    subgenreIds.add(CAREERS_GENRE_ID);
+                    subgenreIds.add(INVESTING_GENRE_ID);
+                    subgenreIds.add(MANAGEMENT_AND_MARKETING_GENRE_ID);
+                    subgenreIds.add(BUSINESS_NEWS_GENRE_ID);
+                    subgenreIds.add(SHOPPING_GENRE_ID);
                     loadCategory(BUSINESS_GENRE_ID);
                     return true;
                 //Language items
@@ -568,14 +717,83 @@ public class ItunesSearchFragment extends Fragment {
         if (subscription != null) {
             subscription.unsubscribe();
         }
+
         gridView.setVisibility(View.GONE);
         txtvError.setVisibility(View.GONE);
         butRetry.setVisibility(View.GONE);
         txtvEmpty.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        if(subgenreIds.isEmpty()){
+            subscription = Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
+                String lang = Locale.getDefault().getLanguage();
+                String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+                OkHttpClient client = AntennapodHttpClient.getHttpClient();
+                Request.Builder httpReq = new Request.Builder()
+                        .url(url)
+                        .header("User-Agent", ClientConfig.USER_AGENT);
+                List<Podcast> results = new ArrayList<>();
+                try {
+                    Response response = client.newCall(httpReq.build()).execute();
+                    if(!response.isSuccessful()) {
+                        // toplist for language does not exist, fall back to united states
+                        url = "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+                        httpReq = new Request.Builder()
+                                .url(url)
+                                .header("User-Agent", ClientConfig.USER_AGENT);
+                        response = client.newCall(httpReq.build()).execute();
+                    }
+                    if(response.isSuccessful()) {
+                        String resultString = response.body().string();
+                        //System.out.println(resultString);
+                        JSONObject result = new JSONObject(resultString);
+                        JSONObject feed = result.getJSONObject("feed");
+                        JSONArray entries = feed.getJSONArray("entry");
+
+                        for(int i=0; i < entries.length(); i++) {
+                            JSONObject json = entries.getJSONObject(i);
+                            Podcast podcast = Podcast.fromToplist(json);
+                            results.add(podcast);
+                        }
+                    }
+                    else {
+                        String prefix = getString(R.string.error_msg_prefix);
+                        subscriber.onError(new IOException(prefix + response));
+                    }
+                } catch (IOException | JSONException e) {
+                    subscriber.onError(e);
+                }
+                subscriber.onNext(results);
+                subscriber.onCompleted();
+            })
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(podcasts -> {
+                        progressBar.setVisibility(View.GONE);
+                        categorySearchResults = podcasts;
+                        updateData(categorySearchResults);
+                    }, error -> {
+                        Log.e(TAG, Log.getStackTraceString(error));
+                        progressBar.setVisibility(View.GONE);
+                        txtvError.setText(error.toString());
+                        txtvError.setVisibility(View.VISIBLE);
+                        butRetry.setOnClickListener(v -> loadToplist());
+                        butRetry.setVisibility(View.VISIBLE);
+                    });
+        }
+        else{
+            for(int i = 0; i < subgenreIds.size(); i++){
+                if(i == 0) adapter.clear();
+                loadSubCategories(subgenreIds.get(i));
+            }
+
+        }
+    }
+
+    public void loadSubCategories(int subgenreId){
+
         subscription = Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
             String lang = Locale.getDefault().getLanguage();
-            String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+            String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=5/genre=" + subgenreId + "/json";
             OkHttpClient client = AntennapodHttpClient.getHttpClient();
             Request.Builder httpReq = new Request.Builder()
                     .url(url)
@@ -583,28 +801,28 @@ public class ItunesSearchFragment extends Fragment {
             List<Podcast> results = new ArrayList<>();
             try {
                 Response response = client.newCall(httpReq.build()).execute();
-                if(!response.isSuccessful()) {
+                if (!response.isSuccessful()) {
                     // toplist for language does not exist, fall back to united states
-                    url = "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+                    url = "https://itunes.apple.com/us/rss/toppodcasts/limit=5/genre=" + subgenreId + "/json";
                     httpReq = new Request.Builder()
                             .url(url)
                             .header("User-Agent", ClientConfig.USER_AGENT);
                     response = client.newCall(httpReq.build()).execute();
                 }
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     String resultString = response.body().string();
                     //System.out.println(resultString);
                     JSONObject result = new JSONObject(resultString);
                     JSONObject feed = result.getJSONObject("feed");
                     JSONArray entries = feed.getJSONArray("entry");
 
-                    for(int i=0; i < entries.length(); i++) {
+                    for (int i = 0; i < entries.length(); i++) {
                         JSONObject json = entries.getJSONObject(i);
                         Podcast podcast = Podcast.fromToplist(json);
                         results.add(podcast);
                     }
-                }
-                else {
+
+                } else {
                     String prefix = getString(R.string.error_msg_prefix);
                     subscriber.onError(new IOException(prefix + response));
                 }
@@ -613,13 +831,14 @@ public class ItunesSearchFragment extends Fragment {
             }
             subscriber.onNext(results);
             subscriber.onCompleted();
+
         })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(podcasts -> {
                     progressBar.setVisibility(View.GONE);
                     categorySearchResults = podcasts;
-                    updateData(categorySearchResults);
+                    appendData(categorySearchResults);
                 }, error -> {
                     Log.e(TAG, Log.getStackTraceString(error));
                     progressBar.setVisibility(View.GONE);
@@ -628,6 +847,7 @@ public class ItunesSearchFragment extends Fragment {
                     butRetry.setOnClickListener(v -> loadToplist());
                     butRetry.setVisibility(View.VISIBLE);
                 });
+
 
     }
 
