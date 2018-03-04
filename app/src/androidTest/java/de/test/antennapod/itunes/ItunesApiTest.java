@@ -385,7 +385,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
 
         //Assertions
         assertNotNull(searchResults);
-        assertEquals(30, searchResults.size()); //limit = 5 for each subcategory
+        assertEquals(60, searchResults.size()); //limit = 10 for each subcategory
         for(int i = 0; i < searchResults.size(); i++){
             String category = searchResults.get(i).category;
             assertTrue( category.contains("Food") || category.contains("Literature")

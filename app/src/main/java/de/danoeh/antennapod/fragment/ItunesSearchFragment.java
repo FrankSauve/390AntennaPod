@@ -821,7 +821,7 @@ public class ItunesSearchFragment extends Fragment {
 
         subscription = Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
             String lang = Locale.getDefault().getLanguage();
-            String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=15/genre=" + subgenreId + "/json";
+            String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=10/genre=" + subgenreId + "/json";
             OkHttpClient client = AntennapodHttpClient.getHttpClient();
             Request.Builder httpReq = new Request.Builder()
                     .url(url)
@@ -831,7 +831,7 @@ public class ItunesSearchFragment extends Fragment {
                 Response response = client.newCall(httpReq.build()).execute();
                 if (!response.isSuccessful()) {
                     // toplist for language does not exist, fall back to united states
-                    url = "https://itunes.apple.com/us/rss/toppodcasts/limit=15/genre=" + subgenreId + "/json";
+                    url = "https://itunes.apple.com/us/rss/toppodcasts/limit=10/genre=" + subgenreId + "/json";
                     httpReq = new Request.Builder()
                             .url(url)
                             .header("User-Agent", ClientConfig.USER_AGENT);
