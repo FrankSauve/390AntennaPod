@@ -430,8 +430,7 @@ public class ItunesSearchFragment extends Fragment {
                         }
                     });
                     return true;
-                //Categoy items
-
+                //Category items
                 case R.id.search_arts:
                     ((MainActivity)getActivity()).setActionBarTitle("Arts");
                     subgenreIds.add(FOOD_GENRE_ID);
