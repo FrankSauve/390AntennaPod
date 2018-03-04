@@ -199,7 +199,13 @@ public class ItunesSearchFragment extends Fragment {
      * @param result List of Podcast objects containing search results
      */
     void appendData(List<Podcast> result) {
-        this.searchResults.addAll(result);
+        if(this.searchResults != null){
+            this.searchResults.addAll(result);
+        }
+        else{
+            this.searchResults = result;
+        }
+
         if (result != null && result.size() > 0) {
             gridView.setVisibility(View.VISIBLE);
             txtvEmpty.setVisibility(View.GONE);
@@ -726,7 +732,7 @@ public class ItunesSearchFragment extends Fragment {
         if(subgenreIds.isEmpty()){
             subscription = Observable.create((Observable.OnSubscribe<List<Podcast>>) subscriber -> {
                 String lang = Locale.getDefault().getLanguage();
-                String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+                String url = "https://itunes.apple.com/" + lang + "/rss/toppodcasts/limit=25/genre=" + genreId + "/json";
                 OkHttpClient client = AntennapodHttpClient.getHttpClient();
                 Request.Builder httpReq = new Request.Builder()
                         .url(url)
@@ -736,7 +742,7 @@ public class ItunesSearchFragment extends Fragment {
                     Response response = client.newCall(httpReq.build()).execute();
                     if(!response.isSuccessful()) {
                         // toplist for language does not exist, fall back to united states
-                        url = "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=" + genreId + "/json";
+                        url = "https://itunes.apple.com/us/rss/toppodcasts/limit=25/genre=" + genreId + "/json";
                         httpReq = new Request.Builder()
                                 .url(url)
                                 .header("User-Agent", ClientConfig.USER_AGENT);
@@ -782,8 +788,11 @@ public class ItunesSearchFragment extends Fragment {
         }
         else{
             for(int i = 0; i < subgenreIds.size(); i++){
+                //If first subcategory, clear the search results, else append the results
                 if(i == 0) {
-                    this.searchResults.clear();
+                    if(this.searchResults != null){
+                        this.searchResults.clear();
+                    }
                     adapter.clear();
                 }
                 loadSubCategories(subgenreIds.get(i));
@@ -926,5 +935,9 @@ public class ItunesSearchFragment extends Fragment {
 
     public List<Podcast> getLanguageSearchResults(){
         return this.languageSearchResults;
+    }
+
+    public void setSubgenreIds(List<Integer> subgenreIds){
+        this.subgenreIds = subgenreIds;
     }
 }
