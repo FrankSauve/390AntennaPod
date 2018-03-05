@@ -37,7 +37,29 @@
                 <menu>
                     <item
                         android:id="@+id/search_arts"
-                        android:title="@string/arts"/>
+                        android:title="@string/arts">
+
+                        <menu>
+                            <item
+                                android:id="@+id/search_food"
+                                android:title="@string/food"/>
+                            <item
+                                android:id="@+id/search_literature"
+                                android:title="@string/literature"/>
+                            <item
+                                android:id="@+id/search_design"
+                                android:title="@string/design"/>
+                            <item
+                                android:id="@+id/search_performing_arts"
+                                android:title="@string/performing_arts"/>
+                            <item
+                                android:id="@+id/search_visual_arts"
+                                android:title="@string/visual_arts"/>
+                            <item
+                                android:id="@+id/search_fasion_and_beauty"
+                                android:title="@string/fashion_and_beauty"/>
+                        </menu>
+                    </item>
                     <item
                         android:id="@+id/search_business"
                         android:title="@string/business"/>
@@ -46,7 +68,25 @@
                         android:title="@string/comedy"/>
                     <item
                         android:id="@+id/search_education"
-                        android:title="@string/education"/>
+                        android:title="@string/education">
+                        <menu>
+                            <item
+                                android:id="@+id/search_k12"
+                                android:title="@string/k12"/>
+                            <item
+                                android:id="@+id/search_higher_education"
+                                android:title="@string/higher_education"/>
+                            <item
+                                android:id="@+id/search_educational_technology"
+                                android:title="@string/educational_technology"/>
+                            <item
+                                android:id="@+id/search_language_courses"
+                                android:title="@string/language_courses"/>
+                            <item
+                                android:id="@+id/search_training"
+                                android:title="@string/training"/>
+                        </menu>
+                    </item>
                     <item
                         android:id="@+id/search_games_hobbies"
                         android:title="@string/games_hobbies"/>
