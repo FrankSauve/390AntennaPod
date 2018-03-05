@@ -171,6 +171,7 @@ public class ItunesSearchFragment extends Fragment {
      */
     private List<Podcast> searchResults;
     private List<Podcast> categorySearchResults;
+    private List<Podcast> subCategorySearchResults;
     private List<Podcast> languageSearchResults;
     private List<Podcast> topList;
     private Subscription subscription;
@@ -439,6 +440,7 @@ public class ItunesSearchFragment extends Fragment {
                     subgenreIds.add(PERFORMING_ARTS_GENRE_ID);
                     subgenreIds.add(VISUAL_ARTS_GENRE_ID);
                     subgenreIds.add(FASHION_AND_BEAUTY_GENRE_ID);
+                    ((MainActivity)getActivity()).setActionBarTitle("Arts");
                     loadCategory(ARTS_GENRE_ID);
                     return true;
                 case R.id.search_food:
@@ -1086,8 +1088,8 @@ public class ItunesSearchFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(podcasts -> {
                     progressBar.setVisibility(View.GONE);
-                    categorySearchResults = podcasts;
-                    appendData(categorySearchResults);
+                    subCategorySearchResults = podcasts;
+                    appendData(subCategorySearchResults);
                 }, error -> {
                     Log.e(TAG, Log.getStackTraceString(error));
                     progressBar.setVisibility(View.GONE);

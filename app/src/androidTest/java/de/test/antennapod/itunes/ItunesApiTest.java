@@ -29,6 +29,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     private ItunesSearchFragment itunesSearchFragment;
     private List<ItunesAdapter.Podcast> topList;
     private List<ItunesAdapter.Podcast> searchResults;
+    private List<ItunesAdapter.Podcast> subCategorySearchResults;
     private List<ItunesAdapter.Podcast> categorySearchResults;
     private List<ItunesAdapter.Podcast> languageSearchResults;
     private String query = "Laura";
@@ -381,16 +382,16 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         //Wait for request
         Thread.sleep(5000);
 
-        searchResults = itunesSearchFragment.getSearchResults();
+        subCategorySearchResults = itunesSearchFragment.getSearchResults();
 
         //Assertions
-        assertNotNull(searchResults);
-        assertEquals(60, searchResults.size()); //limit = 10 for each subcategory
-        for(int i = 0; i < searchResults.size(); i++){
-            String category = searchResults.get(i).category;
-            assertTrue( category.contains("Food") || category.contains("Literature")
-                    || category.contains("Design") || category.contains("Performing Arts") || category.contains("Visual Arts")
-                    || category.contains("Fashion & Beauty"));
+        assertNotNull(subCategorySearchResults);
+        assertEquals(60, subCategorySearchResults.size()); //limit = 10 for each subcategory
+        for(int i = 0; i < subCategorySearchResults.size(); i++){
+            String subcategory = subCategorySearchResults.get(i).category;
+            assertTrue( subcategory.contains("Arts") || subcategory.contains("Food") || subcategory.contains("Literature")
+                    || subcategory.contains("Design") || subcategory.contains("Performing Arts") || subcategory.contains("Visual Arts")
+                    || subcategory.contains("Fashion & Beauty"));
         }
 
     }
