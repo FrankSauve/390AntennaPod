@@ -56,7 +56,7 @@
                                 android:id="@+id/search_visual_arts"
                                 android:title="@string/visual_arts"/>
                             <item
-                                android:id="@+id/search_fasion_and_beauty"
+                                android:id="@+id/search_fashion_and_beauty"
                                 android:title="@string/fashion_and_beauty"/>
                         </menu>
                     </item>
