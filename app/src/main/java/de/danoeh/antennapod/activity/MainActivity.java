@@ -794,4 +794,8 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         super.onNewIntent(intent);
         setIntent(intent);
     }
+
+    public void setActionBarTitle(String title){
+        getSupportActionBar().setTitle(title);
+    }
 }

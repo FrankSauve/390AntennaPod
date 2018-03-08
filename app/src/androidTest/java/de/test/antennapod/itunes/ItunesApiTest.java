@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     private ItunesSearchFragment itunesSearchFragment;
     private List<ItunesAdapter.Podcast> topList;
     private List<ItunesAdapter.Podcast> searchResults;
+    private List<ItunesAdapter.Podcast> subCategorySearchResults;
     private List<ItunesAdapter.Podcast> categorySearchResults;
     private List<ItunesAdapter.Podcast> languageSearchResults;
     private String query = "Laura";
@@ -340,8 +342,10 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     }
 
     public void testItunesCategorySearch() throws InterruptedException {
+
+        itunesSearchFragment.setSubgenreIds(new ArrayList<Integer>());
         //Request to itunes API
-        itunesSearchFragment.loadCategory(itunesSearchFragment.ARTS_GENRE_ID); //Sub-categories = Food, Literature, Design, Performing Arts, Visual Arts, Fashion & Beauty
+        itunesSearchFragment.loadCategory(itunesSearchFragment.MUSIC_GENRE_ID); //"Music" has no sub-categories
 
         //Wait for request
         Thread.sleep(5000);
@@ -350,14 +354,46 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
 
         //Assertions
         assertNotNull(categorySearchResults);
-        assertEquals(100, categorySearchResults.size()); //limit = 100 but this does mean that 100 podcasts will be returned (For some categories there can be less than 100 podcasts returned. Assrertion works with Arts category as it contains at least 100)
+        assertEquals(25, categorySearchResults.size()); //limit = 25
         for(int i = 0; i < categorySearchResults.size(); i++){
-            //Assert that podcast object variable category contains the category and sub-categories searched
+            //Assert that podcast object variable category contains the category
             String category = categorySearchResults.get(i).category;
-            assertTrue(category.contains("Arts") || category.contains("Food") || category.contains("Literature")
-                    || category.contains("Design") || category.contains("Performing Arts") || category.contains("Visual Arts")
-                    || category.contains("Fashion & Beauty"));
+            assertTrue(category.contains("Music"));
+
         }
+    }
+
+    public void testItunesSubCategorySearch() throws InterruptedException {
+
+        //Add the subgenre ids
+        List<Integer> subgenreIds = new ArrayList<Integer>();
+        subgenreIds.add(itunesSearchFragment.FOOD_GENRE_ID);
+        subgenreIds.add(itunesSearchFragment.LITERATURE_GENRE_ID);
+        subgenreIds.add(itunesSearchFragment.DESIGN_GENRE_ID);
+        subgenreIds.add(itunesSearchFragment.PERFORMING_ARTS_GENRE_ID);
+        subgenreIds.add(itunesSearchFragment.VISUAL_ARTS_GENRE_ID);
+        subgenreIds.add(itunesSearchFragment.FASHION_AND_BEAUTY_GENRE_ID);
+
+        itunesSearchFragment.setSubgenreIds(subgenreIds);
+
+        //Request to itunes API
+        itunesSearchFragment.loadCategory(itunesSearchFragment.ARTS_GENRE_ID); //"Arts" has 6 subcategories
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        subCategorySearchResults = itunesSearchFragment.getSearchResults();
+
+        //Assertions
+        assertNotNull(subCategorySearchResults);
+        assertEquals(60, subCategorySearchResults.size()); //limit = 10 for each subcategory
+        for(int i = 0; i < subCategorySearchResults.size(); i++){
+            String subcategory = subCategorySearchResults.get(i).category;
+            assertTrue( subcategory.contains("Arts") || subcategory.contains("Food") || subcategory.contains("Literature")
+                    || subcategory.contains("Design") || subcategory.contains("Performing Arts") || subcategory.contains("Visual Arts")
+                    || subcategory.contains("Fashion & Beauty"));
+        }
+
     }
 
     public void testItunesLanguageSearch() throws InterruptedException {
