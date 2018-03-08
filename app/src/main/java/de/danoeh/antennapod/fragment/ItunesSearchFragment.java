@@ -176,6 +176,8 @@ public class ItunesSearchFragment extends Fragment {
     private List<Podcast> topList;
     private Subscription subscription;
 
+    private Menu menu;
+
     /**
      * Replace adapter data with provided search results from SearchTask.
      * @param result List of Podcast objects containing search results
@@ -325,8 +327,9 @@ public class ItunesSearchFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.itunes_search, menu);
+        this.menu = menu;
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
+        SearchView sv= (SearchView) MenuItemCompat.getActionView(searchItem);
         MenuItemUtils.adjustTextColor(getActivity(), sv);
         sv.setQueryHint(getString(R.string.search_itunes_label));
         sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
@@ -361,11 +364,18 @@ public class ItunesSearchFragment extends Fragment {
 
     public boolean onOptionsItemSelected(MenuItem item)  {
         if (!super.onOptionsItemSelected(item)) {
+
             subgenreIds.clear();
+
+            SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
+
+            //Collapses the artist, title and regular searchviews so they don't overlap
+            menu.findItem(R.id.itunes_search_artist).collapseActionView();
+            menu.findItem(R.id.itunes_search_title).collapseActionView();
+
             switch (item.getItemId()) {
                 //Artist item
                 case R.id.itunes_search_artist:
-                    SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
                     MenuItemUtils.adjustTextColor(getActivity(), sv);
                     sv.setQueryHint(getString(R.string.artist_search));
                     sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
@@ -399,7 +409,7 @@ public class ItunesSearchFragment extends Fragment {
                     return true;
                 //Title item
                 case R.id.itunes_search_title:
-                    sv = (SearchView) MenuItemCompat.getActionView(item);
+
                     MenuItemUtils.adjustTextColor(getActivity(), sv);
                     sv.setQueryHint(getString(R.string.title_search));
                     sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
