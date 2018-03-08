@@ -771,33 +771,43 @@ public class ItunesSearchFragment extends Fragment {
 
                 //Language items
                 case R.id.search_fr:
+                    ((MainActivity)getActivity()).setActionBarTitle("French Podcasts");
                     loadByLanguage("fr");
                     return true;
                 case R.id.search_es:
+                    ((MainActivity)getActivity()).setActionBarTitle("Spanish Podcasts");
                     loadByLanguage("es");
                     return true;
                 case R.id.search_us:
+                    ((MainActivity)getActivity()).setActionBarTitle("USA Podcasts");
                     loadByLanguage("us");
                     return true;
                 case R.id.search_ca:
+                    ((MainActivity)getActivity()).setActionBarTitle("Canadian Podcasts");
                     loadByLanguage("ca");
                     return true;
                 case R.id.search_ar:
+                    ((MainActivity)getActivity()).setActionBarTitle("Arabic Podcasts");
                     loadByLanguage("ar");
                     return true;
                 case R.id.search_de:
+                    ((MainActivity)getActivity()).setActionBarTitle("German Podcasts");
                     loadByLanguage("de");
                     return true;
                 case R.id.search_nl:
+                    ((MainActivity)getActivity()).setActionBarTitle("Netherlands Podcasts");
                     loadByLanguage("nl");
                     return true;
                 case R.id.search_pt:
+                    ((MainActivity)getActivity()).setActionBarTitle("Portuguese Podcasts");
                     loadByLanguage("pt");
                     return true;
                 case R.id.search_it:
+                    ((MainActivity)getActivity()).setActionBarTitle("Italian Podcasts");
                     loadByLanguage("it");
                     return true;
                 case R.id.search_ru:
+                    ((MainActivity)getActivity()).setActionBarTitle("Russian Podcasts");
                     loadByLanguage("ru");
                     return true;
                 default:
