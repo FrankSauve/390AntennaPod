@@ -1328,6 +1328,8 @@ public class ItunesSearchFragment extends Fragment {
         return this.languageSearchResults;
     }
 
+    public JSONArray getAutocompleteResults(){ return this.autocompleteSuggestions; }
+
     public void setSubgenreIds(List<Integer> subgenreIds){
         this.subgenreIds = subgenreIds;
     }
