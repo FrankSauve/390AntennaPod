@@ -37,6 +37,7 @@ import de.danoeh.antennapod.fragment.AddFeedFragment;
 import de.danoeh.antennapod.fragment.AllEpisodesFragment;
 import de.danoeh.antennapod.fragment.DownloadsFragment;
 import de.danoeh.antennapod.fragment.EpisodesFragment;
+import de.danoeh.antennapod.fragment.FoldersFragment;
 import de.danoeh.antennapod.fragment.NewEpisodesFragment;
 import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
 import de.danoeh.antennapod.fragment.QueueFragment;
@@ -141,6 +142,9 @@ public class NavListAdapter extends BaseAdapter
                 break;
             case TrendingFragment.TAG:
                 icon = R.attr.ic_trending;
+                break;
+            case FoldersFragment.TAG:
+                icon = R.attr.ic_create_new_folder;
                 break;
             case AddFeedFragment.TAG:
                 icon = R.attr.content_new;
