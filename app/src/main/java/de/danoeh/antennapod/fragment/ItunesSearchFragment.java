@@ -1,11 +1,15 @@
 package de.danoeh.antennapod.fragment;
 
-import android.content.DialogInterface;
+import android.app.SearchManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.provider.BaseColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -175,6 +179,8 @@ public class ItunesSearchFragment extends Fragment {
     private List<Podcast> languageSearchResults;
     private List<Podcast> topList;
     private Subscription subscription;
+    private SearchView sv;
+    private JSONArray autocompleteSuggestions;
 
     private Menu menu;
 
@@ -222,7 +228,6 @@ public class ItunesSearchFragment extends Fragment {
             txtvEmpty.setVisibility(View.VISIBLE);
         }
     }
-
 
 
     /**
@@ -329,20 +334,46 @@ public class ItunesSearchFragment extends Fragment {
         inflater.inflate(R.menu.itunes_search, menu);
         this.menu = menu;
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView sv= (SearchView) MenuItemCompat.getActionView(searchItem);
+        sv= (SearchView) MenuItemCompat.getActionView(searchItem);
         MenuItemUtils.adjustTextColor(getActivity(), sv);
         sv.setQueryHint(getString(R.string.search_itunes_label));
-        sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+
+        sv.setSuggestionsAdapter(new SimpleCursorAdapter(getContext(), android.R.layout.simple_list_item_1, null, new String[] {SearchManager.SUGGEST_COLUMN_TEXT_1}, new int[] {android.R.id.text1}));
+
+        sv.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                sv.clearFocus();
-                search(s, searchItem);
+            public boolean onSuggestionSelect(int position) {
+
+                Cursor cursor = (Cursor) sv.getSuggestionsAdapter().getItem(position);
+                String term = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                cursor.close();
+                sv.setQuery(term, true);
+                search(term, searchItem);
+
                 return true;
             }
 
             @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
+            public boolean onSuggestionClick(int position) {
+
+                return onSuggestionSelect(position);
+            }
+        });
+
+        sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                sv.clearFocus();
+                search(query, searchItem);
+                sv.getSuggestionsAdapter().changeCursor(null);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                new AutocompleAsyncTask().execute(query);
+                return true;
             }
         });
         MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
@@ -1180,6 +1211,107 @@ public class ItunesSearchFragment extends Fragment {
 
     }
 
+    public void autocomplete(String query){
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+        subscription = Observable.create((Observable.OnSubscribe<JSONArray>) subscriber -> {
+            String formattedUrl = null;
+            formattedUrl = String.format(API_URL, query.toLowerCase()).replace(' ', '+');
+
+            JSONArray j = null;
+
+            OkHttpClient client = AntennapodHttpClient.getHttpClient();
+            Request.Builder httpReq = new Request.Builder()
+                    .url(formattedUrl)
+                    .header("User-Agent", ClientConfig.USER_AGENT);
+            List<Podcast> podcasts = new ArrayList<>();
+            try {
+                Response response = client.newCall(httpReq.build()).execute();
+
+                if(response.isSuccessful()) {
+                    String resultString = response.body().string();
+                    JSONObject result = new JSONObject(resultString);
+                    j = result.getJSONArray("results");
+
+                    for (int i = 0; i < j.length(); i++) {
+                        JSONObject podcastJson = j.getJSONObject(i);
+                        Podcast podcast = Podcast.fromSearch(podcastJson);
+                        podcasts.add(podcast);
+                    }
+                }
+                else {
+                    String prefix = getString(R.string.error_msg_prefix);
+                    subscriber.onError(new IOException(prefix + response));
+                }
+            } catch (IOException | JSONException e) {
+                subscriber.onError(e);
+            }
+            subscriber.onNext(j);
+            subscriber.onCompleted();
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(j -> {
+                   autocompleteSuggestions = j;
+                }, error -> {
+                    Log.e(TAG, Log.getStackTraceString(error));
+
+                });
+    }
+
+
+    class AutocompleAsyncTask extends AsyncTask<String, Void, Cursor>{
+
+        private final String[] sAutocompleteColNames = new String[] {
+                BaseColumns._ID,                         // necessary for adapter
+                SearchManager.SUGGEST_COLUMN_TEXT_1      // the full search term
+        };
+
+        @Override
+        protected Cursor doInBackground(String... params) {
+
+            MatrixCursor cursor = new MatrixCursor(sAutocompleteColNames);
+
+            // get your search terms from the server here, ex:
+            System.out.print(params[0]);
+            // parse your search terms into the MatrixCursor
+            if(!params[0].equals("")){
+                autocomplete(params[0]);
+                try {
+                    Thread.sleep(500); //TODO : This is a bad way of waiting for a request
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                JSONArray podcasts = autocompleteSuggestions;
+                for (int i = 0; i < podcasts.length(); i++) {
+                    JSONObject podcastJson = null;
+                    Podcast podcast = null;
+                    try {
+                        podcastJson = podcasts.getJSONObject(i);
+                        podcast = Podcast.fromSearch(podcastJson);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    Object[] row = new Object[] { i, podcast.title };
+                    cursor.addRow(row);
+                }
+            }
+            return cursor;
+        }
+
+        @Override
+        protected void onPostExecute(Cursor result){
+            sv.getSuggestionsAdapter().changeCursor(result);
+        }
+    }
+
+
+    /**
+     * Getters and setters for testing purposes
+     */
+
     public List<Podcast> getTopList(){
         return this.topList;
     }
@@ -1195,6 +1327,8 @@ public class ItunesSearchFragment extends Fragment {
     public List<Podcast> getLanguageSearchResults(){
         return this.languageSearchResults;
     }
+
+    public JSONArray getAutocompleteResults(){ return this.autocompleteSuggestions; }
 
     public void setSubgenreIds(List<Integer> subgenreIds){
         this.subgenreIds = subgenreIds;
