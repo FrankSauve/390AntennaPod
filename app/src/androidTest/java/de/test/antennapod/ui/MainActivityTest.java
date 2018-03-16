@@ -335,6 +335,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     //tests each category in the dropdown
     public void testAdvancedSearchCategories(){
         openNavDrawer();
+        openNavDrawer();
+        openNavDrawer();
         solo.clickOnText(solo.getString(R.string.trending_label));
 
         categoryVerification("Arts");
