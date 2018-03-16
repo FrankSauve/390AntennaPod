@@ -315,7 +315,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     //method responsible for selecting a given category in the advanced search dropdown and verifying that the page has changed according to the selection
-    public void categoryVerification(String categoryName){
+    private void categoryVerification(String categoryName){
         solo.sleep(4000);
         solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
 
@@ -334,6 +334,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     //tests each category in the dropdown
     public void testAdvancedSearchCategories(){
+        //Go to the homepage (Queue), then Trending
         openNavDrawer();
         openNavDrawer();
         openNavDrawer();
@@ -355,6 +356,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         categoryVerification("Sports & Recreation");
         categoryVerification("TV & Film");
         categoryVerification("Technology");
+
+        assertTrue(true);
     }
 
 
