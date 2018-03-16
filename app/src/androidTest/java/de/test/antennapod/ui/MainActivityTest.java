@@ -314,5 +314,46 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(solo.searchText("Trump Stories: Collusion"));
     }
 
+    //method responsible for selecting a given category in the advanced search dropdown and verifying that the page has changed according to the selection
+    public void categoryVerification(String categoryName){
+        solo.sleep(4000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
+
+        solo.waitForText("Advanced Search");
+        solo.clickOnText("Advanced Search");
+        solo.waitForText("Category");
+        solo.clickOnText("Category");
+
+        solo.sleep(1000);
+        solo.waitForText(categoryName);
+        solo.clickOnText(categoryName);
+        solo.sleep(1000);
+        solo.clickOnScreen(169, 169); //click outside of the dropdown menu to get rid of dropdown
+        assertTrue (solo.searchText(categoryName)); //search the page for the categoryName
+    }
+
+    //tests each category in the dropdown
+    public void testAdvancedSearchCategories(){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+
+        categoryVerification("Arts");
+        categoryVerification("Business");
+        categoryVerification("Comedy");
+        categoryVerification("Education");
+        categoryVerification("Games & Hobbies");
+        categoryVerification("Governments & Organizations");
+        categoryVerification("Health");
+        categoryVerification("Kids & Family");
+        categoryVerification("Music");
+        categoryVerification("News & Politics");
+        categoryVerification("Religion & Spirituality");
+        categoryVerification("Science & Medicine");
+        categoryVerification("Society & Culture");
+        categoryVerification("Sports & Recreation");
+        categoryVerification("TV & Film");
+        categoryVerification("Technology");
+    }
+
 
 }
