@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.FlakyTest;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.robotium.solo.Solo;
@@ -386,7 +387,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.sleep(1000);
 
         solo.clickOnScreen(169, 169); //click outside of the dropdown menu to get rid of dropdown
-        assertTrue (solo.searchText(subcategoryName)); //search the page for the subcategoryName
+        assertTrue (solo.searchText(subcategoryName) || solo.searchText(categoryName)); //search the page for the subcategoryName
     }
 
     //tests each of the Arts subcategories in the dropdown
