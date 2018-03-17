@@ -67,7 +67,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         Folder firstFolder = new Folder(firstFolderName, null);
         Folder secondFolder = new Folder(secondFolderName, null);
 
-        //Add them to database
+        //Add them to database with the PodDBAdapter
         PodDBAdapter adapter = PodDBAdapter.getInstance();
         adapter.open();
         adapter.addFolder(firstFolder);
@@ -90,8 +90,6 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         //Verifying that names correspond to folders created
         for(int i = 0; i < folders.size(); i++){
-            System.out.println(folders.get(i).getName());
-            System.out.println(foldersName.get(i));
             assertEquals(foldersName.get(i), folders.get(i).getName());
         }
 
