@@ -4,11 +4,15 @@ package de.test.antennapod.itunes;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.ActionProvider;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -32,6 +36,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
     private List<ItunesAdapter.Podcast> subCategorySearchResults;
     private List<ItunesAdapter.Podcast> categorySearchResults;
     private List<ItunesAdapter.Podcast> languageSearchResults;
+    private JSONArray autocompleteSearchResults;
     private String query = "Laura";
 
     MenuItem searchItem = new MenuItem() {
@@ -345,7 +350,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
 
         itunesSearchFragment.setSubgenreIds(new ArrayList<Integer>());
         //Request to itunes API
-        itunesSearchFragment.loadCategory(itunesSearchFragment.MUSIC_GENRE_ID); //"Music" has no sub-categories
+        itunesSearchFragment.loadCategory(itunesSearchFragment.NEWS_AND_POLITICS_GENRE_ID); //"News" has no sub-categories
 
         //Wait for request
         Thread.sleep(5000);
@@ -358,8 +363,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         for(int i = 0; i < categorySearchResults.size(); i++){
             //Assert that podcast object variable category contains the category
             String category = categorySearchResults.get(i).category;
-            assertTrue(category.contains("Music"));
-
+            assertTrue(category.contains("News"));
         }
     }
 
@@ -414,6 +418,22 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
             String language = languageSearchResults.get(i).lang;
             assertTrue(language.contains(lang));
         }
+    }
+
+    public void testItunesAutocomplete() throws InterruptedException, JSONException {
+        //Partially complete a query
+        String podQuery = "Comedy Bang"; // Incomplete title for "Comedy Bang Bang: The Podcast"
+        String podExpected = "Comedy Bang Bang: The Podcast";
+        itunesSearchFragment.autocomplete(podQuery);
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        autocompleteSearchResults = itunesSearchFragment.getAutocompleteResults();
+
+        //Assertions
+        assertNotNull(autocompleteSearchResults); // Assert that there were options in the autocomplete
+        assertEquals(true, autocompleteSearchResults.getString(0).contains(podExpected)); // Assert that the first option is "Comedy Bang Bang: The Podcast"
     }
 
 }

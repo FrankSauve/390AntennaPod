@@ -36,6 +36,7 @@ import de.danoeh.antennapod.core.feed.FeedImage;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.feed.FeedMedia;
 import de.danoeh.antennapod.core.feed.FeedPreferences;
+import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.gpoddernet.model.GpodnetEpisodeAction;
 import de.danoeh.antennapod.core.preferences.GpodnetPreferences;
 import de.danoeh.antennapod.core.preferences.PlaybackPreferences;
@@ -505,6 +506,15 @@ public class DBWriter {
         });
     }
 
+    //Add new Folder to DB
+    public static Future<?> addFolder(Folder folder) {
+        return dbExec.submit(() -> {
+            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+            adapter.addFolder(folder);
+            adapter.close();
+        });
+    }
+
     /**
      * Moves the specified item to the top of the queue.
      *  @param itemId          The item to move to the top of the queue
@@ -893,6 +903,15 @@ public class DBWriter {
             adapter.setFeedCustomTitle(feed.getId(), feed.getCustomTitle());
             adapter.close();
             EventDistributor.getInstance().sendFeedUpdateBroadcast();
+        });
+    }
+
+    public static Future<?> setFolder(Folder folder) {
+        return dbExec.submit(() -> {
+            PodDBAdapter adapter = PodDBAdapter.getInstance();
+            adapter.open();
+            adapter.setFolder(folder);
+            adapter.close();
         });
     }
 

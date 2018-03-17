@@ -17,6 +17,7 @@ import de.danoeh.antennapod.core.feed.FeedImage;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.feed.FeedMedia;
 import de.danoeh.antennapod.core.feed.FeedPreferences;
+import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.DownloadStatus;
 import de.danoeh.antennapod.core.util.LongIntMap;
@@ -79,6 +80,36 @@ public final class DBReader {
                 feeds.add(feed);
             }
             return feeds;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+
+    public static List<Folder> getFolderList() {
+        Log.d(TAG, "Extracting FolderList");
+
+        PodDBAdapter adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        try {
+            return getFolderList(adapter);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    private static List<Folder> getFolderList(PodDBAdapter adapter) {
+        Cursor cursor = null;
+        try {
+            cursor = adapter.getAllFoldersCursor();
+            List<Folder> folders = new ArrayList<>(cursor.getCount());
+            while (cursor.moveToNext()) {
+                Folder folder = extractFolderFromCursorRow(adapter, cursor);
+                folders.add(folder);
+            }
+            return folders;
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -273,6 +304,13 @@ public final class DBReader {
         feed.setPreferences(preferences);
 
         return feed;
+    }
+
+    private static Folder extractFolderFromCursorRow(PodDBAdapter adapter, Cursor cursor) {
+
+        Folder folder = Folder.fromCursor(cursor);
+
+        return folder;
     }
 
     static List<FeedItem> getQueue(PodDBAdapter adapter) {

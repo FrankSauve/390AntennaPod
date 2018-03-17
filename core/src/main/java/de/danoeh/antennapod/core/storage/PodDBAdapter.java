@@ -31,6 +31,7 @@ import de.danoeh.antennapod.core.feed.FeedImage;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.feed.FeedMedia;
 import de.danoeh.antennapod.core.feed.FeedPreferences;
+import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.DownloadStatus;
 import de.danoeh.antennapod.core.util.LongIntMap;
@@ -111,6 +112,8 @@ public class PodDBAdapter {
     public static final String KEY_LAST_PLAYED_TIME = "last_played_time";
     public static final String KEY_INCLUDE_FILTER = "include_filter";
     public static final String KEY_EXCLUDE_FILTER = "exclude_filter";
+    public static final String KEY_FOLDER_NAME = "folder_name";
+
 
     // Table names
     private static final String TABLE_NAME_FEEDS = "Feeds";
@@ -121,6 +124,7 @@ public class PodDBAdapter {
     private static final String TABLE_NAME_QUEUE = "Queue";
     private static final String TABLE_NAME_SIMPLECHAPTERS = "SimpleChapters";
     private static final String TABLE_NAME_FAVORITES = "Favorites";
+    private static final String TABLE_NAME_FOLDERS = "Folders";
 
     // SQL Statements for creating new tables
     private static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -189,6 +193,14 @@ public class PodDBAdapter {
             + " TEXT," + KEY_START + " INTEGER," + KEY_FEEDITEM + " INTEGER,"
             + KEY_LINK + " TEXT," + KEY_CHAPTER_TYPE + " INTEGER)";
 
+    public static final String CREATE_TABLE_FAVORITES = "CREATE TABLE "
+            + TABLE_NAME_FAVORITES + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_FEEDITEM + " INTEGER," + KEY_FEED + " INTEGER)";
+
+    public static final String CREATE_TABLE_FOLDERS = "CREATE TABLE "
+            + TABLE_NAME_FOLDERS + "(" + TABLE_PRIMARY_KEY
+            + KEY_FOLDER_NAME + " TEXT," + KEY_FEEDITEM + " INTEGER)";
+
     // SQL Statements for creating indexes
     public static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
             + TABLE_NAME_FEED_ITEMS + "_" + KEY_FEED + " ON " + TABLE_NAME_FEED_ITEMS + " ("
@@ -219,9 +231,6 @@ public class PodDBAdapter {
             + TABLE_NAME_SIMPLECHAPTERS + "_" + KEY_FEEDITEM + " ON " + TABLE_NAME_SIMPLECHAPTERS + " ("
             + KEY_FEEDITEM + ")";
 
-    public static final String CREATE_TABLE_FAVORITES = "CREATE TABLE "
-            + TABLE_NAME_FAVORITES + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
-            + KEY_FEEDITEM + " INTEGER," + KEY_FEED + " INTEGER)";
 
     /**
      * Select all columns from the feed-table
@@ -277,6 +286,14 @@ public class PodDBAdapter {
     };
 
     /**
+     * Select all columns from the folder-table
+     */
+    private static final String[] FOLDER_SEL_STD = {
+            TABLE_NAME_FOLDERS + "." + KEY_ID,
+            TABLE_NAME_FOLDERS + "." + KEY_FOLDER_NAME,
+            TABLE_NAME_FOLDERS + "." + KEY_FEEDITEM};
+
+    /**
      * All the tables in the database
      */
     private static final String[] ALL_TABLES = {
@@ -287,7 +304,8 @@ public class PodDBAdapter {
             TABLE_NAME_DOWNLOAD_LOG,
             TABLE_NAME_QUEUE,
             TABLE_NAME_SIMPLECHAPTERS,
-            TABLE_NAME_FAVORITES
+            TABLE_NAME_FAVORITES,
+            TABLE_NAME_FOLDERS
     };
 
     /**
@@ -387,6 +405,30 @@ public class PodDBAdapter {
         }
     }
 
+    public static boolean deleteAllFolders() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.delete(TABLE_NAME_FOLDERS, null, null);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean deleteFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            String deleteClause = String.format("DROP TABLE %s",
+                    TABLE_NAME_FOLDERS);
+            db.execSQL(deleteClause);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
     /**
      * Inserts or updates a feed entry
      *
@@ -459,6 +501,26 @@ public class PodDBAdapter {
         ContentValues values = new ContentValues();
         values.put(KEY_HIDE, valuesList);
         db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
+    }
+
+
+    /**
+     * Updates a folder entry
+     * @param folder
+     */
+    public long setFolder(Folder folder){
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOLDER_NAME, folder.getName());
+        if (folder.getId() == 0) {
+            // Create new entry
+            Log.d(this.toString(), "Inserting new Feed into db");
+            folder.setId(db.insert(TABLE_NAME_FOLDERS, null, values));
+        } else {
+            Log.d(this.toString(), "Updating existing Feed in db");
+            db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?",
+                    new String[]{String.valueOf(folder.getId())});
+        }
+        return folder.getId();
     }
 
     /**
@@ -924,6 +986,31 @@ public class PodDBAdapter {
         }
     }
 
+    //Create a new folder
+    public long addFolder(Folder folder){
+        // don't create a folder that has the same name as another one
+        if (doesFolderNameAlreadyExist(folder)) {
+            Log.d(TAG, "folder with same name already created... ");
+            return 0;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOLDER_NAME, folder.getName());
+        folder.setId(db.insert(TABLE_NAME_FOLDERS, null, values));
+
+        return folder.getId();
+    }
+
+    //delete item from folder
+    public void removeItemFromFolder(Folder folder){
+
+    }
+
+    //Delete folder
+    public void removeFolder(Folder folder){
+
+    }
+
     /**
      * Adds the item to favorites
      */
@@ -954,6 +1041,19 @@ public class PodDBAdapter {
         int count = c.getCount();
         c.close();
         return count > 0;
+    }
+
+    //Verifies if folder name already exist in database
+    public boolean doesFolderNameAlreadyExist(Folder folder) {
+        String query = String.format("SELECT COUNT(%s) FROM %s WHERE %s='%s'",
+                KEY_ID, TABLE_NAME_FOLDERS, KEY_FOLDER_NAME, folder.getName());
+        Cursor c = db.rawQuery(query, null);
+        int result = 0;
+        if (c.moveToFirst()) {
+            result = c.getInt(0);
+        }
+        c.close();
+        return result > 0;
     }
 
     public long getDownloadLogSize() {
@@ -1073,6 +1173,25 @@ public class PodDBAdapter {
     public final Cursor getAllFeedsCursor() {
         return db.query(TABLE_NAME_FEEDS, FEED_SEL_STD, null, null, null, null,
                 KEY_TITLE + " COLLATE NOCASE ASC");
+    }
+
+    /**
+     * Get all Folders from the Folder Table.
+     *
+     * @return The cursor of the query
+     */
+    public final Cursor getAllFoldersCursor() {
+
+        //Creates the table if it is not already created
+        try{
+            db.execSQL(CREATE_TABLE_FOLDERS);
+        }
+        catch(RuntimeException e){
+           //Table already created. Do nothing
+        }
+
+        return db.query(TABLE_NAME_FOLDERS, FOLDER_SEL_STD, null, null, null, null,
+                KEY_FOLDER_NAME + " COLLATE NOCASE ASC");
     }
 
     public final Cursor getFeedCursorDownloadUrls() {
@@ -1693,6 +1812,7 @@ public class PodDBAdapter {
             db.execSQL(CREATE_TABLE_QUEUE);
             db.execSQL(CREATE_TABLE_SIMPLECHAPTERS);
             db.execSQL(CREATE_TABLE_FAVORITES);
+            db.execSQL(CREATE_TABLE_FOLDERS);
 
             db.execSQL(CREATE_INDEX_FEEDITEMS_FEED);
             db.execSQL(CREATE_INDEX_FEEDITEMS_IMAGE);
@@ -1901,6 +2021,7 @@ public class PodDBAdapter {
             }
             if (oldVersion < 1040001) {
                 db.execSQL(CREATE_TABLE_FAVORITES);
+                db.execSQL(CREATE_TABLE_FOLDERS);
             }
             if (oldVersion < 1040002) {
                 db.execSQL("ALTER TABLE " + PodDBAdapter.TABLE_NAME_FEED_MEDIA

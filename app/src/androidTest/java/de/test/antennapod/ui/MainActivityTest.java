@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.FlakyTest;
+import android.util.Log;
 import android.widget.ListView;
 
 import com.robotium.solo.Solo;
@@ -312,6 +313,96 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         //Assert that the podcast was added to queue
         assertTrue(solo.searchText("Trump Stories: Collusion"));
+    }
+
+    //method responsible for selecting a given category in the advanced search dropdown and verifying that the page has changed according to the selection
+    private void categoryVerification(String categoryName){
+        solo.sleep(4000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
+
+        solo.waitForText("Advanced Search");
+        solo.clickOnText("Advanced Search");
+        solo.waitForText("Category");
+        solo.clickOnText("Category");
+
+        solo.sleep(1000);
+        solo.waitForText(categoryName);
+        solo.clickOnText(categoryName);
+        solo.sleep(1000);
+        solo.clickOnScreen(169, 169); //click outside of the dropdown menu to get rid of dropdown
+        assertTrue (solo.searchText(categoryName)); //search the page for the categoryName
+    }
+
+    //tests each category in the dropdown. Random UI selections for each of the assertion procedures make this test extremely flaky
+    @FlakyTest(tolerance = 8)
+    public void testAdvancedSearchCategories(){
+        //Go to the homepage (Queue), then Trending
+        openNavDrawer();
+        openNavDrawer();
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+
+        categoryVerification("Arts");
+        categoryVerification("Business");
+        categoryVerification("Comedy");
+        categoryVerification("Education");
+        categoryVerification("Games & Hobbies");
+        categoryVerification("Governments & Organizations");
+        categoryVerification("Health");
+        categoryVerification("Kids & Family");
+        categoryVerification("Music");
+        categoryVerification("News & Politics");
+        categoryVerification("Religion & Spirituality");
+        categoryVerification("Science & Medicine");
+        categoryVerification("Society & Culture");
+        categoryVerification("Sports & Recreation");
+        categoryVerification("TV & Film");
+        categoryVerification("Technology");
+
+        assertTrue(true);
+    }
+
+    //method responsible for selecting a given subcategory in the advanced search dropdown and verifying that the page has changed according to the selection
+    private void subcategoryVerification(String subcategoryName, String categoryName){
+        //Go to the homepage (Queue), then Trending for each test because it seems to help with the random UI selection errors.
+        openNavDrawer();
+        openNavDrawer();
+        solo.sleep(1000);
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+
+        solo.sleep(4000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
+
+        solo.waitForText("Advanced Search");
+        solo.clickOnText("Advanced Search");
+        solo.waitForText("Category");
+        solo.clickOnText("Category");
+
+        solo.sleep(2000);
+        solo.waitForText(categoryName);
+        solo.clickOnText(categoryName);
+        solo.sleep(2000);
+        solo.waitForText(subcategoryName);
+        solo.clickOnText(subcategoryName);
+        solo.sleep(1000);
+
+        solo.clickOnScreen(169, 169); //click outside of the dropdown menu to get rid of dropdown
+        assertTrue (solo.searchText(subcategoryName) || solo.searchText(categoryName)); //search the page for the subcategoryName
+    }
+
+    //tests each of the Arts subcategories in the dropdown. Random UI selections for each of the assertion procedures make this test extremely flaky
+    @FlakyTest(tolerance = 3)
+    public void testAdvancedSearchSubCategories(){
+
+        subcategoryVerification("Food","Arts");
+        subcategoryVerification("Literature","Arts");
+        subcategoryVerification("Design","Arts");
+        subcategoryVerification("Performing","Arts");
+        subcategoryVerification("Visual","Arts");
+        subcategoryVerification("Fashion","Arts");
+
+        assertTrue(true);
     }
 
 
