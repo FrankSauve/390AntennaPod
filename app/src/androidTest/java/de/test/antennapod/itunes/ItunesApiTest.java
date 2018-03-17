@@ -358,18 +358,12 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         categorySearchResults = itunesSearchFragment.getCategorySearchResults();
 
         //Assertions
-        Log.d("CATEGORYRESULTS", categorySearchResults.toString());
         assertNotNull(categorySearchResults);
-        Log.d("CATEGORYRESULTSSIZE", categorySearchResults.size()+"");
         assertEquals(25, categorySearchResults.size()); //limit = 25
-        boolean categoryChecker;
         for(int i = 0; i < categorySearchResults.size(); i++){
-            categoryChecker=false;
             //Assert that podcast object variable category contains the category
             String category = categorySearchResults.get(i).category;
-            Log.d("TestingEachObject:", categorySearchResults.get(i).category+"");
             assertTrue(category.contains("News"));
-
         }
     }
 
