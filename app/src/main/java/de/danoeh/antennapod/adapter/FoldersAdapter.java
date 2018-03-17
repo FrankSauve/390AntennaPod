@@ -139,8 +139,6 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == getAddTilePosition()) {
-            //mainActivityRef.get().loadChildFragment(new AddFeedFragment());
-            //Add folder creation dialog
             new NameFolderDialog(mainActivityRef.get()).createFolderDialog();
             mainActivityRef.get().loadFragment(FoldersFragment.TAG, null);
         } else {

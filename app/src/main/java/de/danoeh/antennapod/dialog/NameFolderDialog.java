@@ -8,9 +8,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.lang.ref.WeakReference;
 
 import de.danoeh.antennapod.core.folders.Folder;
-import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DBWriter;
-import de.danoeh.antennapod.fragment.FoldersFragment;
 
 /**
  * Created by William on 2018-03-16.
@@ -41,7 +39,6 @@ public class NameFolderDialog {
                 .onNegative((dialog, which) -> dialog.dismiss())
                 .autoDismiss(false)
                 .show();
-
     }
 
 }
