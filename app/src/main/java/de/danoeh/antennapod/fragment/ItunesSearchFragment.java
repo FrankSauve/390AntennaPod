@@ -505,7 +505,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(VISUAL_ARTS_GENRE_ID);
                     return true;
                 case R.id.search_fashion_and_beauty:
-                    ((MainActivity)getActivity()).setActionBarTitle("Fashion and Beauty");
+                    ((MainActivity)getActivity()).setActionBarTitle("Fashion & Beauty");
                     loadCategory(FASHION_AND_BEAUTY_GENRE_ID);
                     return true;
 
@@ -605,7 +605,7 @@ public class ItunesSearchFragment extends Fragment {
                     return true;
 
                 case R.id.search_tv_film:
-                    ((MainActivity)getActivity()).setActionBarTitle("TV and Film");
+                    ((MainActivity)getActivity()).setActionBarTitle("TV & Film");
                     loadCategory(TV_AND_FILM_GENRE_ID);
                     return true;
 
@@ -648,7 +648,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(HEALTH_GENRE_ID);
                     return true;
                 case R.id.search_fitness_and_nutrition:
-                    ((MainActivity)getActivity()).setActionBarTitle("Fitness and Nutrition");
+                    ((MainActivity)getActivity()).setActionBarTitle("Fitness & Nutrition");
                     loadCategory(FITNESS_AND_NUTRITION_GENRE_ID);
                     return true;
                 case R.id.search_selfhelp:
@@ -697,7 +697,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(PERSONAL_JOURNALS_GENRE_ID);
                     return true;
                 case R.id.search_places_and_travel:
-                    ((MainActivity)getActivity()).setActionBarTitle("Places and Travel");
+                    ((MainActivity)getActivity()).setActionBarTitle("Places & Travel");
                     loadCategory(PLACES_AND_TRAVEL_GENRE_ID);
                     return true;
                 case R.id.search_philosophy:
@@ -771,7 +771,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(PROFESSIONAL_GENRE_ID);
                     return true;
                 case R.id.search_college_and_highschool:
-                    ((MainActivity)getActivity()).setActionBarTitle("College and Highschool");
+                    ((MainActivity)getActivity()).setActionBarTitle("College & Highschool");
                     loadCategory(COLLEGE_AND_HIGHSCHOOL_GENRE_ID);
                     return true;
                 case R.id.search_amateur:
@@ -797,7 +797,7 @@ public class ItunesSearchFragment extends Fragment {
                     loadCategory(INVESTING_GENRE_ID);
                     return true;
                 case R.id.search_management_and_marketing:
-                    ((MainActivity)getActivity()).setActionBarTitle("Management and Marketing");
+                    ((MainActivity)getActivity()).setActionBarTitle("Management & Marketing");
                     loadCategory(MANAGEMENT_AND_MARKETING_GENRE_ID);
                     return true;
                 case R.id.search_business_news:
