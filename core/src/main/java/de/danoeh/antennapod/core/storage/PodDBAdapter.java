@@ -290,8 +290,8 @@ public class PodDBAdapter {
      */
     private static final String[] FOLDER_SEL_STD = {
             TABLE_NAME_FOLDERS + "." + KEY_ID,
-            TABLE_NAME_FOLDERS + "." + KEY_FOLDER_NAME/*,
-            TABLE_NAME_FOLDERS + "." + KEY_FEEDITEM*/};
+            TABLE_NAME_FOLDERS + "." + KEY_FOLDER_NAME,
+            TABLE_NAME_FOLDERS + "." + KEY_FEEDITEM};
 
     /**
      * All the tables in the database
@@ -327,7 +327,7 @@ public class PodDBAdapter {
     private static Context context;
     private static PodDBHelper dbHelper;
 
-    public static volatile SQLiteDatabase db;
+    private static volatile SQLiteDatabase db;
     private static Lock dbLock = new ReentrantLock();
     private static AtomicInteger counter = new AtomicInteger(0);
 
@@ -399,6 +399,30 @@ public class PodDBAdapter {
             for (String tableName : ALL_TABLES) {
                 db.delete(tableName, "1", null);
             }
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean deleteAllFolders() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.delete(TABLE_NAME_FOLDERS, null, null);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean deleteFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            String deleteClause = String.format("DROP TABLE %s",
+                    TABLE_NAME_FOLDERS);
+            db.execSQL(deleteClause);
             return true;
         } finally {
             adapter.close();
@@ -1157,7 +1181,15 @@ public class PodDBAdapter {
      * @return The cursor of the query
      */
     public final Cursor getAllFoldersCursor() {
-        //db.execSQL(CREATE_TABLE_FOLDERS); //You might have to use it to create the table (Remove this line once you used it)
+
+        //Creates the table if it is not already created
+        try{
+            db.execSQL(CREATE_TABLE_FOLDERS);
+        }
+        catch(RuntimeException e){
+           //Table already created. Do nothing
+        }
+
         return db.query(TABLE_NAME_FOLDERS, FOLDER_SEL_STD, null, null, null, null,
                 KEY_FOLDER_NAME + " COLLATE NOCASE ASC");
     }

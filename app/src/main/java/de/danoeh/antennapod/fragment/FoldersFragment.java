@@ -149,6 +149,10 @@ public class FoldersFragment extends Fragment {
         }
     }
 
+    public List<Folder> getFolders() {
+        return folders;
+    }
+
     private FoldersAdapter.ItemAccess itemAccess = new FoldersAdapter.ItemAccess() {
         @Override
         public int getCount() {
