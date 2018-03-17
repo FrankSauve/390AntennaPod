@@ -9,6 +9,7 @@
     <string name="feeds_label">Feeds</string>
     <string name="statistics_label">Statistics</string>
     <string name="add_feed_label">Add Podcast</string>
+    <string name="add_folder_label">Add Folder</string>
     <string name="episodes_label">Episodes</string>
     <string name="all_episodes_short_label">All</string>
     <string name="favorite_episodes_label">Favorites</string>
@@ -178,6 +179,10 @@
     <string name="deactivate_auto_download">Deactivate Auto Download</string>
     <string name="reset_position">Reset Playback Position</string>
     <string name="removed_item">Item removed</string>
+
+    <!-- Actions on folders -->
+    <string name="name_folder_label">Name Your Folder</string>
+    <string name="name_folder_hint">Enter folder\'s name</string>
 
     <!-- Download messages and labels -->
     <string name="download_successful">successful</string>
