@@ -333,7 +333,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue (solo.searchText(categoryName)); //search the page for the categoryName
     }
 
-    //tests each category in the dropdown
+    //tests each category in the dropdown. Random UI selections for each of the assertion procedures make this test extremely flaky
+    @FlakyTest(tolerance = 8)
     public void testAdvancedSearchCategories(){
         //Go to the homepage (Queue), then Trending
         openNavDrawer();
@@ -363,7 +364,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     //method responsible for selecting a given subcategory in the advanced search dropdown and verifying that the page has changed according to the selection
     private void subcategoryVerification(String subcategoryName, String categoryName){
-        //Go to the homepage (Queue), then Trending
+        //Go to the homepage (Queue), then Trending for each test because it seems to help with the random UI selection errors.
         openNavDrawer();
         openNavDrawer();
         solo.sleep(1000);
@@ -390,7 +391,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue (solo.searchText(subcategoryName) || solo.searchText(categoryName)); //search the page for the subcategoryName
     }
 
-    //tests each of the Arts subcategories in the dropdown
+    //tests each of the Arts subcategories in the dropdown. Random UI selections for each of the assertion procedures make this test extremely flaky
+    @FlakyTest(tolerance = 3)
     public void testAdvancedSearchSubCategories(){
 
         subcategoryVerification("Food","Arts");
