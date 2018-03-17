@@ -360,5 +360,47 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(true);
     }
 
+    //method responsible for selecting a given subcategory in the advanced search dropdown and verifying that the page has changed according to the selection
+    private void subcategoryVerification(String subcategoryName, String categoryName){
+        //Go to the homepage (Queue), then Trending
+        openNavDrawer();
+        openNavDrawer();
+        solo.sleep(1000);
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+
+        solo.sleep(4000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
+
+        solo.waitForText("Advanced Search");
+        solo.clickOnText("Advanced Search");
+        solo.waitForText("Category");
+        solo.clickOnText("Category");
+
+        solo.sleep(2000);
+        solo.waitForText(categoryName);
+        solo.clickOnText(categoryName);
+        solo.sleep(2000);
+        solo.waitForText(subcategoryName);
+        solo.clickOnText(subcategoryName);
+        solo.sleep(1000);
+
+        solo.clickOnScreen(169, 169); //click outside of the dropdown menu to get rid of dropdown
+        assertTrue (solo.searchText(subcategoryName)); //search the page for the subcategoryName
+    }
+
+    //tests each of the Arts subcategories in the dropdown
+    public void testAdvancedSearchSubCategories(){
+
+        subcategoryVerification("Food","Arts");
+        subcategoryVerification("Literature","Arts");
+        subcategoryVerification("Design","Arts");
+        subcategoryVerification("Performing","Arts");
+        subcategoryVerification("Visual","Arts");
+        subcategoryVerification("Fashion","Arts");
+
+        assertTrue(true);
+    }
+
 
 }
