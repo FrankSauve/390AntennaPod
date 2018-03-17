@@ -4,6 +4,7 @@ package de.test.antennapod.itunes;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.ActionProvider;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -349,7 +350,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
 
         itunesSearchFragment.setSubgenreIds(new ArrayList<Integer>());
         //Request to itunes API
-        itunesSearchFragment.loadCategory(itunesSearchFragment.MUSIC_GENRE_ID); //"Music" has no sub-categories
+        itunesSearchFragment.loadCategory(itunesSearchFragment.NEWS_AND_POLITICS_GENRE_ID); //"News" has no sub-categories
 
         //Wait for request
         Thread.sleep(5000);
@@ -362,8 +363,7 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         for(int i = 0; i < categorySearchResults.size(); i++){
             //Assert that podcast object variable category contains the category
             String category = categorySearchResults.get(i).category;
-            assertTrue(category.contains("Music"));
-
+            assertTrue(category.contains("News"));
         }
     }
 
