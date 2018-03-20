@@ -36,6 +36,8 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     private static List<Integer> Ids = new ArrayList<>();
 
+    private static List<Integer> CategoryId = new ArrayList<>();
+
     /**
      * Constructor
      */
@@ -136,6 +138,8 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 }
             }
 
+            CategoryId = discoveryIds;
+
             for(int b = 0; b < discoveryIds.size(); b++){
 
                 int getID = discoveryIds.get(b);
@@ -197,10 +201,9 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                         });
             }
 
-
-
-
     }
+
+    public static List<Integer> getCategoryId() { return CategoryId; }
 
 
 }
