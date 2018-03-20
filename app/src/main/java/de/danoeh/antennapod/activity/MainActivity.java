@@ -66,6 +66,7 @@ import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
 import de.danoeh.antennapod.fragment.QueueFragment;
 import de.danoeh.antennapod.fragment.SubscriptionFragment;
 import de.danoeh.antennapod.fragment.TrendingFragment;
+import de.danoeh.antennapod.fragment.DiscoveryFragment;
 import de.danoeh.antennapod.menuhandler.NavDrawerActivity;
 import de.greenrobot.event.EventBus;
 import rx.Observable;
@@ -104,6 +105,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
             PlaybackHistoryFragment.TAG,
             AddFeedFragment.TAG,
             TrendingFragment.TAG,
+            DiscoveryFragment.TAG,
             FoldersFragment.TAG,
             NavListAdapter.SUBSCRIPTION_LIST_TAG
     };
@@ -311,6 +313,10 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
             case TrendingFragment.TAG:
                 TrendingFragment trendingFragment = new TrendingFragment();
                 fragment = trendingFragment;
+                break;
+            case DiscoveryFragment.TAG:
+                DiscoveryFragment discoveryFragment = new DiscoveryFragment();
+                fragment = discoveryFragment;
                 break;
             case FoldersFragment.TAG:
                 FoldersFragment foldersFragment = new FoldersFragment();
@@ -531,6 +537,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
                 case PlaybackHistoryFragment.TAG:
                 case AddFeedFragment.TAG:
                 case TrendingFragment.TAG:
+                case DiscoveryFragment.TAG:
                 case FoldersFragment.TAG:
                 case SubscriptionFragment.TAG:
                     return retVal;

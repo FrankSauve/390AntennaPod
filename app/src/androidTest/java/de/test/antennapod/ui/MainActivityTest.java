@@ -123,6 +123,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.waitForView(R.id.subscriptions_grid); //To Change later
         assertEquals(solo.getString(R.string.trending_label), getActionbarTitle());
 
+        // Discovery
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.discovery_label));
+        solo.waitForView(R.id.subscriptions_grid);  //To Change later
+        assertEquals(solo.getString(R.string.discovery_label), getActionbarTitle());
+
         // downloads
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.downloads_label));
