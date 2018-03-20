@@ -43,6 +43,11 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         // Required empty public constructor
     }
 
+
+    public static List<Integer> getIds(){
+        return Ids;
+    }
+
     public void onStart() {
         super.onStart();
         final List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
