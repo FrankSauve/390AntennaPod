@@ -52,7 +52,7 @@
         <Preference
             android:key="prefCompactNotificationButtons"
             android:summary="@string/pref_compact_notification_buttons_sum"
-            android:title="@string/pref_compact_notification_buttons_title"/>
+            android:title="@string/pref_compact_notification_buttons_title" />
         <de.danoeh.antennapod.preferences.SwitchCompatPreference
             android:defaultValue="true"
             android:enabled="true"
@@ -343,5 +343,8 @@
             android:summary="@string/pref_cast_message"
             android:title="@string/pref_cast_title"/>
     </PreferenceCategory>
-    
+    <PreferenceCategory android:title="Preference category">
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

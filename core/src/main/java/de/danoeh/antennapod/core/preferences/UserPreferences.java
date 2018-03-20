@@ -45,6 +45,9 @@ public class UserPreferences {
 
     private static final String TAG = "UserPreferences";
 
+    //Discovery preferences
+    public static final String PREF_DISCOVERY_BUTTONS = "prefDiscoveryCategories";
+
     // User Interface
     public static final String PREF_THEME = "prefTheme";
     public static final String PREF_HIDDEN_DRAWER_ITEMS = "prefHiddenDrawerItems";
@@ -125,6 +128,8 @@ public class UserPreferences {
     private static final int NOTIFICATION_BUTTON_FAST_FORWARD = 1;
     private static final int NOTIFICATION_BUTTON_SKIP = 2;
     private static int EPISODE_CACHE_SIZE_UNLIMITED = -1;
+    private static final int DISCOVERY_ARTS_BUTTON = 3;
+    private static final int DISCOVERY_COMEDY_BUTTON = 4;
     public static final int FEED_ORDER_COUNTER = 0;
     public static final int FEED_ORDER_ALPHABETICAL = 1;
     public static final int FEED_ORDER_LAST_UPDATE = 2;
@@ -188,6 +193,18 @@ public class UserPreferences {
         return notificationButtons;
     }
 
+    public static List<Integer> getDiscoveryCategoriesButtons() {
+        String[] buttons = TextUtils.split(
+                prefs.getString(PREF_DISCOVERY_BUTTONS,
+                        String.valueOf(DISCOVERY_ARTS_BUTTON)),
+                ",");
+        List<Integer> discoveryButtons = new ArrayList<>();
+        for (int i=0; i<buttons.length; i++) {
+            discoveryButtons.add(Integer.parseInt(buttons[i]));
+        }
+        return discoveryButtons;
+    }
+
     /**
      * Helper function to return whether the specified button should be shown on compact
      * notifications.
@@ -210,6 +227,18 @@ public class UserPreferences {
 
     public static boolean showSkipOnCompactNotification() {
         return showButtonOnCompactNotification(NOTIFICATION_BUTTON_SKIP);
+    }
+
+    private static boolean showButtonOnDiscovery(int buttonId) {
+        return getDiscoveryCategoriesButtons().contains(buttonId);
+    }
+
+    public static boolean showArtsOnDiscovery() {
+        return showButtonOnDiscovery(DISCOVERY_ARTS_BUTTON);
+    }
+
+    public static boolean showComedyOnDiscovery() {
+        return showButtonOnDiscovery(DISCOVERY_COMEDY_BUTTON);
     }
 
     public static int getFeedOrder() {
@@ -588,6 +617,13 @@ public class UserPreferences {
         String str = TextUtils.join(",", items);
         prefs.edit()
              .putString(PREF_COMPACT_NOTIFICATION_BUTTONS, str)
+             .apply();
+    }
+
+    public static void setPrefDiscoveryButtons(List<Integer> items) {
+        String str = TextUtils.join(",", items);
+        prefs.edit()
+             .putString(PREF_DISCOVERY_BUTTONS, str)
              .apply();
     }
 
