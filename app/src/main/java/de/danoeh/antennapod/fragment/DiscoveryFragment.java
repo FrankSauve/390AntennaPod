@@ -16,6 +16,7 @@ import java.util.Locale;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
+import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
 import okhttp3.OkHttpClient;
@@ -33,6 +34,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     public static final String TAG = "DiscoveryFragment";
 
+    private static List<Integer> Ids = new ArrayList<>();
 
     /**
      * Constructor
@@ -41,11 +43,20 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         // Required empty public constructor
     }
 
+    public void onStart() {
+        super.onStart();
+        final List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
+        if (Ids != discoveryCategories)
+        {
+            loadCategories(discoveryCategories);
+            Ids = discoveryCategories;
+        }
+    }
+
 
     @Override
     public void loadToplist() {
         final List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
-
         if (discoveryCategories != null) {
             loadCategories(discoveryCategories);
         }
