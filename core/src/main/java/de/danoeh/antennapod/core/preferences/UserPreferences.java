@@ -254,6 +254,10 @@ public class UserPreferences {
         return showButtonOnDiscovery(DISCOVERY_COMEDY_BUTTON);
     }
 
+    public static boolean showEducationOnDiscovery() {
+        return showButtonOnDiscovery(DISCOVERY_EDUCATION_BUTTON);
+    }
+
     public static int getFeedOrder() {
         String value = prefs.getString(PREF_DRAWER_FEED_ORDER, "0");
         return Integer.parseInt(value);
