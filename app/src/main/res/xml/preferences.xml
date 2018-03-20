@@ -3,6 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <PreferenceCategory android:title="@string/user_discovery_label">
+        <Preference
+            android:key="prefDiscoveryCategories"
+            android:summary="@string/pref_discovery_sum"
+            android:title="@string/pref_discovery_title"/>
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/user_interface_label">
         <com.afollestad.materialdialogs.prefs.MaterialListPreference
             android:entryValues="@array/theme_values"
