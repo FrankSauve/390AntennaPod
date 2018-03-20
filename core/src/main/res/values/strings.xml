@@ -684,6 +684,20 @@
     <string name="load_next_page_label">Load next page</string>
     <string name="arts_label">Arts</string>
     <string name="comedy_label">Comedy</string>
+    <string name="education_label">Education</string>
+    <string name="kids_family_label">Kids and Family</string>
+    <string name="health_label">Health</string>
+    <string name="tv_film_label">TV and Film</string>
+    <string name="music_label">Music</string>
+    <string name="news_politics_label">News and Politics</string>
+    <string name="religion_spirituality_label">Religion and Spirituality</string>
+    <string name="science_medecine_label">Science and Medecine</string>
+    <string name="sports_recreation_label">Sports and Recreation</string>
+    <string name="technology_label">Technology</string>
+    <string name="business_label">Business</string>
+    <string name="games_hobbies_label">Games and Hobbies</string>
+    <string name="society_culture_label">Society and Culture</string>
+    <string name="government_organization_label">Government and Organization</string>
 
     <!-- Feed information screen -->
     <string name="authentication_label">Authentication</string>
