@@ -84,7 +84,7 @@ public class ItunesSearchFragment extends Fragment {
     public static final int SOCIETY_AND_CULTURE_GENRE_ID = 1324;
     public static final int GOVERNMENT_AND_ORGANIZATION_GENRE_ID = 1325;
 
-    private List<Integer> subgenreIds = new ArrayList<Integer>();
+    protected List<Integer> subgenreIds = new ArrayList<Integer>();
 
     //Arts subgenres
     public static final int FOOD_GENRE_ID = 1306;
@@ -163,22 +163,22 @@ public class ItunesSearchFragment extends Fragment {
     /**
      * Adapter responsible with the search results
      */
-    private ItunesAdapter adapter;
-    private GridView gridView;
-    private ProgressBar progressBar;
-    private TextView txtvError;
-    private Button butRetry;
-    private TextView txtvEmpty;
+    protected ItunesAdapter adapter;
+    protected GridView gridView;
+    protected ProgressBar progressBar;
+    protected TextView txtvError;
+    protected Button butRetry;
+    protected TextView txtvEmpty;
 
     /**
      * List of podcasts retreived from the search
      */
-    private List<Podcast> searchResults;
-    private List<Podcast> categorySearchResults;
+    protected List<Podcast> searchResults;
+    protected List<Podcast> categorySearchResults;
     private List<Podcast> subCategorySearchResults;
     private List<Podcast> languageSearchResults;
     private List<Podcast> topList;
-    private Subscription subscription;
+    protected Subscription subscription;
     private SearchView sv;
     private SearchView svSelect;
     private JSONArray autocompleteSuggestions;

@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.shredzone.flattr4j.model.User;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -231,6 +232,11 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
         ui.findPreference(UserPreferences.PREF_COMPACT_NOTIFICATION_BUTTONS)
                 .setOnPreferenceClickListener(preference -> {
                     showNotificationButtonsDialog();
+                    return true;
+                });
+        ui.findPreference(UserPreferences.PREF_DISCOVERY_BUTTONS)
+                .setOnPreferenceClickListener(preference -> {
+                    showDiscoveryButtonsDialog();
                     return true;
                 });
 
@@ -899,7 +905,38 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
             }
         });
         builder.setPositiveButton(R.string.confirm_label, (dialog, which) ->
-            UserPreferences.setCompactNotificationButtons(preferredButtons));
+                UserPreferences.setCompactNotificationButtons(preferredButtons));
+        builder.setNegativeButton(R.string.cancel_label, null);
+        builder.create().show();
+    }
+
+    private void showDiscoveryButtonsDialog() {
+        final Context context = ui.getActivity();
+        final List<Integer> discoveryButton = UserPreferences.getDiscoveryCategoriesButtons();
+        final String[] allButtonNames = context.getResources().getStringArray(
+                R.array.compact_discovery_buttons_options);
+        boolean[] checked = new boolean[allButtonNames.length]; // booleans default to false in java
+
+        for(int i=0; i < checked.length; i++) {
+            if(discoveryButton.contains(i)) {
+                checked[i] = true;
+            }
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(String.format(context.getResources().getString(
+                R.string.pref_discovery_buttons_dialog_title), 2));
+        builder.setMultiChoiceItems(allButtonNames, checked, (dialog, which, isChecked) -> {
+            checked[which] = isChecked;
+
+            if (isChecked) {
+                discoveryButton.add(which);
+            } else {
+                discoveryButton.remove((Integer) which);
+            }
+        });
+        builder.setPositiveButton(R.string.confirm_label, (dialog, which) ->
+                UserPreferences.setPrefDiscoveryButtons(discoveryButton));
         builder.setNegativeButton(R.string.cancel_label, null);
         builder.create().show();
     }
