@@ -20,6 +20,7 @@ import de.danoeh.antennapod.activity.PreferenceActivity;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
+import de.danoeh.antennapod.fragment.DiscoveryFragment;
 import de.danoeh.antennapod.fragment.DownloadsFragment;
 import de.danoeh.antennapod.fragment.EpisodesFragment;
 import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
@@ -122,6 +123,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText(solo.getString(R.string.trending_label));
         solo.waitForView(R.id.subscriptions_grid); //To Change later
         assertEquals(solo.getString(R.string.trending_label), getActionbarTitle());
+
+        // Discovery
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.discovery_label));
+        solo.waitForView(R.id.subscriptions_grid);  //To Change later
+        assertEquals(solo.getString(R.string.discovery_label), getActionbarTitle());
 
         // downloads
         openNavDrawer();
@@ -405,6 +412,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(true);
     }
 
+
     private void addNewFolder(String folderName){
         solo.waitForText("Add Folder");
         solo.clickOnText("Add Folder");
@@ -422,17 +430,16 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText("Cancel");
     }
 
-    public void testAddFolder(){
+    public void testAddFolder() {
 
         //Folder name
         String newFolderName = "First folder";
 
         //Try to open My Folders page (sometimes emulator is already on My Folders page so try/catch will avoid to open side nav)
-        try{ //If already on My Folders page just add new folder
+        try { //If already on My Folders page just add new folder
             //Add a new folder and enter its name
             addNewFolder(newFolderName);
-        }
-        catch(junit.framework.AssertionFailedError e){
+        } catch (junit.framework.AssertionFailedError e) {
             //Otherwise catch error and open side navigation then open My Folders page
             openNavDrawer();
             System.out.println("INSIDE CATCHHHH!!!");
@@ -447,6 +454,15 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         //Assertion
         assertTrue(solo.waitForText(newFolderName));
 
+    }
+
+    public void testDiscoveryPage(){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.discovery_label));
+        solo.waitForView(R.id.subscriptions_grid);  //To Change later
+        assertEquals(solo.getString(R.string.discovery_label), getActionbarTitle());
+
+        assertEquals(UserPreferences.getDiscoveryCategoriesButtons(), DiscoveryFragment.getIds());
     }
 
 

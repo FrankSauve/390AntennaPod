@@ -84,7 +84,7 @@ public class ItunesSearchFragment extends Fragment {
     public static final int SOCIETY_AND_CULTURE_GENRE_ID = 1324;
     public static final int GOVERNMENT_AND_ORGANIZATION_GENRE_ID = 1325;
 
-    private List<Integer> subgenreIds = new ArrayList<Integer>();
+    protected List<Integer> subgenreIds = new ArrayList<Integer>();
 
     //Arts subgenres
     public static final int FOOD_GENRE_ID = 1306;
@@ -163,23 +163,24 @@ public class ItunesSearchFragment extends Fragment {
     /**
      * Adapter responsible with the search results
      */
-    private ItunesAdapter adapter;
-    private GridView gridView;
-    private ProgressBar progressBar;
-    private TextView txtvError;
-    private Button butRetry;
-    private TextView txtvEmpty;
+    protected ItunesAdapter adapter;
+    protected GridView gridView;
+    protected ProgressBar progressBar;
+    protected TextView txtvError;
+    protected Button butRetry;
+    protected TextView txtvEmpty;
 
     /**
      * List of podcasts retreived from the search
      */
-    private List<Podcast> searchResults;
-    private List<Podcast> categorySearchResults;
+    protected List<Podcast> searchResults;
+    protected List<Podcast> categorySearchResults;
     private List<Podcast> subCategorySearchResults;
     private List<Podcast> languageSearchResults;
     private List<Podcast> topList;
-    private Subscription subscription;
+    protected Subscription subscription;
     private SearchView sv;
+    private SearchView svSelect;
     private JSONArray autocompleteSuggestions;
 
     private Menu menu;
@@ -372,7 +373,7 @@ public class ItunesSearchFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String query) {
-                new AutocompleAsyncTask().execute(query);
+                new AutocompleAsyncTask().execute(query, Integer.toString(searchItem.getItemId()));
                 return true;
             }
         });
@@ -398,7 +399,7 @@ public class ItunesSearchFragment extends Fragment {
 
             subgenreIds.clear();
 
-            SearchView sv = (SearchView) MenuItemCompat.getActionView(item);
+            svSelect = (SearchView) MenuItemCompat.getActionView(item);
 
             //Collapses the artist, title and regular searchviews so they don't overlap
             menu.findItem(R.id.itunes_search_artist).collapseActionView();
@@ -407,19 +408,44 @@ public class ItunesSearchFragment extends Fragment {
             switch (item.getItemId()) {
                 //Artist item
                 case R.id.itunes_search_artist:
-                    MenuItemUtils.adjustTextColor(getActivity(), sv);
-                    sv.setQueryHint(getString(R.string.artist_search));
-                    sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                    MenuItemUtils.adjustTextColor(getActivity(), svSelect);
+                    svSelect.setQueryHint(getString(R.string.artist_search));
+                    svSelect.setSuggestionsAdapter(new SimpleCursorAdapter(getContext(), android.R.layout.simple_list_item_1, null, new String[] {SearchManager.SUGGEST_COLUMN_TEXT_1}, new int[] {android.R.id.text1}));
+
+                    svSelect.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+
                         @Override
-                        public boolean onQueryTextSubmit(String s) {
-                            sv.clearFocus();
-                            search(s, item);
+                        public boolean onSuggestionSelect(int position) {
+
+                            Cursor cursor = (Cursor) sv.getSuggestionsAdapter().getItem(position);
+                            String term = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                            cursor.close();
+                            svSelect.setQuery(term, true);
+                            search(term, item);
+
                             return true;
                         }
 
                         @Override
-                        public boolean onQueryTextChange(String s) {
-                            return false;
+                        public boolean onSuggestionClick(int position) {
+
+                            return onSuggestionSelect(position);
+                        }
+                    });
+
+                    svSelect.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            svSelect.clearFocus();
+                            search(query, item);
+                            svSelect.getSuggestionsAdapter().changeCursor(null);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String query) {
+                            new AutocompleAsyncTask().execute(query, Integer.toString(item.getItemId()));
+                            return true;
                         }
                     });
                     MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
@@ -441,19 +467,44 @@ public class ItunesSearchFragment extends Fragment {
                 //Title item
                 case R.id.itunes_search_title:
 
-                    MenuItemUtils.adjustTextColor(getActivity(), sv);
-                    sv.setQueryHint(getString(R.string.title_search));
-                    sv.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                    MenuItemUtils.adjustTextColor(getActivity(), svSelect);
+                    svSelect.setQueryHint(getString(R.string.title_search));
+                    svSelect.setSuggestionsAdapter(new SimpleCursorAdapter(getContext(), android.R.layout.simple_list_item_1, null, new String[] {SearchManager.SUGGEST_COLUMN_TEXT_1}, new int[] {android.R.id.text1}));
+
+                    svSelect.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+
                         @Override
-                        public boolean onQueryTextSubmit(String s) {
-                            sv.clearFocus();
-                            search(s, item);
+                        public boolean onSuggestionSelect(int position) {
+
+                            Cursor cursor = (Cursor) sv.getSuggestionsAdapter().getItem(position);
+                            String term = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                            cursor.close();
+                            svSelect.setQuery(term, true);
+                            search(term, item);
+
                             return true;
                         }
 
                         @Override
-                        public boolean onQueryTextChange(String s) {
-                            return false;
+                        public boolean onSuggestionClick(int position) {
+
+                            return onSuggestionSelect(position);
+                        }
+                    });
+
+                    svSelect.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            svSelect.clearFocus();
+                            search(query, item);
+                            svSelect.getSuggestionsAdapter().changeCursor(null);
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String query) {
+                            new AutocompleAsyncTask().execute(query, Integer.toString(item.getItemId()));
+                            return true;
                         }
                     });
                     MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
@@ -1211,13 +1262,38 @@ public class ItunesSearchFragment extends Fragment {
 
     }
 
-    public void autocomplete(String query){
+    public void autocomplete(String query, String itemId){
         if (subscription != null) {
             subscription.unsubscribe();
         }
         subscription = Observable.create((Observable.OnSubscribe<JSONArray>) subscriber -> {
+
+            String encodedQuery = null;
             String formattedUrl = null;
-            formattedUrl = String.format(API_URL, query.toLowerCase()).replace(' ', '+');
+            try {
+                encodedQuery = URLEncoder.encode(query, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                // this won't ever be thrown
+            }
+            if (encodedQuery == null) {
+                encodedQuery = query.toLowerCase(); // failsafe
+            }
+
+            //If it is an artist search we use the API url for artist search
+            if(Integer.parseInt(itemId) == R.id.itunes_search_artist){
+                //Spaces in the query need to be replaced with '+' character.
+                //query has to be lowercase to only get podcasts objects
+                formattedUrl = String.format(API_URL_ARTIST_SEARCH, query.toLowerCase()).replace(' ', '+');
+            }
+            //If it is a title search we use the API url for title search
+            else if(Integer.parseInt(itemId) == R.id.itunes_search_title){
+                //Spaces in the query need to be replaced with '+' character.
+                formattedUrl = String.format(API_URL_TITLE_SEARCH, query.toLowerCase()).replace(' ', '+');
+            }
+            //Else use standard API search url
+            else{
+                formattedUrl = String.format(API_URL, query.toLowerCase()).replace(' ', '+');
+            }
 
             JSONArray j = null;
 
@@ -1277,7 +1353,8 @@ public class ItunesSearchFragment extends Fragment {
             System.out.print(params[0]);
             // parse your search terms into the MatrixCursor
             if(!params[0].equals("")){
-                autocomplete(params[0]);
+
+                autocomplete(params[0], params[1]);
                 try {
                     Thread.sleep(500); //TODO : This is a bad way of waiting for a request
                 } catch (InterruptedException e) {
@@ -1294,8 +1371,14 @@ public class ItunesSearchFragment extends Fragment {
                         e.printStackTrace();
                     }
 
-                    Object[] row = new Object[] { i, podcast.title };
-                    cursor.addRow(row);
+                    if(Integer.parseInt(params[1]) == R.id.itunes_search_artist){
+                        Object[] row = new Object[] { i, podcast.artist };
+                        cursor.addRow(row);
+                    }
+                    else{
+                        Object[] row = new Object[] { i, podcast.title };
+                        cursor.addRow(row);
+                    }
                 }
             }
             return cursor;
@@ -1304,6 +1387,7 @@ public class ItunesSearchFragment extends Fragment {
         @Override
         protected void onPostExecute(Cursor result){
             sv.getSuggestionsAdapter().changeCursor(result);
+            svSelect.getSuggestionsAdapter().changeCursor(result);
         }
     }
 

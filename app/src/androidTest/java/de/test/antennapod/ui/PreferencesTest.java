@@ -7,7 +7,10 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.robotium.solo.Solo;
 import com.robotium.solo.Timeout;
 
+import org.shredzone.flattr4j.model.User;
+
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.danoeh.antennapod.R;
@@ -46,6 +49,8 @@ public class PreferencesTest extends ActivityInstrumentationTestCase2<Preference
         solo.finishOpenedActivities();
         super.tearDown();
     }
+
+
 
     public void testSwitchTheme() {
         final int theme = UserPreferences.getTheme();
@@ -113,6 +118,37 @@ public class PreferencesTest extends ActivityInstrumentationTestCase2<Preference
         assertTrue(solo.waitForCondition(() -> UserPreferences.showRewindOnCompactNotification(), Timeout.getLargeTimeout()));
         assertTrue(solo.waitForCondition(() -> UserPreferences.showFastForwardOnCompactNotification(), Timeout.getLargeTimeout()));
         assertTrue(solo.waitForCondition(() -> !UserPreferences.showSkipOnCompactNotification(), Timeout.getLargeTimeout()));
+    }
+
+    public void testDiscoveryPreferences() {
+        String[] buttons = res.getStringArray(R.array.compact_discovery_buttons_options);
+        //Click on Discovery Preferences
+        solo.clickOnText(solo.getString(R.string.pref_discovery_title));
+        solo.waitForDialogToOpen();
+
+        // First uncheck every checkbox
+        for (int i=0; i<buttons.length; i++) {
+            if (solo.isTextChecked(buttons[i])) {
+                solo.clickOnText(buttons[i]);
+            }
+        }
+        solo.clickOnText(solo.getString(R.string.confirm_label));
+        solo.waitForDialogToClose(1000);
+
+        solo.clickOnText(solo.getString(R.string.pref_discovery_title));
+        solo.waitForDialogToOpen();
+
+        // Now we will check two options
+        solo.clickOnText(buttons[0]);
+        solo.clickOnText(buttons[1]);
+        solo.clickOnText(solo.getString(R.string.confirm_label));
+        solo.waitForDialogToClose(1000);
+
+       // final List<Integer> discovery = UserPreferences.getDiscoveryCategoriesButtons();
+        assertTrue(solo.waitForCondition(() -> UserPreferences.showArtsOnDiscovery(), Timeout.getLargeTimeout()));
+        assertTrue(solo.waitForCondition(() -> UserPreferences.showComedyOnDiscovery(), Timeout.getLargeTimeout()));
+        assertTrue(solo.waitForCondition(() -> !UserPreferences.showEducationOnDiscovery(), Timeout.getLargeTimeout()));
+
     }
 
     public void testEnqueueAtFront() {
