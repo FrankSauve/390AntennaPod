@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.fragment.ItunesSearchFragment;
@@ -420,11 +421,11 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         }
     }
 
-    public void testItunesAutocomplete() throws InterruptedException, JSONException {
+    public void testItunesAutocompleteRegular() throws InterruptedException, JSONException {
         //Partially complete a query
         String podQuery = "Comedy Bang"; // Incomplete title for "Comedy Bang Bang: The Podcast"
         String podExpected = "Comedy Bang Bang: The Podcast";
-        itunesSearchFragment.autocomplete(podQuery);
+        itunesSearchFragment.autocomplete(podQuery, Integer.toString(R.id.action_search));
 
         //Wait for request
         Thread.sleep(5000);
@@ -434,6 +435,38 @@ public class ItunesApiTest extends ActivityInstrumentationTestCase2<MainActivity
         //Assertions
         assertNotNull(autocompleteSearchResults); // Assert that there were options in the autocomplete
         assertEquals(true, autocompleteSearchResults.getString(0).contains(podExpected)); // Assert that the first option is "Comedy Bang Bang: The Podcast"
+    }
+
+    public void testItunesAutocompleteTitle() throws InterruptedException, JSONException {
+        //Partially complete a query
+        String titleQuery = "Comedy Bang"; // Incomplete title for "Comedy Bang Bang: The Podcast"
+        String titleExpected = "Comedy Bang Bang: The Podcast";
+        itunesSearchFragment.autocomplete(titleQuery, Integer.toString(R.id.itunes_search_title));
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        autocompleteSearchResults = itunesSearchFragment.getAutocompleteResults();
+
+        //Assertions
+        assertNotNull(autocompleteSearchResults); // Assert that there were options in the autocomplete
+        assertEquals(true, autocompleteSearchResults.getString(0).contains(titleExpected)); // Assert that the first option is "Comedy Bang Bang: The Podcast"
+    }
+
+    public void testItunesAutocompleteArtists() throws InterruptedException, JSONException {
+        //Partially complete a query
+        String artistQuery = "CBC"; // Incomplete artist for "CBC Podcasts"
+        String artistExpexted = "CBC Podcasts";
+        itunesSearchFragment.autocomplete(artistQuery, Integer.toString(R.id.itunes_search_artist));
+
+        //Wait for request
+        Thread.sleep(5000);
+
+        autocompleteSearchResults = itunesSearchFragment.getAutocompleteResults();
+
+        //Assertions
+        assertNotNull(autocompleteSearchResults); // Assert that there were options in the autocomplete
+        assertEquals(true, autocompleteSearchResults.getString(0).contains(artistExpexted)); // Assert that the first option is "CBC Podcasts"
     }
 
 }
