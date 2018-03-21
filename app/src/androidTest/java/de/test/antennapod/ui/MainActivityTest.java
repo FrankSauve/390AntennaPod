@@ -442,7 +442,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         } catch (junit.framework.AssertionFailedError e) {
             //Otherwise catch error and open side navigation then open My Folders page
             openNavDrawer();
-            System.out.println("INSIDE CATCHHHH!!!");
             solo.waitForText("My Folders");
             solo.clickOnText("My Folders");
             addNewFolder(newFolderName);
