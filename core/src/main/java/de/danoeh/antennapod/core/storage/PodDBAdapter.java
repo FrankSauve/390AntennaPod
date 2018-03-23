@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.text.TextUtils;
@@ -125,6 +126,7 @@ public class PodDBAdapter {
     private static final String TABLE_NAME_SIMPLECHAPTERS = "SimpleChapters";
     private static final String TABLE_NAME_FAVORITES = "Favorites";
     private static final String TABLE_NAME_FOLDERS = "Folders";
+    private static final String TABLE_NAME_ITEMS_FOLDERS = "ItemsFolders";
 
     // SQL Statements for creating new tables
     private static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -200,6 +202,13 @@ public class PodDBAdapter {
     public static final String CREATE_TABLE_FOLDERS = "CREATE TABLE "
             + TABLE_NAME_FOLDERS + "(" + TABLE_PRIMARY_KEY
             + KEY_FOLDER_NAME + " TEXT," + KEY_FEEDITEM + " INTEGER)";
+
+    public static final String CREATE_TABLE_ITEMS_FOLDERS = "CREATE TABLE "
+            + TABLE_NAME_ITEMS_FOLDERS + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_FEEDITEM + " INTEGER,"
+            + KEY_FOLDER_NAME + " TEXT,"
+            + KEY_FEED + " INTEGER,"
+            + " FOREIGN KEY ("+ KEY_FOLDER_NAME +") REFERENCES "+TABLE_NAME_FOLDERS+"("+KEY_ID+"));";;
 
     // SQL Statements for creating indexes
     public static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
@@ -986,6 +995,26 @@ public class PodDBAdapter {
         }
     }
 
+    public void setItemsToFolder(Folder folder, List<FeedItem> items) {
+        ContentValues values = new ContentValues();
+        try {
+            db.beginTransactionNonExclusive();
+            db.delete(TABLE_NAME_ITEMS_FOLDERS, null, null);
+            for (int i = 0; i < items.size(); i++) {
+                FeedItem item = items.get(i);
+                values.put(KEY_ID, i);
+                values.put(KEY_FEEDITEM, item.getId());
+                values.put(KEY_FOLDER_NAME, folder.getName());
+                db.insertWithOnConflict(TABLE_NAME_ITEMS_FOLDERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     //Create a new folder
     public long addFolder(Folder folder){
         // don't create a folder that has the same name as another one
@@ -1026,6 +1055,19 @@ public class PodDBAdapter {
         db.insert(TABLE_NAME_FAVORITES, null, values);
     }
 
+    public void addFolderItem(Folder folder, FeedItem item) {
+        // don't add an item that's already there...
+        if (isItemInFolder(item)) {
+            Log.d(TAG, "item already in folder");
+            return;
+        }
+        ContentValues values = new ContentValues();
+        values.put(KEY_FEEDITEM, item.getId());
+        values.put(KEY_FEED, item.getFeedId());
+        values.put(KEY_FOLDER_NAME, folder.getName());
+        db.insert(TABLE_NAME_ITEMS_FOLDERS, null, values);
+    }
+
     public void removeFavoriteItem(FeedItem item) {
         String deleteClause = String.format("DELETE FROM %s WHERE %s=%s AND %s=%s",
                 TABLE_NAME_FAVORITES,
@@ -1037,6 +1079,15 @@ public class PodDBAdapter {
     public boolean isItemInFavorites(FeedItem item) {
         String query = String.format("SELECT %s from %s WHERE %s=%d",
                 KEY_ID, TABLE_NAME_FAVORITES, KEY_FEEDITEM, item.getId());
+        Cursor c = db.rawQuery(query, null);
+        int count = c.getCount();
+        c.close();
+        return count > 0;
+    }
+
+    public boolean isItemInFolder(FeedItem item) {
+        String query = String.format("SELECT %s from %s WHERE %s=%d",
+                KEY_ID, TABLE_NAME_ITEMS_FOLDERS, KEY_FEEDITEM, item.getId());
         Cursor c = db.rawQuery(query, null);
         int count = c.getCount();
         c.close();
@@ -1612,6 +1663,19 @@ public class PodDBAdapter {
         return result;
     }
 
+    public int itemCount(Folder folder){
+        final String query = "SELECT COUNT(*) FROM " + TABLE_NAME_ITEMS_FOLDERS +
+                " WHERE " + KEY_FOLDER_NAME + "= '" + folder.getName() +"'";
+
+        Cursor c = db.rawQuery(query, null);
+        int result = 0;
+        if (c.moveToFirst()) {
+            result = c.getInt(0);
+        }
+        c.close();
+        return result;
+    }
+
     /**
      * Uses DatabaseUtils to escape a search query and removes ' at the
      * beginning and the end of the string returned by the escape method.
@@ -1813,6 +1877,7 @@ public class PodDBAdapter {
             db.execSQL(CREATE_TABLE_SIMPLECHAPTERS);
             db.execSQL(CREATE_TABLE_FAVORITES);
             db.execSQL(CREATE_TABLE_FOLDERS);
+            db.execSQL(CREATE_TABLE_ITEMS_FOLDERS);
 
             db.execSQL(CREATE_INDEX_FEEDITEMS_FEED);
             db.execSQL(CREATE_INDEX_FEEDITEMS_IMAGE);
@@ -2022,6 +2087,7 @@ public class PodDBAdapter {
             if (oldVersion < 1040001) {
                 db.execSQL(CREATE_TABLE_FAVORITES);
                 db.execSQL(CREATE_TABLE_FOLDERS);
+                db.execSQL(CREATE_TABLE_ITEMS_FOLDERS);
             }
             if (oldVersion < 1040002) {
                 db.execSQL("ALTER TABLE " + PodDBAdapter.TABLE_NAME_FEED_MEDIA
