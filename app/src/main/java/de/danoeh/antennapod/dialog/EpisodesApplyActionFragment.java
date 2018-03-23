@@ -19,12 +19,17 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.core.dialog.DownloadRequestErrorDialogCreator;
 import de.danoeh.antennapod.core.feed.FeedItem;
+import de.danoeh.antennapod.core.folders.Folder;
+import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DBTasks;
 import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.core.storage.DownloadRequestException;
@@ -49,6 +54,9 @@ public class EpisodesApplyActionFragment extends Fragment {
 
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
+    List<String> listItems;
+    List<Folder> folders;
+    Map<Integer, String> hmap;
 
     private Button btnAddToQueue;
     private Button btnMarkAsPlayed;
@@ -169,6 +177,9 @@ public class EpisodesApplyActionFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.episodes_apply_action_options, menu);
+        folders();
+        for(String item : listItems)
+        {menu.add(R.id.sort,getKey(item),2,item);}
 
         mSelectToggle = menu.findItem(R.id.select_toggle);
         mSelectToggle.setOnMenuItemClickListener(item -> {
@@ -203,46 +214,50 @@ public class EpisodesApplyActionFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if(hmap.containsKey(item.getItemId())){
+            //testing to see if proper id is found
+            addToFolder(folders.get(item.getItemId()-1));
+        }
         int resId = 0;
         switch(item.getItemId()) {
             case R.id.select_options:
                 return true;
-            case R.id.check_all:
-                checkAll();
-                resId = R.string.selected_all_label;
-                break;
-            case R.id.check_none:
-                checkNone();
-                resId = R.string.deselected_all_label;
-                break;
-            case R.id.check_played:
-                checkPlayed(true);
-                resId = R.string.selected_played_label;
-                break;
-            case R.id.check_unplayed:
-                checkPlayed(false);
-                resId = R.string.selected_unplayed_label;
-                break;
-            case R.id.check_downloaded:
-                checkDownloaded(true);
-                resId = R.string.selected_downloaded_label;
-                break;
-            case R.id.check_not_downloaded:
-                checkDownloaded(false);
-                resId = R.string.selected_not_downloaded_label;
-                break;
-            case R.id.check_queued:
-                checkQueued(true);
-                resId = R.string.selected_queued_label;
-                break;
-            case R.id.check_not_queued:
-                checkQueued(false);
-                resId = R.string.selected_not_queued_label;
-                break;
-            case R.id.check_has_media:
-                checkWithMedia();
-                resId = R.string.selected_has_media_label;
-                break;
+//            case R.id.check_all:
+//                checkAll();
+//                resId = R.string.selected_all_label;
+//                break;
+//            case R.id.check_none:
+//                checkNone();
+//                resId = R.string.deselected_all_label;
+//                break;
+//            case R.id.check_played:
+//                checkPlayed(true);
+//                resId = R.string.selected_played_label;
+//                break;
+//            case R.id.check_unplayed:
+//                checkPlayed(false);
+//                resId = R.string.selected_unplayed_label;
+//                break;
+//            case R.id.check_downloaded:
+//                checkDownloaded(true);
+//                resId = R.string.selected_downloaded_label;
+//                break;
+//            case R.id.check_not_downloaded:
+//                checkDownloaded(false);
+//                resId = R.string.selected_not_downloaded_label;
+//                break;
+//            case R.id.check_queued:
+//                checkQueued(true);
+//                resId = R.string.selected_queued_label;
+//                break;
+//            case R.id.check_not_queued:
+//                checkQueued(false);
+//                resId = R.string.selected_not_queued_label;
+//                break;
+//            case R.id.check_has_media:
+//                checkWithMedia();
+//                resId = R.string.selected_has_media_label;
+//                break;
             case R.id.sort_title_a_z:
                 sortByTitle(false);
                 return true;
@@ -270,6 +285,25 @@ public class EpisodesApplyActionFragment extends Fragment {
         }
     }
 
+    public int getKey(String item){
+        int  key = 0;
+        for (Map.Entry entry : hmap.entrySet()) {
+            if (item.equals(entry.getValue())) {
+                key = (int)entry.getKey();
+            }
+        }
+            return key;
+    }
+    public void folders(){
+        hmap = new Hashtable<Integer, String>();
+        folders= new ArrayList<>();
+        listItems = new ArrayList<>();
+        folders = DBReader.getFolderList();
+        for (Folder folder : folders){
+            listItems.add(folder.getName());
+            hmap.put((int)folder.getId(), folder.getName());
+        }
+    }
     private void sortByTitle(final boolean reverse) {
         Collections.sort(episodes, (lhs, rhs) -> {
             if (reverse) {
@@ -419,6 +453,16 @@ public class EpisodesApplyActionFragment extends Fragment {
             FeedItem episode = idMap.get(id);
             if(episode.hasMedia()) {
                 DBWriter.addFavoriteItemById(episode.getMedia().getId());
+            }
+        }
+        close();
+    }
+
+    private void addToFolder(Folder folder) {
+        for(long id : checkedIds.toArray()) {
+            FeedItem episode = idMap.get(id);
+            if(episode.hasMedia()) {
+                DBWriter.addItemsToFolderById(folder,episode.getMedia().getId());
             }
         }
         close();
