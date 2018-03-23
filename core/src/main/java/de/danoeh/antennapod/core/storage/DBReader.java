@@ -876,6 +876,17 @@ public final class DBReader {
         }
     }
 
+    public static int getNumberOfItemsInFolder(Folder folder){
+        PodDBAdapter adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        try {
+            return adapter.itemCount(folder);
+        } finally {
+            adapter.close();
+        }
+
+    }
+
     /**
      * Searches the DB for a FeedImage of the given id.
      *
@@ -931,6 +942,7 @@ public final class DBReader {
         }
         return result;
     }
+
 
     /**
      * Searches the DB for a FeedMedia of the given id.
