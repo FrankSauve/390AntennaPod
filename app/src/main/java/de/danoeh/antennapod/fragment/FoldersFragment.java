@@ -46,6 +46,7 @@ public class FoldersFragment extends Fragment {
     //private DBReader.NavDrawerData navDrawerData;
     private FoldersAdapter foldersAdapter;
 
+
     private List<Folder> folders;
 
     private int mPosition = -1;
@@ -93,6 +94,7 @@ public class FoldersFragment extends Fragment {
     public void loadFolders() {
 
         folders = DBReader.getFolderList();
+
 
     }
 
@@ -147,6 +149,7 @@ public class FoldersFragment extends Fragment {
             default:
                 return super.onContextItemSelected(item);
         }
+
     }
 
     public List<Folder> getFolders() {
@@ -174,8 +177,9 @@ public class FoldersFragment extends Fragment {
 
         @Override
         public int getFolderCounter(long folderId) {
-            return folders != null ? 25 : 0; //Hard coded (to change later)
+            return DBReader.getNumberOfItemsInFolder(folders.get((int)folderId-1));
         }
     };
+
 }
 
