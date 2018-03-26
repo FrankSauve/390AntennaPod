@@ -412,6 +412,49 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(true);
     }
 
+
+    private void addNewFolder(String folderName){
+        solo.waitForText("Add Folder");
+        solo.clickOnText("Add Folder");
+        solo.waitForText("Name Your Folder");
+        solo.enterText(0, folderName);
+        solo.sleep(1000);
+        solo.clickOnText("OK");
+    }
+
+    private void cancelAddNewFolder(){
+        solo.waitForText("Add Folder");
+        solo.clickOnText("Add Folder");
+        solo.waitForText("Cancel");
+        solo.sleep(1000);
+        solo.clickOnText("Cancel");
+    }
+
+    public void testAddFolder() {
+
+        //Folder name
+        String newFolderName = "First folder";
+
+        //Try to open My Folders page (sometimes emulator is already on My Folders page so try/catch will avoid to open side nav)
+        try { //If already on My Folders page just add new folder
+            //Add a new folder and enter its name
+            addNewFolder(newFolderName);
+        } catch (junit.framework.AssertionFailedError e) {
+            //Otherwise catch error and open side navigation then open My Folders page
+            openNavDrawer();
+            solo.waitForText("My Folders");
+            solo.clickOnText("My Folders");
+            addNewFolder(newFolderName);
+        }
+
+        //For now this step is needed to load new folder(To remove when issue fixed)
+        cancelAddNewFolder();
+
+        //Assertion
+        assertTrue(solo.waitForText(newFolderName));
+
+    }
+
     public void testDiscoveryPage(){
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.discovery_label));
