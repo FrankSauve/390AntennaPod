@@ -464,5 +464,44 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals(UserPreferences.getDiscoveryCategoriesButtons(), DiscoveryFragment.getIds());
     }
 
+    public void testAutocompleteRegular(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(882, 151);
+        solo.sleep(1000);
+        solo.enterText(0, "daily");
+
+        assertTrue(solo.searchText("The Daily"));
+    }
+
+    public void testAutocompleteTitle(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(1011, 154);
+        solo.sleep(1000);
+        solo.clickOnText("Advanced Search");
+        solo.sleep(1000);
+        solo.clickOnText("Title");
+        solo.enterText(0, "daily");
+
+        assertTrue(solo.searchText("The Daily"));
+    }
+
+    public void testAutocompleteArtist(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(1011, 154);
+        solo.sleep(1000);
+        solo.clickOnText("Advanced Search");
+        solo.sleep(1000);
+        solo.clickOnText("Artist");
+        solo.enterText(0, "cbc");
+
+        assertTrue(solo.searchText("CBC Podcasts"));
+    }
+
 
 }
