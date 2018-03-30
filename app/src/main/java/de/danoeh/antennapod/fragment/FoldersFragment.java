@@ -1,10 +1,7 @@
 package de.danoeh.antennapod.fragment;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -19,21 +16,10 @@ import java.util.List;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.FoldersAdapter;
-import de.danoeh.antennapod.core.asynctask.FeedRemover;
-import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
-import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.folders.Folder;
-import de.danoeh.antennapod.core.preferences.PlaybackPreferences;
-import de.danoeh.antennapod.core.service.playback.PlaybackService;
 import de.danoeh.antennapod.core.storage.DBReader;
-import de.danoeh.antennapod.core.storage.DBWriter;
-import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.dialog.RenameFeedDialog;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Fragment for displaying folders created and add podcasts to these folders
@@ -43,7 +29,6 @@ public class FoldersFragment extends Fragment {
     public static final String TAG = "FoldersFragment";
 
     private GridView foldersGridLayout;
-    //private DBReader.NavDrawerData navDrawerData;
     private FoldersAdapter foldersAdapter;
 
 
@@ -58,6 +43,12 @@ public class FoldersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadFolders();
     }
 
     @Override
@@ -94,7 +85,6 @@ public class FoldersFragment extends Fragment {
     public void loadFolders() {
 
         folders = DBReader.getFolderList();
-
 
     }
 
@@ -176,8 +166,8 @@ public class FoldersFragment extends Fragment {
         }
 
         @Override
-        public int getFolderCounter(long folderId) {
-            return DBReader.getNumberOfItemsInFolder(folders.get((int)folderId-1));
+        public int getFolderCounter(int position) {
+            return DBReader.getNumberOfItemsInFolder(getFolder(position));
         }
     };
 

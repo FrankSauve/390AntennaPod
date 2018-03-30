@@ -179,7 +179,7 @@ public class EpisodesApplyActionFragment extends Fragment {
         inflater.inflate(R.menu.episodes_apply_action_options, menu);
         folders();
         for(String item : listItems)
-        {menu.add(R.id.sort,getKey(item),2,item);}
+        {menu.add(R.id.sort,getPosition(item),2,item);}
 
         mSelectToggle = menu.findItem(R.id.select_toggle);
         mSelectToggle.setOnMenuItemClickListener(item -> {
@@ -216,7 +216,7 @@ public class EpisodesApplyActionFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(hmap.containsKey(item.getItemId())){
             //testing to see if proper id is found
-            addToFolder(folders.get(item.getItemId()-1));
+            addToFolder(folders.get(getPosition(item.toString())));
         }
         int resId = 0;
         switch(item.getItemId()) {
@@ -285,23 +285,25 @@ public class EpisodesApplyActionFragment extends Fragment {
         }
     }
 
-    public int getKey(String item){
-        int  key = 0;
+    public int getPosition(String item){
+        int  position = 0;
         for (Map.Entry entry : hmap.entrySet()) {
             if (item.equals(entry.getValue())) {
-                key = (int)entry.getKey();
+                position = (int)entry.getKey();
             }
         }
-            return key;
+        return position;
     }
     public void folders(){
         hmap = new Hashtable<Integer, String>();
         folders= new ArrayList<>();
         listItems = new ArrayList<>();
         folders = DBReader.getFolderList();
+        int position = 0;
         for (Folder folder : folders){
             listItems.add(folder.getName());
-            hmap.put((int)folder.getId(), folder.getName());
+            hmap.put(position, folder.getName());
+            position++;
         }
     }
     private void sortByTitle(final boolean reverse) {
@@ -344,12 +346,12 @@ public class EpisodesApplyActionFragment extends Fragment {
             } else {
                 ordering = lhs.getMedia().getDuration() - rhs.getMedia().getDuration();
             }
-        if(reverse) {
-            return -1 * ordering;
-        } else {
-            return ordering;
-        }
-    });
+            if(reverse) {
+                return -1 * ordering;
+            } else {
+                return ordering;
+            }
+        });
         refreshTitles();
         refreshCheckboxes();
     }

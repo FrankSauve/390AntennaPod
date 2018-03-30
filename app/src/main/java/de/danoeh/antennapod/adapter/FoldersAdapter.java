@@ -125,9 +125,9 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
 
         holder.feedTitle.setText(folder.getName());
         holder.feedTitle.setVisibility(View.VISIBLE);
-        int count = itemAccess.getFolderCounter(folder.getId());
+        int count = itemAccess.getFolderCounter(position);
         if(count > 0) {
-            holder.count.setPrimaryText(String.valueOf(itemAccess.getFolderCounter(folder.getId())));
+            holder.count.setPrimaryText(String.valueOf(itemAccess.getFolderCounter(position)));
             holder.count.setVisibility(View.VISIBLE);
         } else {
             holder.count.setVisibility(View.GONE);
@@ -156,7 +156,7 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
     public interface ItemAccess {
         int getCount();
         Folder getFolder(int position);
-        int getFolderCounter(long folderId);
+        int getFolderCounter(int position);
     }
 
 }
