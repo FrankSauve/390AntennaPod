@@ -285,6 +285,7 @@ public class FolderItemListFragment extends Fragment {
     }*/
 
     private void onFragmentLoaded() {
+        Log.d(TAG, "onFragmentLoaded() called");
         if(adapter == null) {
             MainActivity mainActivity = (MainActivity) getActivity();
             adapter = new AllEpisodesRecycleAdapter(mainActivity, itemAccess,
@@ -362,19 +363,15 @@ public class FolderItemListFragment extends Fragment {
     };
 
     protected void loadItems() {
-        Log.d(TAG, "loadItems() is called");
         if (viewsCreated && !itemsLoaded) {
             recyclerView.setVisibility(View.GONE);
             progLoading.setVisibility(View.VISIBLE);
         }
         folder = loadFolder();
         episodes = folder.getEpisodes();
-        Log.d(TAG, "episodes: " + episodes.size());
-        List<FeedItem> data = null;
         if(episodes != null){
             recyclerView.setVisibility(View.VISIBLE);
             progLoading.setVisibility(View.GONE);
-            episodes = data;
             itemsLoaded = true;
             if (viewsCreated) {
                 onFragmentLoaded();
@@ -386,6 +383,7 @@ public class FolderItemListFragment extends Fragment {
 
         Folder folder = DBReader.getFolder(folderID);
         DBReader.loadFolderDataOfFolderItemList(folder.getEpisodes());
+        DBReader.loadFeedDataOfFeedItemList(folder.getEpisodes());
 
         return folder;
     }
