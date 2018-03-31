@@ -416,6 +416,28 @@ public class PodDBAdapter {
         }
     }
 
+    public static boolean createFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.execSQL(CREATE_TABLE_FOLDERS);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean createItemsFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.execSQL(CREATE_TABLE_ITEMS_FOLDERS);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
     public static boolean deleteAllFolders() {
         PodDBAdapter adapter = getInstance();
         adapter.open();
@@ -457,19 +479,6 @@ public class PodDBAdapter {
         try {
             String deleteClause = String.format("DROP TABLE %s",
                     TABLE_NAME_ITEMS_FOLDERS);
-            db.execSQL(deleteClause);
-            return true;
-        } finally {
-            adapter.close();
-        }
-    }
-
-    public static boolean deleteFeedItemsTable() {
-        PodDBAdapter adapter = getInstance();
-        adapter.open();
-        try {
-            String deleteClause = String.format("DROP TABLE %s",
-                    TABLE_NAME_FEED_ITEMS);
             db.execSQL(deleteClause);
             return true;
         } finally {
@@ -1295,15 +1304,6 @@ public class PodDBAdapter {
      * @return The cursor of the query
      */
     public final Cursor getAllFoldersCursor() {
-
-        //Creates the table if it is not already created
-        try{
-            db.execSQL(CREATE_TABLE_FOLDERS);
-        }
-        catch(RuntimeException e){
-            //Table already created. Do nothing
-        }
-
         return db.query(TABLE_NAME_FOLDERS, FOLDER_SEL_STD, null, null, null, null,
                 KEY_FOLDER_NAME + " COLLATE NOCASE ASC");
     }
