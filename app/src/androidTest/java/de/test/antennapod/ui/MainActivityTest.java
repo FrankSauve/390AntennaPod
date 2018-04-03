@@ -422,14 +422,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText("OK");
     }
 
-    private void cancelAddNewFolder(){
-        solo.waitForText("Add Folder");
-        solo.clickOnText("Add Folder");
-        solo.waitForText("Cancel");
-        solo.sleep(1000);
-        solo.clickOnText("Cancel");
-    }
-
     public void testAddFolder() {
 
         //Folder name
@@ -446,9 +438,6 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
             solo.clickOnText("My Folders");
             addNewFolder(newFolderName);
         }
-
-        //For now this step is needed to load new folder(To remove when issue fixed)
-        cancelAddNewFolder();
 
         //Assertion
         assertTrue(solo.waitForText(newFolderName));
