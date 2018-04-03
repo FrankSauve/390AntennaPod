@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * EventListener. When new events arrive, the EventDistributor will process the
  * event queue in a handler that runs on the main thread. The observers will only
  * be notified once if the event queue contains multiple elements.
- * 
+ *
  * Events can be sent with the send* methods.
  */
 public class EventDistributor extends Observable {
@@ -25,7 +25,8 @@ public class EventDistributor extends Observable {
 	public static final int DOWNLOADLOG_UPDATE = 8;
 	public static final int PLAYBACK_HISTORY_UPDATE = 16;
 	public static final int DOWNLOAD_HANDLED = 64;
-    public static final int PLAYER_STATUS_UPDATE = 128;
+	public static final int PLAYER_STATUS_UPDATE = 128;
+	public static final int FOLDER_LIST_UPDATE = 256;
 
 	private Handler handler;
 	private AbstractQueue<Integer> events;
@@ -86,6 +87,10 @@ public class EventDistributor extends Observable {
 		addEvent(FEED_LIST_UPDATE);
 	}
 
+	public void sendFolderUpdateBroadcast() {
+		addEvent(FOLDER_LIST_UPDATE);
+	}
+
 	public void sendPlaybackHistoryUpdateBroadcast() {
 		addEvent(PLAYBACK_HISTORY_UPDATE);
 	}
@@ -94,7 +99,7 @@ public class EventDistributor extends Observable {
 		addEvent(DOWNLOADLOG_UPDATE);
 	}
 
-    public void sendPlayerStatusUpdateBroadcast() { addEvent(PLAYER_STATUS_UPDATE); }
+	public void sendPlayerStatusUpdateBroadcast() { addEvent(PLAYER_STATUS_UPDATE); }
 
 	public abstract static class EventListener implements Observer {
 
@@ -107,6 +112,6 @@ public class EventDistributor extends Observable {
 		}
 
 		public abstract void update(EventDistributor eventDistributor,
-				Integer arg);
+									Integer arg);
 	}
 }
