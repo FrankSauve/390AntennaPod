@@ -682,6 +682,7 @@
     <string name="in_queue_label">Episode is in the queue</string>
     <string name="drag_handle_content_description">Drag to change the position of this item</string>
     <string name="load_next_page_label">Load next page</string>
+    <string name="automatic_recommendations_label">Automatic Recommendations</string>
     <string name="arts_label">Arts</string>
     <string name="comedy_label">Comedy</string>
     <string name="education_label">Education</string>

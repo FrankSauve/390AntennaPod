@@ -16,7 +16,6 @@ import java.util.Locale;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
-import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
 import okhttp3.OkHttpClient;
@@ -38,6 +37,8 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     private static List<Integer> CategoryId = new ArrayList<>();
 
+    private static List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
+
     /**
      * Constructor
      */
@@ -52,22 +53,29 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     public void onStart() {
         super.onStart();
-        final List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
-        if (Ids != discoveryCategories)
-        {
-            loadCategories(discoveryCategories);
-            Ids = discoveryCategories;
-        }
-    }
 
+
+        // If automatic recommendation is selected
+        if(discoveryCategories.contains(0)){
+            //TODO: Call Automatic recommendation
+
+
+        }
+        else{
+            if (Ids != discoveryCategories)
+            {
+                loadCategories(discoveryCategories);
+                Ids = discoveryCategories;
+            }
+        }
+
+    }
 
     @Override
     public void loadToplist() {
-        final List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
         if (discoveryCategories != null) {
             loadCategories(discoveryCategories);
         }
-
     }
 
 
@@ -87,52 +95,52 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
             for(int c = 0; c < discoveryCategoriesId.size(); c++){
                 switch(discoveryCategoriesId.get(c)){
-                    case 0:
+                    case 1:
                         discoveryIds.add(ARTS_GENRE_ID);
                         break;
-                    case 1:
+                    case 2:
                         discoveryIds.add(COMEDY_GENRE_ID);
                         break;
-                    case 2:
+                    case 3:
                         discoveryIds.add(EDUCATION_GENRE_ID);
                         break;
-                    case 3:
+                    case 4:
                         discoveryIds.add(KIDS_AND_FAMILY_GENRE_ID);
                         break;
-                    case 4:
+                    case 5:
                         discoveryIds.add(HEALTH_GENRE_ID);
                         break;
-                    case 5:
+                    case 6:
                         discoveryIds.add(TV_AND_FILM_GENRE_ID);
                         break;
-                    case 6:
+                    case 7:
                         discoveryIds.add(MUSIC_GENRE_ID);
                         break;
-                    case 7:
+                    case 8:
                         discoveryIds.add(NEWS_AND_POLITICS_GENRE_ID);
                         break;
-                    case 8:
+                    case 9:
                         discoveryIds.add(RELIGION_AND_SPIRITUALITY_GENRE_ID);
                         break;
-                    case 9:
+                    case 10:
                         discoveryIds.add(SCIENCE_AND_MEDECINE_GENRE_ID);
                         break;
-                    case 10:
+                    case 11:
                         discoveryIds.add(SPORTS_AND_RECREATION_GENRE_ID);
                         break;
-                    case 11:
+                    case 12:
                         discoveryIds.add(TECHNOLOGY_GENRE_ID);
                         break;
-                    case 12:
+                    case 13:
                         discoveryIds.add(BUSINESS_GENRE_ID);
                         break;
-                    case 13:
+                    case 14:
                         discoveryIds.add(GAMES_AND_HOBBIES_GENRE_ID);
                         break;
-                    case 14:
+                    case 15:
                         discoveryIds.add(SOCIETY_AND_CULTURE_GENRE_ID);
                         break;
-                    case 15:
+                    case 16:
                         discoveryIds.add(GOVERNMENT_AND_ORGANIZATION_GENRE_ID);
                         break;
                 }
@@ -202,7 +210,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                             butRetry.setOnClickListener(v -> loadToplist());
                             butRetry.setVisibility(View.VISIBLE);
                         });
-            }
+    }
 
 
 

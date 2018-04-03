@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -924,10 +925,24 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(String.format(context.getResources().getString(
-                R.string.pref_discovery_buttons_dialog_title), 2));
+        builder.setTitle(String.format(context.getResources().getString(R.string.pref_discovery_buttons_dialog_title), 2));
         builder.setMultiChoiceItems(allButtonNames, checked, (dialog, which, isChecked) -> {
             checked[which] = isChecked;
+
+            /**
+             * TODO: This is broken
+             * - Some checkboxes don't get disable
+             * - As you scroll up and down the different checkboxes become disabled/enabled
+             * - Even if they are set to disabled and unclickable, they can still be selected (?!?!??!?)
+             */
+            if(which == 0 && checked[which]){
+                for(int i = 1; i < allButtonNames.length; i++){
+                    if(((AlertDialog)dialog).getListView().getChildAt(i) != null){
+                        ((AlertDialog)dialog).getListView().getChildAt(i).setEnabled(false);
+                        ((AlertDialog)dialog).getListView().getChildAt(i).setClickable(false);
+                    }
+               }
+            }
 
             if (isChecked) {
                 discoveryButton.add(which);
