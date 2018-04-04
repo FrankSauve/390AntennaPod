@@ -42,9 +42,9 @@ public class DiscoveryTest extends ActivityInstrumentationTestCase2<MainActivity
 
         // Create new List for User preferences
         List<Integer> newCategories = new ArrayList<>();
-        newCategories.add(5);
-        newCategories.add(7);
+        newCategories.add(6);
         newCategories.add(8);
+        newCategories.add(9);
 
         //Assign List to new values for Buttons
         UserPreferences.setPrefDiscoveryButtons(newCategories);
