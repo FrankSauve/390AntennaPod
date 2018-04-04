@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.bumptech.glide.Glide;
@@ -33,9 +34,11 @@ import com.bumptech.glide.Glide;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.adapter.FolderListAdapte;
 import de.danoeh.antennapod.adapter.NavListAdapter;
 import de.danoeh.antennapod.core.asynctask.FeedRemover;
 import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
@@ -72,6 +75,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import de.danoeh.antennapod.core.folders.Folder;
 
 /**
  * The activity that is shown when the user launches the app.
@@ -105,7 +109,8 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
             AddFeedFragment.TAG,
             TrendingFragment.TAG,
             FoldersFragment.TAG,
-            NavListAdapter.SUBSCRIPTION_LIST_TAG
+            NavListAdapter.SUBSCRIPTION_LIST_TAG,
+            NavListAdapter.FOLDER_LIST_TAG
     };
 
     private Toolbar toolbar;
@@ -114,7 +119,9 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
 
     private View navDrawer;
     private ListView navList;
+    private ListView folderView;
     private NavListAdapter navAdapter;
+    private FolderListAdapte madapter;
     private int mPosition = -1;
 
     private ActionBarDrawerToggle drawerToggle;
@@ -124,6 +131,9 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
     private ProgressDialog pd;
 
     private Subscription subscription;
+
+    private List<Folder> listOfFolders = DBReader.getFolderList();
+    private ArrayList<Folder> listForAdapter = new ArrayList<Folder>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,8 +154,16 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
 
         currentTitle = getTitle();
 
+        listOfFolders = DBReader.getFolderList();
+        listForAdapter = new ArrayList<Folder>();
+        listForAdapter.addAll(listOfFolders);
+
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navList = (ListView) findViewById(R.id.nav_list);
+
+        folderView = (ListView) findViewById(R.id.nav_list2);
+        madapter = new FolderListAdapte(this, listForAdapter, this);
+        folderView.setAdapter(madapter);
         navDrawer = findViewById(R.id.nav_layout);
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
@@ -166,7 +184,10 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         navList.setAdapter(navAdapter);
         navList.setOnItemClickListener(navListClickListener);
         navList.setOnItemLongClickListener(newListLongClickListener);
+        folderView.setOnItemClickListener(navListClickListener);
+        folderView.setOnItemLongClickListener(newListLongClickListener);
         registerForContextMenu(navList);
+        registerForContextMenu(folderView);
 
         navAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -174,6 +195,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
                 selectedNavListIndex = getSelectedNavListIndex();
             }
         });
+
 
         findViewById(R.id.nav_settings).setOnClickListener(v -> {
             drawerLayout.closeDrawer(navDrawer);
@@ -487,6 +509,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
                         (intent.hasExtra(EXTRA_NAV_INDEX) || intent.hasExtra(EXTRA_FRAGMENT_TAG)))) {
             handleNavIntent();
         }
+        //
         loadData();
         RatingDialog.check();
     }

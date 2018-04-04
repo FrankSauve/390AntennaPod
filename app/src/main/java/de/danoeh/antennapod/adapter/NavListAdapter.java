@@ -54,12 +54,15 @@ public class NavListAdapter extends BaseAdapter
     public static final int VIEW_TYPE_NAV = 0;
     public static final int VIEW_TYPE_SECTION_DIVIDER = 1;
     public static final int VIEW_TYPE_SUBSCRIPTION = 2;
+   // public static final int VIEW_TYPE_SECTION_DIVIDER_2 = 3;
+   // public static final int VIEW_TYPE_FOLDER = 4;
 
     /**
      * a tag used as a placeholder to indicate if the subscription list should be displayed or not
      * This tag doesn't correspond to any specific activity.
      */
     public static final String SUBSCRIPTION_LIST_TAG = "SubscriptionList";
+    public static final String FOLDER_LIST_TAG = "FolderList";
 
     private static List<String> tags;
     private static String[] titles;
@@ -67,6 +70,7 @@ public class NavListAdapter extends BaseAdapter
     private ItemAccess itemAccess;
     private WeakReference<Activity> activity;
     private boolean showSubscriptionList = true;
+    //private boolean showFolderList = true;
 
     public NavListAdapter(ItemAccess itemAccess, Activity context) {
         this.itemAccess = itemAccess;
@@ -98,9 +102,12 @@ public class NavListAdapter extends BaseAdapter
             // a placeholder that indicates if we should show the subscription list in the
             // nav drawer at all.
             showSubscriptionList = true;
+            //showFolderList = true;
             newTags.remove(SUBSCRIPTION_LIST_TAG);
+            newTags.remove(FOLDER_LIST_TAG);
         } else {
             showSubscriptionList = false;
+            //showFolderList = true;
         }
 
         tags = newTags;
@@ -396,10 +403,10 @@ public class NavListAdapter extends BaseAdapter
         int getCount();
         Feed getItem(int position);
         int getSelectedItemIndex();
+        int getReclaimableItems();
         int getQueueSize();
         int getNumberOfNewItems();
         int getNumberOfDownloadedItems();
-        int getReclaimableItems();
         int getFeedCounter(long feedId);
         int getFeedCounterSum();
     }

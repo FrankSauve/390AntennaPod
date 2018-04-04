@@ -153,6 +153,7 @@
         <item>@string/trending_label</item>
         <item>@string/folders_label</item>
         <item>@string/subscriptions_list_label</item>
+        <item>@string/folder_list_label</item>
     </string-array>
 
     <string-array name="nav_drawer_feed_order_options">
