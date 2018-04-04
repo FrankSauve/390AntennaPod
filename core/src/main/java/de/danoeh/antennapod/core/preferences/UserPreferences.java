@@ -210,7 +210,7 @@ public class UserPreferences {
     public static List<Integer> getDiscoveryCategoriesButtons() {
         String[] buttons = TextUtils.split(
                 prefs.getString(PREF_DISCOVERY_BUTTONS,
-                        String.valueOf(DISCOVERY_AUTOMATIC_RECOMMENDATION)),
+                        null),
                 ",");
         List<Integer> discoveryButtons = new ArrayList<>();
         for (int i=0; i<buttons.length; i++) {

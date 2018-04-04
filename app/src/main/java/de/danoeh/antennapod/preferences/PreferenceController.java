@@ -929,29 +929,30 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
         builder.setMultiChoiceItems(allButtonNames, checked, (dialog, which, isChecked) -> {
             checked[which] = isChecked;
 
-            /**
-             * TODO: This is broken
-             * - Some checkboxes don't get disable
-             * - As you scroll up and down the different checkboxes become disabled/enabled
-             * - Even if they are set to disabled and unclickable, they can still be selected (?!?!??!?)
-             */
-            if(which == 0 && checked[which]){
-                for(int i = 1; i < allButtonNames.length; i++){
-                    if(((AlertDialog)dialog).getListView().getChildAt(i) != null){
-                        ((AlertDialog)dialog).getListView().getChildAt(i).setEnabled(false);
-                        ((AlertDialog)dialog).getListView().getChildAt(i).setClickable(false);
-                    }
-               }
-            }
-
             if (isChecked) {
                 discoveryButton.add(which);
             } else {
                 discoveryButton.remove((Integer) which);
             }
         });
-        builder.setPositiveButton(R.string.confirm_label, (dialog, which) ->
-                UserPreferences.setPrefDiscoveryButtons(discoveryButton));
+        builder.setPositiveButton(R.string.confirm_label, (dialog, which) -> {
+            Boolean error = false;
+            for(int i = 1; i < allButtonNames.length; i++){
+                //If automatic selection is selected at the same time as another category
+                if(checked[0] && checked[i]){
+                    error = true;
+                    AlertDialog.Builder errorBuilder = new AlertDialog.Builder(context);
+                    //Show an error message
+                    errorBuilder.setMessage("ERROR: Automatic Recommendation must be selected on its own");
+                    errorBuilder.setPositiveButton(null, null);
+                    errorBuilder.setNegativeButton("Close", null);
+                    errorBuilder.create().show();
+                }
+            }
+            if(!error){
+                UserPreferences.setPrefDiscoveryButtons(discoveryButton);
+             }
+        });
         builder.setNegativeButton(R.string.cancel_label, null);
         builder.create().show();
     }

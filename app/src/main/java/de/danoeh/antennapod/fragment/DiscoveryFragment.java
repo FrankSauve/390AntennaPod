@@ -37,7 +37,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     private static List<Integer> CategoryId = new ArrayList<>();
 
-    private static List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
+
 
     /**
      * Constructor
@@ -54,6 +54,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     public void onStart() {
         super.onStart();
 
+        List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
 
         // If automatic recommendation is selected
         if(discoveryCategories.contains(0)){
@@ -62,8 +63,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
         }
         else{
-            if (Ids != discoveryCategories)
-            {
+            if (Ids != discoveryCategories) {
                 loadCategories(discoveryCategories);
                 Ids = discoveryCategories;
             }
@@ -73,6 +73,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     @Override
     public void loadToplist() {
+        List<Integer> discoveryCategories = UserPreferences.getDiscoveryCategoriesButtons();
         if (discoveryCategories != null) {
             loadCategories(discoveryCategories);
         }
