@@ -182,8 +182,8 @@ public class ItunesSearchFragment extends Fragment {
     private SearchView sv;
     private SearchView svSelect;
     private JSONArray autocompleteSuggestions;
-
     private Menu menu;
+    private boolean isInDiscoveryTab = false;
 
     /**
      * Replace adapter data with provided search results from SearchTask.
@@ -1048,7 +1048,13 @@ public class ItunesSearchFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(podcasts -> {
                     progressBar.setVisibility(View.GONE);
-                    updateData(podcasts);
+                    //Append data if in discovery tab
+                    if(isInDiscoveryTab){
+                        appendData(podcasts);
+                    }
+                    else{
+                        updateData(podcasts);
+                    }
                 }, error -> {
                     Log.e(TAG, Log.getStackTraceString(error));
                     progressBar.setVisibility(View.GONE);
@@ -1414,7 +1420,14 @@ public class ItunesSearchFragment extends Fragment {
 
     public JSONArray getAutocompleteResults(){ return this.autocompleteSuggestions; }
 
+    public Menu getMenu() {return this.menu;}
+
     public void setSubgenreIds(List<Integer> subgenreIds){
         this.subgenreIds = subgenreIds;
     }
+
+    public void setIsInDisvoryTab(boolean b){
+        this.isInDiscoveryTab = b;
+    }
+
 }

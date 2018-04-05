@@ -2,6 +2,7 @@ package de.danoeh.antennapod.fragment;
 
 
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import org.json.JSONArray;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.SubscriptionsAdapter;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
@@ -25,6 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -40,10 +43,10 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     private static List<Integer> CategoryId = new ArrayList<>();
 
+    private Subscription subscription;
+
     private DBReader.NavDrawerData navDrawerData;
     private SubscriptionsAdapter subscriptionAdapter;
-
-
 
     /**
      * Constructor
@@ -57,6 +60,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         return Ids;
     }
 
+    @Override
     public void onStart() {
         super.onStart();
 
@@ -64,13 +68,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
         // If automatic recommendation is selected
         if(discoveryCategories.contains(0)){
-            try {
-                loadAutomaticRecommendations();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-
+            loadSubscriptions();
         }
         else{
             if (Ids != discoveryCategories) {
@@ -232,24 +230,66 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
                     navDrawerData = result;
-                    subscriptionAdapter.notifyDataSetChanged();
+                    //subscriptionAdapter.notifyDataSetChanged();
+                    findAutomaticRecommendations();
                 }, error -> Log.e(TAG, Log.getStackTraceString(error)));
     }
 
-    public void loadAutomaticRecommendations() throws InterruptedException {
-        loadSubscriptions();
+    /**
+     * Algorithm to automatically suggest podcast based on the subscribed podcast
+     */
+    public void findAutomaticRecommendations() {
+        List<Feed> feeds = navDrawerData.feeds;
 
-//        Thread.sleep(5000);
-//
-//        List<Feed> subscritions = navDrawerData.feeds;
-//        for(int i = 0; i < subscritions.size(); i++){
-//            System.out.println("FEEDS: " + subscritions.get(i));
-//        }
+        super.setIsInDisvoryTab(true);
+
+        //Generate random int
+        int min = 0;
+        int max = feeds.size() - 1;
+        int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
+        String author = feeds.get(randomFeed).getAuthor();
+        String title = feeds.get(randomFeed).getTitle();
+
+        //Set action bar title to "Like ...."
+        ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
+
+        //Search similar artists
+        MenuItem authorItem = getMenu().findItem(R.id.itunes_search_artist);
+        super.search(author, authorItem);
+
+        //TODO: Search similar title and/or category
+
+        //TODO: Remove duplicates + the podcast in the query. May need to change the search function in super class
     }
 
 
 
     public static List<Integer> getCategoryId() { return CategoryId; }
+
+    private SubscriptionsAdapter.ItemAccess itemAccess = new SubscriptionsAdapter.ItemAccess() {
+        @Override
+        public int getCount() {
+            if (navDrawerData != null) {
+                return navDrawerData.feeds.size();
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
+        public Feed getItem(int position) {
+            if (navDrawerData != null && 0 <= position && position < navDrawerData.feeds.size()) {
+                return navDrawerData.feeds.get(position);
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public int getFeedCounter(long feedId) {
+            return navDrawerData != null ? navDrawerData.feedCounters.get(feedId) : 0;
+        }
+    };
 
 
 }
