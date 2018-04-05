@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Locale;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.adapter.SubscriptionsAdapter;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
+import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
+import de.danoeh.antennapod.core.storage.DBReader;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -36,6 +39,9 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     private static List<Integer> Ids = new ArrayList<>();
 
     private static List<Integer> CategoryId = new ArrayList<>();
+
+    private DBReader.NavDrawerData navDrawerData;
+    private SubscriptionsAdapter subscriptionAdapter;
 
 
 
@@ -58,7 +64,11 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
         // If automatic recommendation is selected
         if(discoveryCategories.contains(0)){
-            //TODO: Call Automatic recommendation
+            try {
+                loadAutomaticRecommendations();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
 
         }
@@ -211,6 +221,30 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                             butRetry.setOnClickListener(v -> loadToplist());
                             butRetry.setVisibility(View.VISIBLE);
                         });
+    }
+
+    private void loadSubscriptions() {
+        if(subscription != null) {
+            subscription.unsubscribe();
+        }
+        subscription = Observable.fromCallable(DBReader::getNavDrawerData)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    navDrawerData = result;
+                    subscriptionAdapter.notifyDataSetChanged();
+                }, error -> Log.e(TAG, Log.getStackTraceString(error)));
+    }
+
+    public void loadAutomaticRecommendations() throws InterruptedException {
+        loadSubscriptions();
+
+//        Thread.sleep(5000);
+//
+//        List<Feed> subscritions = navDrawerData.feeds;
+//        for(int i = 0; i < subscritions.size(); i++){
+//            System.out.println("FEEDS: " + subscritions.get(i));
+//        }
     }
 
 
