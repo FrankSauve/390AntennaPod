@@ -2,6 +2,7 @@ package de.danoeh.antennapod.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import de.danoeh.antennapod.adapter.FoldersAdapter;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBReader;
+import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.dialog.RenameFeedDialog;
 
 /**
@@ -43,6 +45,27 @@ public class FoldersFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //You can delete this whole code once your local devices have the tables and are set up properly
+        try{
+            setUpTables(); //Creates folders and itemsfolders tables in DB for local devices in case they do not have these tables already
+        }
+        catch(android.database.sqlite.SQLiteException e) {
+            //Catch error: means you already have one of the tables (probably folders table so let's create itemsfolder table)
+            Log.e(TAG, "e: " + e.getMessage());
+            try {
+                PodDBAdapter.createItemsFoldersTable(); //Creates itemsfolders table in DB for local devices in case they do not have this table already
+            } catch (android.database.sqlite.SQLiteException e1) {
+                //Catch this error: means you already have this table
+                Log.e(TAG, "e1: " + e1.getMessage());
+                try {
+                    PodDBAdapter.addFolderNameColumnToFeedItemsTable(); //Add folder_name column to feeditems table in DB for local devices in case it is not added yet
+                } catch (android.database.sqlite.SQLiteException e2) {
+                    //Catch this error: last catch
+                    Log.e(TAG, "e2: " + e2.getMessage());
+                    //Do nothing in this case the device should be set up properly in this case
+                }
+            }
+        }
     }
 
     @Override
@@ -144,6 +167,12 @@ public class FoldersFragment extends Fragment {
 
     public List<Folder> getFolders() {
         return folders;
+    }
+
+    private void setUpTables(){
+        PodDBAdapter.createFoldersTable();
+        PodDBAdapter.createItemsFoldersTable();
+        PodDBAdapter.addFolderNameColumnToFeedItemsTable();
     }
 
     private FoldersAdapter.ItemAccess itemAccess = new FoldersAdapter.ItemAccess() {
