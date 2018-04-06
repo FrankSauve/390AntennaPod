@@ -18,7 +18,6 @@ import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.dialog.NameFolderDialog;
-import de.danoeh.antennapod.fragment.FoldersFragment;
 import de.danoeh.antennapod.fragment.FolderItemListFragment;
 import jp.shts.android.library.TriangleLabelView;
 
@@ -135,7 +134,6 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == getAddTilePosition()) {
             new NameFolderDialog(mainActivityRef.get()).createFolderDialog();
-            mainActivityRef.get().loadFragment(FoldersFragment.TAG, null);
         } else {
             Fragment fragment = FolderItemListFragment.newInstance(getItemId(position));
             mainActivityRef.get().loadChildFragment(fragment);

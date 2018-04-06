@@ -21,6 +21,7 @@ import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
+import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.dialog.RenameFeedDialog;
 
 /**
@@ -33,6 +34,7 @@ public class FoldersFragment extends Fragment {
     private GridView foldersGridLayout;
     private FoldersAdapter foldersAdapter;
 
+    private static final int EVENTS = EventDistributor.FOLDER_LIST_UPDATE;
 
     private List<Folder> folders;
 
@@ -98,6 +100,8 @@ public class FoldersFragment extends Fragment {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).getSupportActionBar().setTitle(R.string.folders_label);
         }
+
+        EventDistributor.getInstance().register(contentUpdate);
     }
 
     @Override
@@ -108,6 +112,7 @@ public class FoldersFragment extends Fragment {
     public void loadFolders() {
 
         folders = DBReader.getFolderList();
+        foldersAdapter.notifyDataSetChanged();
 
     }
 
@@ -164,6 +169,16 @@ public class FoldersFragment extends Fragment {
         }
 
     }
+
+    private EventDistributor.EventListener contentUpdate = new EventDistributor.EventListener() {
+        @Override
+        public void update(EventDistributor eventDistributor, Integer arg) {
+            if ((EVENTS & arg) != 0) {
+                Log.d(TAG, "Received contentUpdate Intent.");
+                loadFolders();
+            }
+        }
+    };
 
     public List<Folder> getFolders() {
         return folders;

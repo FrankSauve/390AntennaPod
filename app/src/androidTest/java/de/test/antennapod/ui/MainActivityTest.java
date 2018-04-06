@@ -412,6 +412,38 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(true);
     }
 
+
+    private void addNewFolder(String folderName){
+        solo.waitForText("Add Folder");
+        solo.clickOnText("Add Folder");
+        solo.waitForText("Name Your Folder");
+        solo.enterText(0, folderName);
+        solo.sleep(1000);
+        solo.clickOnText("OK");
+    }
+
+    public void testAddFolder() {
+
+        //Folder name
+        String newFolderName = "First folder";
+
+        //Try to open My Folders page (sometimes emulator is already on My Folders page so try/catch will avoid to open side nav)
+        try { //If already on My Folders page just add new folder
+            //Add a new folder and enter its name
+            addNewFolder(newFolderName);
+        } catch (junit.framework.AssertionFailedError e) {
+            //Otherwise catch error and open side navigation then open My Folders page
+            openNavDrawer();
+            solo.waitForText("My Folders");
+            solo.clickOnText("My Folders");
+            addNewFolder(newFolderName);
+        }
+
+        //Assertion
+        assertTrue(solo.waitForText(newFolderName));
+
+    }
+
     public void testDiscoveryPage(){
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.discovery_label));
@@ -419,6 +451,45 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals(solo.getString(R.string.discovery_label), getActionbarTitle());
 
         assertEquals(UserPreferences.getDiscoveryCategoriesButtons(), DiscoveryFragment.getIds());
+    }
+
+    public void testAutocompleteRegular(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(882, 151);
+        solo.sleep(1000);
+        solo.enterText(0, "daily");
+
+        assertTrue(solo.searchText("The Daily"));
+    }
+
+    public void testAutocompleteTitle(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(1011, 154);
+        solo.sleep(1000);
+        solo.clickOnText("Advanced Search");
+        solo.sleep(1000);
+        solo.clickOnText("Title");
+        solo.enterText(0, "daily");
+
+        assertTrue(solo.searchText("The Daily"));
+    }
+
+    public void testAutocompleteArtist(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(1011, 154);
+        solo.sleep(1000);
+        solo.clickOnText("Advanced Search");
+        solo.sleep(1000);
+        solo.clickOnText("Artist");
+        solo.enterText(0, "cbc");
+
+        assertTrue(solo.searchText("CBC Podcasts"));
     }
 
 
