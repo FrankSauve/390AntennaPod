@@ -258,25 +258,28 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
 
         //Search similar artists
-        MenuItem authorItem = getMenu().findItem(R.id.itunes_search_artist);
-        super.search(author, authorItem);
+        MenuItem menuItem = getMenu().findItem(R.id.itunes_search_artist);
+        super.search(author, menuItem);
         podcastSuggestions = super.getSearchResults();
 
         //Search for podcasts with similar titles
-        MenuItem titleItem = getMenu().findItem(R.id.itunes_search_title);
+        menuItem = getMenu().findItem(R.id.itunes_search_title);
         ArrayList<String> keywords = titleKeywordExtractor(title);
         //If there are valid keywords, search and add them to the list.
         if(keywords.size()>0){
 
             if(keywords.size()==1)
-                super.search(keywords.get(0),titleItem);
+                super.search(keywords.get(0),menuItem);
             else if (keywords.size()==2)
-                super.search(keywords.get(0)+" "+keywords.get(1),titleItem);
+                super.search(keywords.get(0)+" "+keywords.get(1),menuItem);
             else
-                super.search(keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2),titleItem);
+                super.search(keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2),menuItem);
 
             podcastSuggestions.addAll(super.getSearchResults());
         }
+        //remove the suggested podcast from the results
+        podcastSuggestions.remove(randomFeed);
+
         //remove all duplications
         Set<ItunesAdapter.Podcast> tempSet = new HashSet<>();
         tempSet.addAll(podcastSuggestions);
@@ -285,7 +288,6 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
         //Podcast suggestions are added to the page with duplicates being removed
         super.appendData(podcastSuggestions);
-
     }
 
     //method used to extract important keywords from a title by removing common articles from podcast titles

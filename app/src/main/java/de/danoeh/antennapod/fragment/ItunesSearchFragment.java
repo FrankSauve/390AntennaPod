@@ -221,10 +221,7 @@ public class ItunesSearchFragment extends Fragment {
             gridView.setVisibility(View.VISIBLE);
             txtvEmpty.setVisibility(View.GONE);
             for (Podcast p : result) {
-                //check duplications
-                if(!podcastAlreadyPresent(p)){
-                    adapter.add(p);
-                }
+                adapter.add(p);
             }
             adapter.notifyDataSetInvalidated();
         } else {
@@ -233,19 +230,6 @@ public class ItunesSearchFragment extends Fragment {
         }
     }
 
-    /**
-     * Compares each Podcast value in the searchResults List with Podcast object p
-     * @param p Podcast object
-     * @return boolean
-     */
-    private boolean podcastAlreadyPresent(Podcast p){
-        for(Podcast q : searchResults){
-            if(p.equals(q))
-                return true;
-        }
-
-        return false;
-    }
 
     /**
      * Constructor
