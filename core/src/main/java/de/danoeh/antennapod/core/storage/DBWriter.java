@@ -506,6 +506,7 @@ public class DBWriter {
             final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
             adapter.addFolder(folder);
             adapter.close();
+            EventDistributor.getInstance().sendFolderUpdateBroadcast();
         });
     }
     public static Future<?> addFavoriteItemById(final long itemId) {
