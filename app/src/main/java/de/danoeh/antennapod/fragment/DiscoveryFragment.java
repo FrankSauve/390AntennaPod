@@ -11,8 +11,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
@@ -249,6 +252,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
         String author = feeds.get(randomFeed).getAuthor();
         String title = feeds.get(randomFeed).getTitle();
+        List<ItunesAdapter.Podcast> podcastSuggestions;
 
         //Set action bar title to "Like ...."
         ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
@@ -256,12 +260,59 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         //Search similar artists
         MenuItem authorItem = getMenu().findItem(R.id.itunes_search_artist);
         super.search(author, authorItem);
+        podcastSuggestions = super.getSearchResults();
 
-        //TODO: Search similar title and/or category
+        //Search for podcasts with similar titles
+        MenuItem titleItem = getMenu().findItem(R.id.itunes_search_title);
+        ArrayList<String> keywords = titleKeywordExtractor(title);
+        //If there are valid keywords, search and add them to the list.
+        if(keywords.size()>0){
 
-        //TODO: Remove duplicates + the podcast in the query. May need to change the search function in super class
+            if(keywords.size()==1)
+                super.search(keywords.get(0),titleItem);
+            else if (keywords.size()==2)
+                super.search(keywords.get(0)+" "+keywords.get(1),titleItem);
+            else
+                super.search(keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2),titleItem);
+
+            podcastSuggestions.addAll(super.getSearchResults());
+        }
+        //remove all duplications
+        Set<ItunesAdapter.Podcast> tempSet = new HashSet<>();
+        tempSet.addAll(podcastSuggestions);
+        podcastSuggestions.clear();
+        podcastSuggestions.addAll(tempSet);
+
+        //Podcast suggestions are added to the page with duplicates being removed
+        super.appendData(podcastSuggestions);
+
     }
 
+    //method used to extract important keywords from a title by removing common articles from podcast titles
+    private ArrayList<String> titleKeywordExtractor(String title){
+        //Remove all non-lettered characters, convert to lowercase and store individual words in an ArrayList.
+        ArrayList<String> splitTitle = new ArrayList(Arrays.asList(title.toLowerCase().replaceAll("[^a-zA-Z0-9 -]","").split(" ")));
+        ArrayList<String> keywords = new ArrayList<String>();
+        //iterate through the array, only adding non-determiners
+        for(String s : splitTitle){
+            switch (s){
+                case "the": //Definite article
+                case "a":case "an": //Indefinite articles
+                case "this":case "that":case "these":case "those": //Demonstrators
+                case "my":case "your":case "his":case "her":case "its":case "our":case "their": //Pronouns and Possessive determiners
+                case "few":case "little":case "much":case "many":case "most":case "some":case "any":case "enough": //Quantifiers
+                case "all":case "both":case "half":case "either":case "neither":case "each":case "every": //Distributives
+                case "other":case "another": //Difference words
+                case "such":case "what":case "rather":case "quite": //Pre-determiners
+                    break;
+                default:
+                    keywords.add(s);
+                    break;
+            }
+        }
+        keywords.trimToSize();
+        return keywords;
+    }
 
 
     public static List<Integer> getCategoryId() { return CategoryId; }
