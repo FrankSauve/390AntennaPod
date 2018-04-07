@@ -365,10 +365,27 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                         JSONObject result = new JSONObject(resultString);
                         JSONArray j = result.getJSONArray("results");
 
-                        for (int i = 1; i < 11 && i<j.length(); i++) {
+                        int limit = 10;
+                        for (int i = 0; i < limit && i<j.length(); i++) {
                             JSONObject json = j.getJSONObject(i);
                             ItunesAdapter.Podcast podcast = ItunesAdapter.Podcast.fromSearch(json);
-                            results.add(podcast);
+                            String temp1="";
+                            ArrayList<String> temp2 = titleKeywordExtractor(podcast.title);
+                            for(int count = 0; count<temp2.size();count++){
+                                if(count!=temp2.size()-1){
+                                    temp1 += temp2.get(count)+" ";
+                                }
+                                else{
+                                    temp1 += temp2.get(count);
+                                }
+
+                            }
+                            if(!temp1.equals(queryTitle)){ // excluding the same podcast
+                                results.add(podcast);
+                            }
+                            else{
+                                limit++;
+                            }
                         }
                     } else {
                         String prefix = getString(R.string.error_msg_prefix);
