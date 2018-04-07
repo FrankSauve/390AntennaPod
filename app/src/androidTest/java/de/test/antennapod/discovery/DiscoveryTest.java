@@ -75,10 +75,10 @@ public class DiscoveryTest extends ActivityInstrumentationTestCase2<MainActivity
 
         //Get subscriptions
         discoveryFragment.loadSubscriptions();
-        Thread.sleep(1000);
+        Thread.sleep(5000);
 
         discoveryFragment.findAutomaticRecommendations();
-        Thread.sleep(1000);
+        Thread.sleep(5000);
 
         //Assert that recommendations are not empty
         assertNotNull(discoveryFragment.getSearchResults());
