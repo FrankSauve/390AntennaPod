@@ -12,14 +12,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
-import de.danoeh.antennapod.adapter.SubscriptionsAdapter;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
 import de.danoeh.antennapod.core.feed.Feed;
@@ -234,7 +231,6 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
                     navDrawerData = result;
-                    //subscriptionAdapter.notifyDataSetChanged();
                     findAutomaticRecommendations();
                 }, error -> Log.e(TAG, Log.getStackTraceString(error)));
     }
@@ -253,18 +249,10 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
         String author = feeds.get(randomFeed).getAuthor();
         String title = feeds.get(randomFeed).getTitle();
-        List<ItunesAdapter.Podcast> podcastSuggestions;
 
-        //Set action bar title to "Like ...."
+        //Set action bar title to "Similar to: ...."
         ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
 
-        //Search similar artists
-//        MenuItem menuItem = getMenu().findItem(R.id.itunes_search_artist);
-//        super.search(author, menuItem);
-//        podcastSuggestions = super.getSearchResults();
-
-        //Search for podcasts with similar titles
-//        menuItem = getMenu().findItem(R.id.itunes_search_title);
         ArrayList<String> keywords = titleKeywordExtractor(title);
         String fullTitle="";
         for(int i=0;i<keywords.size();i++){
@@ -285,25 +273,16 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 query =keywords.get(0)+" "+keywords.get(1);
             else
                 query=keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2);
-
-//            super.search(query,menuItem);
-//            podcastSuggestions.addAll(super.getSearchResults());
         }
-//        //remove the suggested podcast from the results
-//        podcastSuggestions.remove(randomFeed);
-//
-//        //remove all duplications
-//        Set<ItunesAdapter.Podcast> tempSet = new HashSet<>();
-//        tempSet.addAll(podcastSuggestions);
-//        podcastSuggestions.clear();
-//        podcastSuggestions.addAll(tempSet);
-//
-//        //Podcast suggestions are added to the page with duplicates being removed
-//        super.appendData(podcastSuggestions);
         loadRecommended(author, query, fullTitle);
     }
 
-    //method used to extract important keywords from a title by removing common articles from podcast titles
+
+    /**
+     * Method used to extract important keywords from a title by removing common articles from podcast titles
+     * @param title
+     * @return keywords
+     */
     private ArrayList<String> titleKeywordExtractor(String title){
         //Remove all non-lettered characters, convert to lowercase and store individual words in an ArrayList.
         ArrayList<String> splitTitle = new ArrayList(Arrays.asList(title.toLowerCase().replaceAll("[^a-zA-Z0-9 -]","").split(" ")));
@@ -329,7 +308,13 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         return keywords;
     }
 
-    public void loadRecommended(String queryArtist, String queryTitle, String queryFullTitle){
+    /**
+     * Loads the recommended podcast based on the artist, title and queryFullTitle
+     * @param queryArtist
+     * @param queryTitle
+     * @param keywords
+     */
+    public void loadRecommended(String queryArtist, String queryTitle, String keywords){
 
         List<String> queries = new ArrayList<String>();
         queries.add(queryArtist);
@@ -345,7 +330,6 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         txtvEmpty.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
-
         List<ItunesAdapter.Podcast> results = new ArrayList<>();
 
         subscription = Observable.create((Observable.OnSubscribe<List<ItunesAdapter.Podcast>>) subscriber -> {
@@ -355,7 +339,6 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 }
                 String query = queries.get(b);
 
-                String lang = Locale.getDefault().getLanguage();
                 String url ="";
                 if(b==0){
                     url = String.format(API_URL_ARTIST_SEARCH, query.toLowerCase()).replace(' ', '+');
@@ -399,7 +382,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                                     }
 
                                 }
-                                if(!temp1.equals(queryFullTitle)){ // excluding the same podcast
+                                if(!temp1.equals(keywords)){ // excluding the same podcast
                                     results.add(podcast);
                                 }
                                 else{
@@ -428,9 +411,8 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                                     else{
                                         temp1 += temp2.get(count);
                                     }
-
                                 }
-                                if(!temp1.contains(queryFullTitle)){ // excluding the same podcast
+                                if(!temp1.contains(keywords)){ // excluding the same podcast
                                     results.add(podcast);
                                 }
                                 else{
@@ -439,9 +421,8 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                                 }
                             }
                         }
-
-
-                    } else {
+                    }
+                    else {
                         String prefix = getString(R.string.error_msg_prefix);
                         subscriber.onError(new IOException(prefix + response));
                     }
@@ -457,9 +438,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(podcasts -> {
                     progressBar.setVisibility(View.GONE);
-
                     appendData(podcasts);
-
                     searchResults = podcasts;
                     updateData(searchResults);
                 }, error -> {
@@ -467,38 +446,16 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                     progressBar.setVisibility(View.GONE);
                     txtvError.setText(error.toString());
                     txtvError.setVisibility(View.VISIBLE);
-                    butRetry.setOnClickListener(v -> loadRecommended(queryArtist,queryTitle, queryFullTitle));
+                    butRetry.setOnClickListener(v -> loadRecommended(queryArtist,queryTitle, keywords));
                     butRetry.setVisibility(View.VISIBLE);
                 });
     }
 
-    public static List<Integer> getCategoryId() { return CategoryId; }
-
-    private SubscriptionsAdapter.ItemAccess itemAccess = new SubscriptionsAdapter.ItemAccess() {
-        @Override
-        public int getCount() {
-            if (navDrawerData != null) {
-                return navDrawerData.feeds.size();
-            } else {
-                return 0;
-            }
-        }
-
-        @Override
-        public Feed getItem(int position) {
-            if (navDrawerData != null && 0 <= position && position < navDrawerData.feeds.size()) {
-                return navDrawerData.feeds.get(position);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public int getFeedCounter(long feedId) {
-            return navDrawerData != null ? navDrawerData.feedCounters.get(feedId) : 0;
-        }
-    };
-
+    /**
+     * Get itunes genreId based on the name of the category
+     * @param categoryName
+     * @return genreId
+     */
     private int getGenreId(String categoryName){
         switch(categoryName){
             case "Arts": return ARTS_GENRE_ID;
