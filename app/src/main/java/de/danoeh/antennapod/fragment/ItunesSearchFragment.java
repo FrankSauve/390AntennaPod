@@ -61,10 +61,10 @@ public class ItunesSearchFragment extends Fragment {
     private static final String API_URL = "https://itunes.apple.com/search?media=podcast&term=%s";
 
     //itunes api url to search podcasts by title name
-    private static final String API_URL_TITLE_SEARCH = "https://itunes.apple.com/search?entity=podcast&attribute=titleTerm&term=%s";
+    protected static final String API_URL_TITLE_SEARCH = "https://itunes.apple.com/search?entity=podcast&attribute=titleTerm&term=%s";
 
     //itunes api url to search podcasts by artist name
-    private static final String API_URL_ARTIST_SEARCH  = "https://itunes.apple.com/search?entity=podcast&attribute=artistTerm&term=%s";
+    protected static final String API_URL_ARTIST_SEARCH  = "https://itunes.apple.com/search?entity=podcast&attribute=artistTerm&term=%s";
 
     //itunes api genre ids to search podcasts by category
     public static final int ARTS_GENRE_ID = 1301;

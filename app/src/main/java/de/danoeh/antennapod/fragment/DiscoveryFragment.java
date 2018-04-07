@@ -45,11 +45,12 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     private static List<Integer> Ids = new ArrayList<>();
 
     private static List<Integer> CategoryId = new ArrayList<>();
+    private static List<String> queryList = new ArrayList<>();
 
     private Subscription subscription;
 
     private DBReader.NavDrawerData navDrawerData;
-    private SubscriptionsAdapter subscriptionAdapter;
+
 
     /**
      * Constructor
@@ -258,36 +259,39 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
 
         //Search similar artists
-        MenuItem menuItem = getMenu().findItem(R.id.itunes_search_artist);
-        super.search(author, menuItem);
-        podcastSuggestions = super.getSearchResults();
+//        MenuItem menuItem = getMenu().findItem(R.id.itunes_search_artist);
+//        super.search(author, menuItem);
+//        podcastSuggestions = super.getSearchResults();
 
         //Search for podcasts with similar titles
-        menuItem = getMenu().findItem(R.id.itunes_search_title);
+//        menuItem = getMenu().findItem(R.id.itunes_search_title);
         ArrayList<String> keywords = titleKeywordExtractor(title);
         //If there are valid keywords, search and add them to the list.
+        String query="";
         if(keywords.size()>0){
 
             if(keywords.size()==1)
-                super.search(keywords.get(0),menuItem);
+                query = keywords.get(0);
             else if (keywords.size()==2)
-                super.search(keywords.get(0)+" "+keywords.get(1),menuItem);
+                query =keywords.get(0)+" "+keywords.get(1);
             else
-                super.search(keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2),menuItem);
+                query=keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2);
 
-            podcastSuggestions.addAll(super.getSearchResults());
+//            super.search(query,menuItem);
+//            podcastSuggestions.addAll(super.getSearchResults());
         }
-        //remove the suggested podcast from the results
-        podcastSuggestions.remove(randomFeed);
-
-        //remove all duplications
-        Set<ItunesAdapter.Podcast> tempSet = new HashSet<>();
-        tempSet.addAll(podcastSuggestions);
-        podcastSuggestions.clear();
-        podcastSuggestions.addAll(tempSet);
-
-        //Podcast suggestions are added to the page with duplicates being removed
-        super.appendData(podcastSuggestions);
+//        //remove the suggested podcast from the results
+//        podcastSuggestions.remove(randomFeed);
+//
+//        //remove all duplications
+//        Set<ItunesAdapter.Podcast> tempSet = new HashSet<>();
+//        tempSet.addAll(podcastSuggestions);
+//        podcastSuggestions.clear();
+//        podcastSuggestions.addAll(tempSet);
+//
+//        //Podcast suggestions are added to the page with duplicates being removed
+//        super.appendData(podcastSuggestions);
+        loadRecommended(author, query);
     }
 
     //method used to extract important keywords from a title by removing common articles from podcast titles
@@ -316,6 +320,86 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         return keywords;
     }
 
+    public void loadRecommended(String queryArtist, String queryTitle){
+
+        List<String> queries = new ArrayList<String>();
+        queries.add(queryArtist);
+        queries.add(queryTitle);
+
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+
+        gridView.setVisibility(View.GONE);
+        txtvError.setVisibility(View.GONE);
+        butRetry.setVisibility(View.GONE);
+        txtvEmpty.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+
+        queryList = queries;
+        List<ItunesAdapter.Podcast> results = new ArrayList<>();
+
+        subscription = Observable.create((Observable.OnSubscribe<List<ItunesAdapter.Podcast>>) subscriber -> {
+            for(int b = 0; b < queries.size(); b++) {
+
+                String query = queries.get(b);
+
+                String lang = Locale.getDefault().getLanguage();
+                String url ="";
+                if(b==0){
+                    url = String.format(API_URL_ARTIST_SEARCH, query.toLowerCase()).replace(' ', '+');
+                }
+                else{
+                    url = String.format(API_URL_TITLE_SEARCH, query.toLowerCase()).replace(' ', '+');
+                }
+                OkHttpClient client = AntennapodHttpClient.getHttpClient();
+                Request.Builder httpReq = new Request.Builder()
+                        .url(url)
+                        .header("User-Agent", ClientConfig.USER_AGENT);
+                try {
+                    Response response = client.newCall(httpReq.build()).execute();
+
+                    if (response.isSuccessful()) {
+                        String resultString = response.body().string();
+                        //System.out.println(resultString);
+                        JSONObject result = new JSONObject(resultString);
+                        JSONArray j = result.getJSONArray("results");
+
+                        for (int i = 1; i < 11 && i<j.length(); i++) {
+                            JSONObject json = j.getJSONObject(i);
+                            ItunesAdapter.Podcast podcast = ItunesAdapter.Podcast.fromSearch(json);
+                            results.add(podcast);
+                        }
+                    } else {
+                        String prefix = getString(R.string.error_msg_prefix);
+                        subscriber.onError(new IOException(prefix + response));
+                    }
+                } catch (IOException | JSONException e) {
+                    subscriber.onError(e);
+                }
+
+            }
+            subscriber.onNext(results);
+            subscriber.onCompleted();
+        })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(podcasts -> {
+                    progressBar.setVisibility(View.GONE);
+
+                    appendData(podcasts);
+
+                    searchResults = podcasts;
+                    updateData(searchResults);
+                }, error -> {
+                    Log.e(TAG, Log.getStackTraceString(error));
+                    progressBar.setVisibility(View.GONE);
+                    txtvError.setText(error.toString());
+                    txtvError.setVisibility(View.VISIBLE);
+                    butRetry.setOnClickListener(v -> loadRecommended(queryArtist,queryTitle));
+                    butRetry.setVisibility(View.VISIBLE);
+                });
+    }
 
     public static List<Integer> getCategoryId() { return CategoryId; }
 
