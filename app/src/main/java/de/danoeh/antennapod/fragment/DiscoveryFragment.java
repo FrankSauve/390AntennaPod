@@ -266,6 +266,15 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         //Search for podcasts with similar titles
 //        menuItem = getMenu().findItem(R.id.itunes_search_title);
         ArrayList<String> keywords = titleKeywordExtractor(title);
+        String fullTitle="";
+        for(int i=0;i<keywords.size();i++){
+            if(i<keywords.size()-1){
+                fullTitle += keywords.get(i)+" ";
+            }
+            else{
+                fullTitle += keywords.get(i);
+            }
+        }
         //If there are valid keywords, search and add them to the list.
         String query="";
         if(keywords.size()>0){
@@ -291,7 +300,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 //
 //        //Podcast suggestions are added to the page with duplicates being removed
 //        super.appendData(podcastSuggestions);
-        loadRecommended(author, query);
+        loadRecommended(author, query, fullTitle);
     }
 
     //method used to extract important keywords from a title by removing common articles from podcast titles
@@ -320,7 +329,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         return keywords;
     }
 
-    public void loadRecommended(String queryArtist, String queryTitle){
+    public void loadRecommended(String queryArtist, String queryTitle, String queryFullTitle){
 
         List<String> queries = new ArrayList<String>();
         queries.add(queryArtist);
@@ -380,7 +389,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                                 }
 
                             }
-                            if(!temp1.equals(queryTitle)){ // excluding the same podcast
+                            if(!temp1.equals(queryFullTitle)){ // excluding the same podcast
                                 results.add(podcast);
                             }
                             else{
@@ -413,7 +422,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                     progressBar.setVisibility(View.GONE);
                     txtvError.setText(error.toString());
                     txtvError.setVisibility(View.VISIBLE);
-                    butRetry.setOnClickListener(v -> loadRecommended(queryArtist,queryTitle));
+                    butRetry.setOnClickListener(v -> loadRecommended(queryArtist,queryTitle, queryFullTitle));
                     butRetry.setVisibility(View.VISIBLE);
                 });
     }
