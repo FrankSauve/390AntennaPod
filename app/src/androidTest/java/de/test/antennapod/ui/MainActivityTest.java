@@ -503,5 +503,38 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(solo.searchText("CBC Podcasts"));
     }
 
+    public void subscribeToPodcast(String title){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+        solo.clickOnText(title);
+        solo.clickOnText(solo.getString(R.string.subscribe_label));
+        solo.clickOnScreen(80, 150); //Go back
+    }
+
+    public void testDiscoveryAutomaticRecommendation(){
+        subscribeToPodcast("The Daily - The New York Times");
+
+        //Go to settings
+        openNavDrawer();
+        solo.clickOnText("Settings");
+        solo.clickOnText("Select your Categories preferences");
+
+        //Uncheck and recheck automatic recommendations
+        solo.clickOnText("Automatic Recommendations");
+        solo.clickOnText("Automatic Recommendations");
+        solo.clickOnText("Confirm");
+
+        //Click back
+        solo.clickOnScreen(80, 150);
+
+        //Go to discovery tab
+        openNavDrawer();
+        solo.clickOnText("Discovery");
+        solo.waitForText("Similar To: The Daily");
+
+        //Check that the Actionbar title is correct and that there is a search result
+        assertEquals("Similar To:  The Daily", getActionbarTitle());
+    }
+
 
 }
