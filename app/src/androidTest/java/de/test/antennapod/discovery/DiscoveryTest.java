@@ -1,12 +1,10 @@
 package de.test.antennapod.discovery;
 
 import android.test.ActivityInstrumentationTestCase2;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import de.danoeh.antennapod.activity.MainActivity;
-import de.danoeh.antennapod.core.preferences.UserPreferences;
+import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
+import de.danoeh.antennapod.core.feed.Feed;
+import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.fragment.DiscoveryFragment;
 
 /**
@@ -63,4 +61,42 @@ public class DiscoveryTest extends ActivityInstrumentationTestCase2<MainActivity
 //        assertTrue(discoveryFragment.getCategoryId().contains(1314));
 //
 //    }
+
+    public void testFindAutomaticRecommendations() throws InterruptedException {
+
+        discoveryFragment.testing = true;
+
+        Feed feed = new Feed();
+        feed.setTitle("The Daily");
+        feed.setAuthor("The New York Times");
+        PodDBAdapter adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.setFeed(feed);
+
+        //Get subscriptions
+        discoveryFragment.loadSubscriptions();
+        Thread.sleep(1000);
+
+        discoveryFragment.findAutomaticRecommendations();
+        Thread.sleep(1000);
+
+        //Assert that recommendations are not empty
+        assertNotNull(discoveryFragment.getSearchResults());
+
+        //Assert that there is a podcast from the same author
+        boolean foundModernLove = false;
+        for(ItunesAdapter.Podcast podcast : discoveryFragment.getSearchResults()){
+            //Podcast from the same author
+            System.out.println("TITLE " + podcast.title);
+            if(podcast.title.equals("Modern Love")){
+                System.out.println("MODERN LOVE FOUND");
+                foundModernLove = true;
+            }
+        }
+        assertTrue(foundModernLove);
+
+        //Remove the feed
+        adapter.removeFeed(feed);
+        adapter.close();
+    }
 }

@@ -48,6 +48,8 @@ public class DiscoveryFragment extends ItunesSearchFragment {
 
     private DBReader.NavDrawerData navDrawerData;
 
+    public boolean testing = false; //Toggle for testing
+
 
     /**
      * Constructor
@@ -222,7 +224,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                         });
     }
 
-    private void loadSubscriptions() {
+    public void loadSubscriptions() {
         if(subscription != null) {
             subscription.unsubscribe();
         }
@@ -251,7 +253,9 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         String title = feeds.get(randomFeed).getTitle();
 
         //Set action bar title to "Similar to: ...."
-        ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
+        if(!testing){
+            ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
+        }
 
         ArrayList<String> keywords = titleKeywordExtractor(title);
         String fullTitle="";
@@ -528,5 +532,4 @@ public class DiscoveryFragment extends ItunesSearchFragment {
             default: return ARTS_GENRE_ID;
         }
     }
-
 }
