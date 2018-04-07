@@ -45,7 +45,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     private static List<Integer> Ids = new ArrayList<>();
 
     private static List<Integer> CategoryId = new ArrayList<>();
-    private static List<String> queryList = new ArrayList<>();
+    private String recommendedCategory ="";
 
     private Subscription subscription;
 
@@ -345,12 +345,14 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         txtvEmpty.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
-        queryList = queries;
+
         List<ItunesAdapter.Podcast> results = new ArrayList<>();
 
         subscription = Observable.create((Observable.OnSubscribe<List<ItunesAdapter.Podcast>>) subscriber -> {
             for(int b = 0; b < queries.size(); b++) {
-
+                if(!recommendedCategory.equals("") && b==1){
+                    queries.add(recommendedCategory);
+                }
                 String query = queries.get(b);
 
                 String lang = Locale.getDefault().getLanguage();
@@ -358,9 +360,13 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 if(b==0){
                     url = String.format(API_URL_ARTIST_SEARCH, query.toLowerCase()).replace(' ', '+');
                 }
-                else{
+                else if(b==1){
                     url = String.format(API_URL_TITLE_SEARCH, query.toLowerCase()).replace(' ', '+');
                 }
+                else{
+                    url = "https://itunes.apple.com/us/rss/toppodcasts/limit=10/genre=" + query + "/json";
+                }
+
                 OkHttpClient client = AntennapodHttpClient.getHttpClient();
                 Request.Builder httpReq = new Request.Builder()
                         .url(url)
@@ -372,30 +378,69 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                         String resultString = response.body().string();
                         //System.out.println(resultString);
                         JSONObject result = new JSONObject(resultString);
-                        JSONArray j = result.getJSONArray("results");
+                        if(b!=2){
+                            JSONArray j = result.getJSONArray("results");
 
-                        int limit = 10;
-                        for (int i = 0; i < limit && i<j.length(); i++) {
-                            JSONObject json = j.getJSONObject(i);
-                            ItunesAdapter.Podcast podcast = ItunesAdapter.Podcast.fromSearch(json);
-                            String temp1="";
-                            ArrayList<String> temp2 = titleKeywordExtractor(podcast.title);
-                            for(int count = 0; count<temp2.size();count++){
-                                if(count!=temp2.size()-1){
-                                    temp1 += temp2.get(count)+" ";
+                            int limit = 10;
+                            for (int i = 0; i < limit && i<j.length(); i++) {
+                                JSONObject json = j.getJSONObject(i);
+                                ItunesAdapter.Podcast podcast;
+                                podcast = ItunesAdapter.Podcast.fromSearch(json);
+
+
+                                String temp1="";
+                                ArrayList<String> temp2 = titleKeywordExtractor(podcast.title);
+                                for(int count = 0; count<temp2.size();count++){
+                                    if(count!=temp2.size()-1){
+                                        temp1 += temp2.get(count)+" ";
+                                    }
+                                    else{
+                                        temp1 += temp2.get(count);
+                                    }
+
+                                }
+                                if(!temp1.equals(queryFullTitle)){ // excluding the same podcast
+                                    results.add(podcast);
                                 }
                                 else{
-                                    temp1 += temp2.get(count);
+                                    limit++;
+                                    this.recommendedCategory= getGenreId(podcast.category)+"";
                                 }
-
-                            }
-                            if(!temp1.equals(queryFullTitle)){ // excluding the same podcast
-                                results.add(podcast);
-                            }
-                            else{
-                                limit++;
                             }
                         }
+                        else{
+                            JSONObject feed = result.getJSONObject("feed");
+                            JSONArray entries = feed.getJSONArray("entry");
+
+                            int limit = 5;
+                            for (int i = 0; i < limit && i<entries.length(); i++) {
+                                JSONObject json = entries.getJSONObject(i);
+                                ItunesAdapter.Podcast podcast;
+                                podcast = ItunesAdapter.Podcast.fromToplist(json);
+
+
+                                String temp1="";
+                                ArrayList<String> temp2 = titleKeywordExtractor(podcast.title);
+                                for(int count = 0; count<temp2.size();count++){
+                                    if(count!=temp2.size()-1){
+                                        temp1 += temp2.get(count)+" ";
+                                    }
+                                    else{
+                                        temp1 += temp2.get(count);
+                                    }
+
+                                }
+                                if(!temp1.contains(queryFullTitle)){ // excluding the same podcast
+                                    results.add(podcast);
+                                }
+                                else{
+                                    limit++;
+                                    this.recommendedCategory= getGenreId(podcast.category)+"";
+                                }
+                            }
+                        }
+
+
                     } else {
                         String prefix = getString(R.string.error_msg_prefix);
                         subscriber.onError(new IOException(prefix + response));
@@ -454,5 +499,77 @@ public class DiscoveryFragment extends ItunesSearchFragment {
         }
     };
 
+    private int getGenreId(String categoryName){
+        switch(categoryName){
+            case "Arts": return ARTS_GENRE_ID;
+            case "Food": return FOOD_GENRE_ID;
+            case "Literature": return LITERATURE_GENRE_ID;
+            case "Design": return DESIGN_GENRE_ID;
+            case "Performing Arts": return PERFORMING_ARTS_GENRE_ID;
+            case "Visual Arts": return VISUAL_ARTS_GENRE_ID;
+            case "Fashion & Beauty": return FASHION_AND_BEAUTY_GENRE_ID;
+            case "Comedy": return COMEDY_GENRE_ID;
+            case "News & Politics": return NEWS_AND_POLITICS_GENRE_ID;
+            case "Kids & Family": return KIDS_AND_FAMILY_GENRE_ID;
+            case "Games & Hobbies": return GAMES_AND_HOBBIES_GENRE_ID;
+            case "Videogames": return VIDEOGAMES_GENRE_ID;
+            case "Automotive": return AUTOMOTIVE_GENRE_ID;
+            case "Aviation": return AVIATION_GENRE_ID;
+            case "Hobbies": return HOBBIES_GENRE_ID;
+            case "Other Games": return OTHER_GAMES_GENRE_ID;
+            case "Governments & Organizations": return GOVERNMENT_AND_ORGANIZATION_GENRE_ID;
+            case "National": return NATIONAL_GENRE_ID;
+            case "Regional": return REGIONAL_GENRE_ID;
+            case "Local": return LOCAL_GENRE_ID;
+            case "Non-Profit": return NON_PROFIT_GENRE_ID;
+            case "Technology": return TECHNOLOGY_GENRE_ID;
+            case "Gadgets": return GADGETS_GENRE_ID;
+            case "Tech News": return TECHNEWS_GENRE_ID;
+            case "Podcasting": return PODCASTING_GENRE_ID;
+            case "Software How-To": return SOFTWARE_HOW_TO_GENRE_ID;
+            case "TV & Film": return TV_AND_FILM_GENRE_ID;
+            case "Education": return EDUCATION_GENRE_ID;
+            case "K-12": return K12_GENRE_ID;
+            case "Higher Education": return HIGHER_EDUCATION_GENRE_ID;
+            case "Educational Technology": return EDUCATIONAL_TECHNOLOGY_GENRE_ID;
+            case "Language Courses": return LANGUAGE_COURSES_GENRE_ID;
+            case "Training": return TRAINING_GENRE_ID;
+            case "Health": return HEALTH_GENRE_ID;
+            case "Fitness & Nutrition": return FITNESS_AND_NUTRITION_GENRE_ID;
+            case "Self-Help": return SELFHELP_GENRE_ID;
+            case "Sexuality": return SEXUALITY_GENRE_ID;
+            case "Alternative health": return ALTERNATIVE_HEALTH_GENRE_ID;
+            case "Science & Medicine": return SCIENCE_AND_MEDECINE_GENRE_ID;
+            case "Natural Sciences": return NATURAL_SCIENCES_GENRE_ID;
+            case "Medicine": return MEDECINE_GENRE_ID;
+            case "Social Sciences": return SOCIAL_SCIENCES_GENRE_ID;
+            case "Society & Culture": return SOCIETY_AND_CULTURE_GENRE_ID;
+            case "Personal Journals": return PERSONAL_JOURNALS_GENRE_ID;
+            case "Places & Travel": return PLACES_AND_TRAVEL_GENRE_ID;
+            case "Philosophy": return PHILOSOPHY_GENRE_ID;
+            case "History": return HISTORY_GENRE_ID;
+            case "Music": return MUSIC_GENRE_ID;
+            case "Religion & Spirituality": return RELIGION_AND_SPIRITUALITY_GENRE_ID;
+            case "Buddhism": return BUDDHISM_GENRE_ID;
+            case "Christianity": return CHRISTIANITY_GENRE_ID;
+            case "Islam": return ISLAM_GENRE_ID;
+            case "Judaism": return JUDAISM_GENRE_ID;
+            case "Spirituality": return SPIRITUALITY_GENRE_ID;
+            case "Hinduism": return HINDUISM_GENRE_ID;
+            case "Other Religions & Spirituality": return OTHER_GENRE_ID;
+            case "Sports & Recreation": return SPORTS_AND_RECREATION_GENRE_ID;
+            case "Outdoor": return OUTDOOR_GENRE_ID;
+            case "Professional": return PROFESSIONAL_GENRE_ID;
+            case "College & Highschool": return COLLEGE_AND_HIGHSCHOOL_GENRE_ID;
+            case "Amateur": return AMATEUR_GENRE_ID;
+            case "Business": return BUSINESS_GENRE_ID;
+            case "Careers": return CAREERS_GENRE_ID;
+            case "Investing": return INVESTING_GENRE_ID;
+            case "Management & Marketing": return MANAGEMENT_AND_MARKETING_GENRE_ID;
+            case "Business News": return BUSINESS_NEWS_GENRE_ID;
+            case "Shopping": return SHOPPING_GENRE_ID;
+            default: return ARTS_GENRE_ID;
+        }
+    }
 
 }
