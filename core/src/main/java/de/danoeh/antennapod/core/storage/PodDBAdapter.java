@@ -1100,12 +1100,34 @@ public class PodDBAdapter {
     }
 
     //delete item from folder
-    public void removeItemFromFolder(Folder folder){
+    private void removeItemFromFolder(FeedItem item){
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOLDER_NAME, ""); //put empty string to remove folder name
 
+        //Update corresponding feeditem so it is no longer linked to a folder
+        db.update(TABLE_NAME_FEED_ITEMS, values, KEY_ID + "=?", new String[]{String.valueOf(item.getId())});
     }
 
-    //Delete folder
+    //Delete folder and its episodes
     public void removeFolder(Folder folder){
+        List<FeedItem> items = folder.getEpisodes();
+
+        //Remove all items from folder
+        for(FeedItem item : items){
+            removeItemFromFolder(item);
+        }
+
+        try {
+            db.beginTransactionNonExclusive();
+            db.delete(TABLE_NAME_FOLDERS, KEY_ID + "=?",
+                    new String[]{String.valueOf(folder.getId())});
+            db.delete(TABLE_NAME_ITEMS_FOLDERS, KEY_FOLDER_NAME + "=?", new String[]{String.valueOf(folder.getName())});
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            db.endTransaction();
+        }
 
     }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/rename_item"
+        android:menuCategory="container"
+        android:title="@string/rename_folder_label" />
+
+    <item
+        android:id="@+id/remove_item"
+        android:menuCategory="container"
+        android:title="@string/remove_folder_label" />
+
+</menu>
