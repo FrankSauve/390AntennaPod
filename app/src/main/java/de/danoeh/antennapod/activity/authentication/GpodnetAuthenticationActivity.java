@@ -1,4 +1,4 @@
-package de.danoeh.antennapod.activity.gpoddernet;
+package de.danoeh.antennapod.activity.authentication;
 
 import android.content.Context;
 import android.content.Intent;

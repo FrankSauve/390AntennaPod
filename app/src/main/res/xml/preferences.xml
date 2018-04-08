@@ -340,7 +340,7 @@
                     android:key="pref_gpodnet_authenticate"
                     android:title="@string/pref_gpodnet_authenticate_title"
                     android:summary="@string/pref_gpodnet_authenticate_sum">
-                    <intent android:action=".activity.gpoddernet.GpodnetAuthenticationActivity"/>
+                    <intent android:action=".activity.authentication.GpodnetAuthenticationActivity"/>
                 </PreferenceScreen>
                 <Preference
                     android:key="pref_gpodnet_setlogin_information"
@@ -365,6 +365,19 @@
                     android:title="@string/pref_gpodnet_notifications_title"
                     android:summary="@string/pref_gpodnet_notifications_sum"
                     android:defaultValue="true"/>
+            </PreferenceScreen>
+            <PreferenceScreen
+                android:key="prefTwitterSettings"
+                android:title="@string/twitter_label">
+                <PreferenceScreen
+                    android:key="pref_twitter_authenticate"
+                    android:title="@string/pref_twitter_authenticate_title"
+                    android:summary="@string/pref_twitter_authenticate_sum">
+                    <intent android:action=".activity.authentication.TwitterAuthenticationActivity" />
+                </PreferenceScreen>
+                <Preference
+                    android:key="pref_twitter_logout"
+                    android:title="@string/pref_gpodnet_logout_title"/>
             </PreferenceScreen>
             </PreferenceCategory>
         </PreferenceScreen>

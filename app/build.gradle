@@ -181,6 +181,8 @@ dependencies {
     compile 'com.github.mfietz:fyydlin:v0.3'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
+    compile 'com.twitter.sdk.android:twitter-core:3.1.0'
+
 }
 
 play {

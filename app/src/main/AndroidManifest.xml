@@ -319,12 +319,26 @@
         </activity>
 
         <activity
-            android:name=".activity.gpoddernet.GpodnetAuthenticationActivity"
+            android:name=".activity.authentication.GpodnetAuthenticationActivity"
             android:configChanges="orientation"
             android:label="@string/gpodnet_auth_label"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name=".activity.gpoddernet.GpodnetAuthenticationActivity"/>
+                <action android:name=".activity.authentication.GpodnetAuthenticationActivity"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="de.danoeh.antennapod.activity.PreferenceActivity"/>
+        </activity>
+
+        <activity
+            android:name=".activity.authentication.TwitterAuthenticationActivity"
+            android:configChanges="orientation"
+            android:label="@string/twitter_label"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name=".activity.authentication.TwitterAuthenticationActivity"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
             <meta-data
