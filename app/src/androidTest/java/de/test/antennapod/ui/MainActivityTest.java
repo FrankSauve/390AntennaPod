@@ -422,7 +422,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText("OK");
     }
 
-    public void testAddFolder() {
+    public String testAddFolder() {
 
         //Folder name
         String newFolderName = "First folder";
@@ -441,6 +441,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         //Assertion
         assertTrue(solo.waitForText(newFolderName));
+
+        return newFolderName;
 
     }
 
@@ -523,6 +525,28 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         //Check that the Actionbar title is correct and that there is a search result
         assertEquals("Similar To:  The Daily", getActionbarTitle());
+    }
+
+    private void removeFolder(String folderName){
+        solo.clickLongOnText(folderName);
+        solo.waitForText("Remove Folder");
+        solo.clickOnText("Remove Folder");
+        solo.waitForText("Confirm");
+        solo.clickOnText("Confirm");
+        solo.sleep(1000);
+    }
+
+    public void testDeleteFolder() {
+
+        //Add a new folder first
+        String newFolderName = testAddFolder();
+
+        //delete the folder created
+        removeFolder(newFolderName);
+
+        //Assertion
+        assertFalse(solo.waitForText(newFolderName));
+
     }
 
 
