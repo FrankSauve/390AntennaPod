@@ -1113,8 +1113,10 @@ public class PodDBAdapter {
         List<FeedItem> items = folder.getEpisodes();
 
         //Remove all items from folder
-        for(FeedItem item : items){
-            removeItemFromFolder(item);
+        if(items != null){
+            for(FeedItem item : items){
+                removeItemFromFolder(item);
+            }
         }
 
         try {
