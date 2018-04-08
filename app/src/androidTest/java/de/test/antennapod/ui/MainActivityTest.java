@@ -527,8 +527,19 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertEquals("Similar To:  The Daily", getActionbarTitle());
     }
 
-    private void removeFolder(String folderName){
+    private void removeFolderContextClick(String folderName){
         solo.clickLongOnText(folderName);
+        solo.waitForText("Remove Folder");
+        solo.clickOnText("Remove Folder");
+        solo.waitForText("Confirm");
+        solo.clickOnText("Confirm");
+        solo.sleep(1000);
+    }
+
+    private void removeFolderFromFolderMenu(String folderName){
+        solo.clickOnText(folderName);
+        solo.sleep(1000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
         solo.waitForText("Remove Folder");
         solo.clickOnText("Remove Folder");
         solo.waitForText("Confirm");
@@ -541,8 +552,17 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         //Add a new folder first
         String newFolderName = testAddFolder();
 
-        //delete the folder created
-        removeFolder(newFolderName);
+        //delete the folder created with menu from a long click
+        removeFolderContextClick(newFolderName);
+
+        //Assertion
+        assertFalse(solo.waitForText(newFolderName));
+
+        //Add a new folder once again
+        newFolderName = testAddFolder();
+
+        //delete the folder created from folder menu options
+        removeFolderFromFolderMenu(newFolderName);
 
         //Assertion
         assertFalse(solo.waitForText(newFolderName));

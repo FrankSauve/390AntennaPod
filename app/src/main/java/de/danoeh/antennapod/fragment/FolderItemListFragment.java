@@ -1,5 +1,7 @@
 package de.danoeh.antennapod.fragment;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -30,13 +32,18 @@ import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.AllEpisodesRecycleAdapter;
 import de.danoeh.antennapod.adapter.DefaultActionButtonCallback;
+import de.danoeh.antennapod.core.asynctask.FolderRemover;
+import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.feed.FeedMedia;
 import de.danoeh.antennapod.core.folders.Folder;
+import de.danoeh.antennapod.core.preferences.PlaybackPreferences;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.Downloader;
+import de.danoeh.antennapod.core.service.playback.PlaybackService;
 import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DownloadRequestException;
+import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
@@ -176,14 +183,7 @@ public class FolderItemListFragment extends Fragment {
         }
         super.onCreateOptionsMenu(menu, inflater);
 
-        FeedMenuHandler.onCreateOptionsMenu(inflater, menu);
-
-        menu.findItem(R.id.action_search).setVisible(false); //For now cannot search for episode inside folders
-        menu.findItem(R.id.share_link_item).setVisible(false); //Folders do not have a share link
-        menu.findItem(R.id.visit_website_item).setVisible(false); //Folders do not have a website to visit
-        menu.findItem(R.id.refresh_complete_item).setVisible(false); //Folders are refreshed when accessing the view
-        menu.findItem(R.id.refresh_item).setVisible(false); //Same as above
-        menu.findItem(R.id.share_download_url_item).setVisible(false);//Folders do not have an url
+        inflater.inflate(R.menu.folderlist, menu);
 
         int[] attrs = { R.attr.action_bar_icon_color };
         TypedArray ta = getActivity().obtainStyledAttributes(UserPreferences.getTheme(), attrs);
@@ -208,6 +208,35 @@ public class FolderItemListFragment extends Fragment {
                     //new RenameFeedDialog(getActivity(), feed).show();
                     return true;
                 case R.id.remove_item:
+                    final FolderRemover remover = new FolderRemover(getContext(), folder) {
+                        @Override
+                        protected void onPostExecute(Void result) {
+                            super.onPostExecute(result);
+                            ((MainActivity) getActivity()).loadFragment(FoldersFragment.TAG, null);
+                        }
+                    };
+                    ConfirmationDialog conDialog = new ConfirmationDialog(getContext(),
+                            R.string.remove_folder_label,
+                            getString(R.string.folder_delete_confirmation_msg, folder.getName())) {
+                        @Override
+                        public void onConfirmButtonPressed(
+                                DialogInterface dialog) {
+                            dialog.dismiss();
+                            long mediaId = PlaybackPreferences.getCurrentlyPlayingFeedMediaId();
+                            if (mediaId > 0 &&
+                                    FeedItemUtil.indexOfItemWithMediaId(folder.getEpisodes(), mediaId) >= 0) {
+                                Log.d(TAG, "Currently playing episode is about to be deleted, skipping");
+                                remover.skipOnCompletion = true;
+                                int playerStatus = PlaybackPreferences.getCurrentPlayerStatus();
+                                if(playerStatus == PlaybackPreferences.PLAYER_STATUS_PLAYING) {
+                                    getActivity().sendBroadcast(new Intent(
+                                            PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE));
+                                }
+                            }
+                            remover.executeAsync();
+                        }
+                    };
+                    conDialog.createNewDialog().show();
                     return true;
                 default:
                     return false;
