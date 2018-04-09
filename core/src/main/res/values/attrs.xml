@@ -53,6 +53,7 @@
     <attr name="ic_cast_disconnect" format="reference"/>
     <attr name="ic_trending" format="reference"/>
     <attr name="ic_discovery" format="reference"/>
+    <attr name="ic_home" format="reference"/>
 
 
     <!-- Used in itemdescription -->
