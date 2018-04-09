@@ -184,8 +184,8 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         navList.setAdapter(navAdapter);
         navList.setOnItemClickListener(navListClickListener);
         navList.setOnItemLongClickListener(newListLongClickListener);
-        folderView.setOnItemClickListener(navListClickListener);
-        folderView.setOnItemLongClickListener(newListLongClickListener);
+        folderView.setOnItemClickListener(folderListClickListener);
+        folderView.setOnItemLongClickListener(folderListLongClickListener);
         registerForContextMenu(navList);
         registerForContextMenu(folderView);
 
@@ -444,19 +444,37 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         }
     };
 
+    private AdapterView.OnItemClickListener folderListClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            madapter.onItemClick(parent,view,position,id);
+
+            drawerLayout.closeDrawer(navDrawer);
+        }
+    };
+
     private AdapterView.OnItemLongClickListener newListLongClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             if(position < navAdapter.getTags().size()) {
                 showDrawerPreferencesDialog();
                 return true;
-            } else {
+            } else
                 mPosition = position;
                 return false;
-            }
         }
     };
 
+    private AdapterView.OnItemLongClickListener folderListLongClickListener = new AdapterView.OnItemLongClickListener() {
+        @Override
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+           mPosition= position;
+            return false;
+
+        }
+    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -584,12 +602,24 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if(v.getId() != R.id.nav_list) {
-            return;
-        }
+
+        if (v.getId() == R.id.nav_list2) {
+
+            AdapterView.AdapterContextMenuInfo adapterInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            int position = adapterInfo.position;
+
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.nav_feed_context, menu);
+            Folder folder = navDrawerData.folders.get(position);
+            menu.setHeaderTitle(folder.getName());
+        } else {
+            if (v.getId() != R.id.nav_list) {
+                return;
+            }
+
         AdapterView.AdapterContextMenuInfo adapterInfo = (AdapterView.AdapterContextMenuInfo) menuInfo;
         int position = adapterInfo.position;
-        if(position < navAdapter.getSubscriptionOffset()) {
+        if (position < navAdapter.getSubscriptionOffset()) {
             return;
         }
         MenuInflater inflater = getMenuInflater();
@@ -597,6 +627,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         Feed feed = navDrawerData.feeds.get(position - navAdapter.getSubscriptionOffset());
         menu.setHeaderTitle(feed.getTitle());
         // episodes are not loaded, so we cannot check if the podcast has new or unplayed ones!
+        }
     }
 
 
