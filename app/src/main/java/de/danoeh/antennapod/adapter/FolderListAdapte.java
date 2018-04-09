@@ -17,7 +17,9 @@ import java.util.ArrayList;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
+import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.folders.Folder;
+import de.danoeh.antennapod.dialog.RenameFeedDialog;
 import de.danoeh.antennapod.fragment.ItemlistFragment;
 import de.danoeh.antennapod.fragment.QueueFragment;
 
