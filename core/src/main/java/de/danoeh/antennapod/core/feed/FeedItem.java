@@ -2,6 +2,7 @@ package de.danoeh.antennapod.core.feed;
 
 import android.database.Cursor;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,6 +15,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import de.danoeh.antennapod.core.asynctask.ImageResource;
+import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.core.util.ShownotesProvider;
@@ -52,6 +54,8 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
 
     private Feed feed;
     private long feedId;
+
+    private Folder folder;
 
     private int state;
     public static final int NEW = -1;
@@ -298,6 +302,18 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
         this.feed = feed;
     }
 
+    public Folder getFolder(){
+        return this.folder;
+    }
+
+    public long getFolderId(){
+        return getFolder().getId();
+    }
+
+    public void setFolder(Folder folder){
+        this.folder = folder;
+    }
+
     public boolean isNew() {
         return state == NEW;
     }
@@ -330,7 +346,7 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
     public void setContentEncoded(String contentEncoded) {
         this.contentEncoded = contentEncoded;
     }
-    
+
     public FlattrStatus getFlattrStatus() {
         return flattrStatus;
     }
@@ -382,7 +398,7 @@ public class FeedItem extends FeedComponent implements ShownotesProvider, Flattr
         if(media != null && media.hasEmbeddedPicture()) {
             return media.getImageLocation();
         } else if (image != null) {
-           return image.getImageLocation();
+            return image.getImageLocation();
         } else if (feed != null) {
             return feed.getImageLocation();
         } else {
