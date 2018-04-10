@@ -1138,6 +1138,7 @@ public class PodDBAdapter {
 
         //Updating the corresponding feeditem with the name of the folder
         setFeedItemFolder(item, folder);
+        folder.episodes.add(item);
     }
 
     public void removeFavoriteItem(FeedItem item) {

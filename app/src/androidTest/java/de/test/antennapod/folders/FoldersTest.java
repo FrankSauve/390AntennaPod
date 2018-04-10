@@ -5,11 +5,13 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import de.danoeh.antennapod.activity.MainActivity;
+import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBReader;
@@ -129,6 +131,37 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         //You might want to delete all folders from database from time to time
         //deleteAllFolders();
+    }
+
+    public void testAddItemsToFolder() throws Exception {
+        //Create Feeds
+        FeedItem item1 = new FeedItem(1, "item1", "1", "link1", new Date(), 0, new Feed());
+        FeedItem item2 = new FeedItem(2, "item2", "2", "link2", new Date(), 0, new Feed());
+        FeedItem item3 = new FeedItem(3, "item3", "3", "link3", new Date(), 0, new Feed());
+        FeedItem item4 = new FeedItem(4, "item4", "4", "link4", new Date(), 0, new Feed());
+
+
+        //Assign random name
+        String firstFolderName = randomAlphabet();
+        String secondFolderName = randomAlphabet();
+
+        //Creating folders containing no episodes
+        Folder firstFolder = new Folder(firstFolderName, null);
+        Folder secondFolder = new Folder(secondFolderName, null);
+
+        //Add them to database with the PodDBAdapter
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.addFolder(firstFolder);
+        adapter.addFolder(secondFolder);
+        adapter.addFolderItem(firstFolder,item1);
+        adapter.addFolderItem(firstFolder, item3);
+        adapter.addFolderItem(secondFolder, item2);
+        adapter.addFolderItem(secondFolder, item4);
+        assertEquals(2, firstFolder.getEpisodesNum());
+        adapter.close();
+
+
     }
 
     private void deleteAllFolders(){
