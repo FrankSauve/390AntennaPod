@@ -479,21 +479,15 @@ public class DBWriter {
         });
     }
 
-    public static Future<?> addFavoriteItemById(final long itemId) {
-        return dbExec.submit(() -> {
-            final FeedItem item = DBReader.getFeedItem(itemId);
-            if (item == null) {
-                Log.d(TAG, "Can't find item for itemId " + itemId);
-                return;
-            }
-            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
-            adapter.addFavoriteItem(item);
-            adapter.close();
-            item.addTag(FeedItem.TAG_FAVORITE);
-            EventBus.getDefault().post(FavoritesEvent.added(item));
-            EventBus.getDefault().post(FeedItemEvent.updated(item));
-        });
-    }
+
+
+//    public static Future<?> addFolderItem(final Folder folder, final FeedItem item) {
+//        return dbExec.submit(() -> {
+//            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+//            adapter.addFolderItem(folder,item);
+//            adapter.close();
+//        });
+//    }
 
     public static Future<?> removeFavoriteItem(final FeedItem item) {
         return dbExec.submit(() -> {
@@ -511,6 +505,35 @@ public class DBWriter {
         return dbExec.submit(() -> {
             final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
             adapter.addFolder(folder);
+            adapter.close();
+            EventDistributor.getInstance().sendFolderUpdateBroadcast();
+        });
+    }
+    public static Future<?> addFavoriteItemById(final long itemId) {
+        return dbExec.submit(() -> {
+            final FeedItem item = DBReader.getFeedItem(itemId);
+            if (item == null) {
+                Log.d(TAG, "Can't find item for itemId " + itemId);
+                return;
+            }
+            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+            adapter.addFavoriteItem(item);
+            adapter.close();
+            item.addTag(FeedItem.TAG_FAVORITE);
+            EventBus.getDefault().post(FavoritesEvent.added(item));
+            EventBus.getDefault().post(FeedItemEvent.updated(item));
+        });
+    }
+    //Add new Items to folder
+    public static Future<?> addItemsToFolderById(final Folder folder, final long itemId){
+        return dbExec.submit(() -> {
+            final FeedItem item = DBReader.getFeedItem(itemId);
+            if (item == null) {
+                Log.d(TAG, "Can't find item for itemId " + itemId);
+                return;
+            }
+            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+            adapter.addFolderItem(folder,item);
             adapter.close();
         });
     }
@@ -906,14 +929,14 @@ public class DBWriter {
         });
     }
 
-    public static Future<?> setFolder(Folder folder) {
-        return dbExec.submit(() -> {
-            PodDBAdapter adapter = PodDBAdapter.getInstance();
-            adapter.open();
-            adapter.setFolder(folder);
-            adapter.close();
-        });
-    }
+//    public static Future<?> setFolder(Folder folder) {
+//        return dbExec.submit(() -> {
+//            PodDBAdapter adapter = PodDBAdapter.getInstance();
+//            adapter.open();
+//            adapter.setFolder(folder);
+//            adapter.close();
+//        });
+//    }
 
 
     /**

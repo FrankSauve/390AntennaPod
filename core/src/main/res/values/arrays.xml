@@ -151,6 +151,7 @@
         <item>@string/playback_history_label</item>
         <item>@string/add_feed_label</item>
         <item>@string/trending_label</item>
+        <item>@string/discovery_label</item>
         <item>@string/folders_label</item>
         <item>@string/subscriptions_list_label</item>
         <item>@string/folder_list_label</item>
@@ -227,4 +228,25 @@
         <item>@string/fast_forward_label</item>
         <item>@string/skip_episode_label</item>
     </string-array>
+
+    <string-array name="compact_discovery_buttons_options">
+        <item>@string/automatic_recommendations_label</item>
+        <item>@string/arts_label</item>
+        <item>@string/comedy_label</item>
+        <item>@string/education_label</item>
+        <item>@string/kids_family_label</item>
+        <item>@string/health_label</item>
+        <item>@string/tv_film_label</item>
+        <item>@string/music_label</item>
+        <item>@string/news_politics_label</item>
+        <item>@string/religion_spirituality_label</item>
+        <item>@string/science_medecine_label</item>
+        <item>@string/sports_recreation_label</item>
+        <item>@string/technology_label</item>
+        <item>@string/business_label</item>
+        <item>@string/games_hobbies_label</item>
+        <item>@string/society_culture_label</item>
+        <item>@string/government_organization_label</item>
+    </string-array>
+
 </resources>

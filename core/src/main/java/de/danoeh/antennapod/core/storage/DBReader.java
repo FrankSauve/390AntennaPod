@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -188,6 +189,22 @@ public final class DBReader {
         }
     }
 
+    public static void loadFolderDataOfFolderItemList(List<FeedItem> items) {
+        List<Folder> folders = getFolderList();
+
+        Map<Long, Folder> folderIndex = new ArrayMap<>(folders.size());
+        for (Folder folder : folders) {
+            folderIndex.put(folder.getId(), folder);
+        }
+        for (FeedItem item : items) {
+            Folder folder = folderIndex.get(item.getFolderId());
+            if (folder == null) {
+                Log.w(TAG, "No match found for item with ID " + item.getId() + ". Feed ID was " + item.getFolderId());
+            }
+            item.setFolder(folder);
+        }
+    }
+
     /**
      * Loads the list of FeedItems for a certain Feed-object. This method should NOT be used if the FeedItems are not
      * used. In order to get information ABOUT the list of FeedItems, consider using {@link #getFeedStatisticsList()} instead.
@@ -207,7 +224,31 @@ public final class DBReader {
             List<FeedItem> items = extractItemlistFromCursor(adapter, cursor);
             Collections.sort(items, new FeedItemPubdateComparator());
             for (FeedItem item : items) {
+                //Log.d(TAG, "itemTitle: " + item.getTitle());
                 item.setFeed(feed);
+            }
+            return items;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            adapter.close();
+        }
+    }
+
+    public static List<FeedItem> getFolderItemList(final Folder folder) {
+        Log.d(TAG, "getFolderItemList() called with: " + "folderName = [" + folder.getName() + "]");
+
+        PodDBAdapter adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        Cursor cursor = null;
+        try {
+            cursor = adapter.getAllItemsOfFolderCursor(folder);
+            List<FeedItem> items = extractItemlistFromCursor(adapter, cursor);
+            Collections.sort(items, new FeedItemPubdateComparator());
+            for (FeedItem item : items) {
+                //Log.d(TAG, "itemTitle: " + item.getTitle());
+                item.setFolder(folder);
             }
             return items;
         } finally {
@@ -231,6 +272,7 @@ public final class DBReader {
 
     private static List<FeedItem> extractItemlistFromCursor(PodDBAdapter adapter, Cursor cursor) {
         List<FeedItem> result = new ArrayList<>(cursor.getCount());
+        //Log.d(TAG, "cursorCount: " + cursor.getCount());
 
         LongList imageIds = new LongList(cursor.getCount());
         LongList itemIds = new LongList(cursor.getCount());
@@ -259,6 +301,7 @@ public final class DBReader {
             }
         }
         return result;
+
     }
 
     private static Map<Long, FeedMedia> getFeedMedia(PodDBAdapter adapter, LongList itemIds) {
@@ -619,6 +662,40 @@ public final class DBReader {
     }
 
     /**
+     * Loads a specific Folder from the database.
+     */
+    public static Folder getFolder(final long folderId) {
+        Log.d(TAG, "getFolder() called with: " + "folderId = [" + folderId + "]");
+
+        PodDBAdapter adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        try {
+            return getFolder(folderId, adapter);
+        } finally {
+            adapter.close();
+        }
+    }
+
+    static Folder getFolder(final long folderId, PodDBAdapter adapter) {
+        Folder folder = null;
+        Cursor cursor = null;
+        try {
+            cursor = adapter.getFolderCursor(folderId);
+            if (cursor.moveToNext()) {
+                folder = extractFolderFromCursorRow(adapter, cursor);
+                folder.setEpisodes(getFolderItemList(folder));
+            } else {
+                Log.e(TAG, "getFolder could not find folder with id " + folderId);
+            }
+            return folder;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
      * Loads a specific Feed from the database.
      *
      * @param feedId The ID of the Feed
@@ -876,6 +953,17 @@ public final class DBReader {
         }
     }
 
+    public static int getNumberOfItemsInFolder(Folder folder){
+        PodDBAdapter adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        try {
+            return adapter.itemCount(folder);
+        } finally {
+            adapter.close();
+        }
+
+    }
+
     /**
      * Searches the DB for a FeedImage of the given id.
      *
@@ -931,6 +1019,7 @@ public final class DBReader {
         }
         return result;
     }
+
 
     /**
      * Searches the DB for a FeedMedia of the given id.

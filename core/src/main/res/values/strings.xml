@@ -21,6 +21,7 @@
     <string name="downloads_log_label">Log</string>
     <string name="subscriptions_label">Subscriptions</string>
     <string name="trending_label">Trending</string>
+    <string name="discovery_label">Discovery</string>
     <string name="folders_label">My Folders</string>
     <string name="subscriptions_list_label">Subscriptions List</string>
     <string name="folder_list_label">Folders List</string>
@@ -451,7 +452,43 @@
     <string name="pref_auto_flattr_title">Automatic Flattr</string>
     <string name="pref_auto_flattr_sum">Configure automatic flattring</string>
     <string name="user_interface_label">User Interface</string>
+    <string name="user_discovery_label">Discovery Preferences</string>
     <string name="pref_set_theme_title">Select Theme</string>
+    <string name="pref_playback_title">Change your Playback settings</string>
+    <string name="pref_playback_sum">Manage your playback settings.</string>
+    <string name="pref_playback_settings_title">PLAYBACK SETTINGS</string>
+    <string name="pref_headphones_settings_title">HEADPHONES SETTINGS</string>
+    <string name="pref_headphones_title">Change your Headphones and Bluetooth settings</string>
+    <string name="pref_headphones_sum">Headphones reconnect or disconnect impact on playback. Bluetooth settings.</string>
+    <string name="pref_skip_settings_title">SKIP SETTINGS</string>
+    <string name="pref_skip_title">Change your skip (time and button) settings</string>
+    <string name="pref_skip_sum">Fast Forward Skip time, rewind skip time and forward button skips.</string>
+    <string name="pref_manage_settings_title">MANAGE EPISODES AFTER PLAYBACK ACTION SETTINGS</string>
+    <string name="pref_manage_title">Manage what happens after a playback action on the episodes.</string>
+    <string name="pref_manage_sum">Smart mark as played, auto delete, keep skipped episodes, keep favorite episodes</string>
+    <string name="pref_network_settings_title">NETWORK SETTINGS</string>
+    <string name="pref_network_title">Change your Network settings</string>
+    <string name="pref_network_sum">Enqueue Download, Update interval or time of day, Mobile updates, Episode cleanup, Parallel downloads, Automatic download and Proxy.</string>
+    <string name="pref_automatic_download_settings_title">AUTOMATIC DOWNLOAD SETTINGS</string>
+    <string name="pref_services_settings_title">SERVICES SETTINGS</string>
+    <string name="pref_services_title">Change your Services settings</string>
+    <string name="pref_services_sum">Change your Flattr and gpodder.net settings</string>
+    <string name="pref_storage_settings_title">STORAGE SETTINGS</string>
+    <string name="pref_storage_title">Change your Storage settings</string>
+    <string name="pref_storage_sum">Choose data folder and image cache size.</string>
+    <string name="pref_other_settings_title">OTHER SETTINGS</string>
+    <string name="pref_other_title">Other settings</string>
+    <string name="pref_other_sum">OPML export, HTML export and Statistics.</string>
+    <string name="pref_project_settings_title">PROJECT INFORMATION</string>
+    <string name="pref_project_title">Project information and bug reports</string>
+    <string name="pref_project_sum">FAQ, Known issues, Crash Report and About.</string>
+    <string name="pref_user_interface_title">Change your User Interface settings</string>
+    <string name="pref_user_interface_sum">Change your interface settings such as the Theme, Lockscreen, Navigation menu, etc.</string>
+    <string name="pref_user_interface_settings_title">USER INTERFACE SETTINGS</string>
+    <string name="pref_lockScreen_title">LockScreen preferences</string>
+    <string name="pref_lockScreen_sum">Change your LockScreen settings.</string>
+    <string name="pref_lockScreen_settings_title">LOCKSCREEN SETTINGS</string>
+    <string name="pref_drawer_settings_title">NAVIGATION DRAWER SETTINGS</string>
     <string name="pref_nav_drawer_title">Customize Navigation Drawer</string>
     <string name="pref_nav_drawer_sum">Customize the appearance of the navigation drawer.</string>
     <string name="pref_nav_drawer_items_title">Set Navigation Drawer items</string>
@@ -461,6 +498,8 @@
     <string name="pref_nav_drawer_feed_counter_title">Set Subscription Counter</string>
     <string name="pref_nav_drawer_feed_counter_sum">Change the information displayed by the subscription counter</string>
     <string name="pref_set_theme_sum">Change the appearance of AntennaPod.</string>
+    <string name="pref_discovery_sum">Select the Categories and Subcategories you prefer.</string>
+    <string name="pref_discovery_title">Select your Categories preferences.</string>
     <string name="pref_automatic_download_title">Automatic Download</string>
     <string name="pref_automatic_download_sum">Configure the automatic download of episodes.</string>
     <string name="pref_autodl_wifi_filter_title">Enable Wi-Fi filter</string>
@@ -508,6 +547,7 @@
     <string name="pref_compact_notification_buttons_title">Set Lockscreen Buttons</string>
     <string name="pref_compact_notification_buttons_sum">Change the playback buttons on the lockscreen. The play/pause button is always included.</string>
     <string name="pref_compact_notification_buttons_dialog_title">Select a maximum of %1$d items</string>
+    <string name="pref_discovery_buttons_dialog_title">Select your favourite categories</string>
     <string name="pref_compact_notification_buttons_dialog_error">You can only select a maximum of %1$d items.</string>
     <string name="pref_lockscreen_background_title">Set Lockscreen Background</string>
     <string name="pref_lockscreen_background_sum">Set the lockscreen background to the current episode\'s image. As a side effect, this will also show the image in third party apps.</string>
@@ -679,6 +719,23 @@
     <string name="in_queue_label">Episode is in the queue</string>
     <string name="drag_handle_content_description">Drag to change the position of this item</string>
     <string name="load_next_page_label">Load next page</string>
+    <string name="automatic_recommendations_label">Automatic Recommendations</string>
+    <string name="arts_label">Arts</string>
+    <string name="comedy_label">Comedy</string>
+    <string name="education_label">Education</string>
+    <string name="kids_family_label">Kids and Family</string>
+    <string name="health_label">Health</string>
+    <string name="tv_film_label">TV and Film</string>
+    <string name="music_label">Music</string>
+    <string name="news_politics_label">News and Politics</string>
+    <string name="religion_spirituality_label">Religion and Spirituality</string>
+    <string name="science_medecine_label">Science and Medecine</string>
+    <string name="sports_recreation_label">Sports and Recreation</string>
+    <string name="technology_label">Technology</string>
+    <string name="business_label">Business</string>
+    <string name="games_hobbies_label">Games and Hobbies</string>
+    <string name="society_culture_label">Society and Culture</string>
+    <string name="government_organization_label">Government and Organization</string>
 
     <!-- Feed information screen -->
     <string name="authentication_label">Authentication</string>
@@ -721,7 +778,7 @@
     <string name="selected_not_queued_label">Selected not queued Episodes</string>
     <string name="has_media">Has media</string>
     <string name="selected_has_media_label">Selected episodes with media</string>
-
+    <string name="folder_label">Add to Folder</string>
     <!-- Sort  -->
     <string name="sort_title_a_z">Title (A \u2192 Z)</string>
     <string name="sort_title_z_a">Title (Z \u2192 A)</string>
