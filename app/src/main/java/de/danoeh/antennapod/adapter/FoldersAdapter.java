@@ -18,7 +18,7 @@ import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.dialog.NameFolderDialog;
-import de.danoeh.antennapod.fragment.ItemlistFragment;
+import de.danoeh.antennapod.fragment.FolderItemListFragment;
 import jp.shts.android.library.TriangleLabelView;
 
 /**
@@ -105,7 +105,7 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
             holder.feedTitle.setVisibility(View.VISIBLE);
             // prevent any accidental re-use of old values (not sure how that would happen...)
             holder.count.setPrimaryText("");
-            // make it go away, we don't need it for add feed
+            // make it go away, we don't need it for add oflder
             holder.count.setVisibility(View.INVISIBLE);
 
             // when this holder is reused, we could else end up with a cover image
@@ -119,9 +119,9 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
 
         holder.feedTitle.setText(folder.getName());
         holder.feedTitle.setVisibility(View.VISIBLE);
-        int count = itemAccess.getFolderCounter(folder.getId());
+        int count = itemAccess.getFolderCounter(position);
         if(count > 0) {
-            holder.count.setPrimaryText(String.valueOf(itemAccess.getFolderCounter(folder.getId())));
+            holder.count.setPrimaryText(String.valueOf(itemAccess.getFolderCounter(position)));
             holder.count.setVisibility(View.VISIBLE);
         } else {
             holder.count.setVisibility(View.GONE);
@@ -135,8 +135,9 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
         if (position == getAddTilePosition()) {
             new NameFolderDialog(mainActivityRef.get()).createFolderDialog();
         } else {
-            Fragment fragment = ItemlistFragment.newInstance(getItemId(position));
+            Fragment fragment = FolderItemListFragment.newInstance(getItemId(position));
             mainActivityRef.get().loadChildFragment(fragment);
+            mainActivityRef.get().getSupportActionBar().setTitle(itemAccess.getFolder(position).getName());
         }
     }
 
@@ -149,7 +150,7 @@ public class FoldersAdapter extends BaseAdapter implements AdapterView.OnItemCli
     public interface ItemAccess {
         int getCount();
         Folder getFolder(int position);
-        int getFolderCounter(long folderId);
+        int getFolderCounter(int position);
     }
 
 }

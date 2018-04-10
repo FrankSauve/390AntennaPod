@@ -457,8 +457,8 @@
     <string name="pref_playback_sum">Manage your playback settings.</string>
     <string name="pref_playback_settings_title">PLAYBACK SETTINGS</string>
     <string name="pref_headphones_settings_title">HEADPHONES SETTINGS</string>
-    <string name="pref_headphones_title">Change your Headphones settings</string>
-    <string name="pref_headphones_sum">Headphones reconnect or disconnect impact on playback.</string>
+    <string name="pref_headphones_title">Change your Headphones and Bluetooth settings</string>
+    <string name="pref_headphones_sum">Headphones reconnect or disconnect impact on playback. Bluetooth settings.</string>
     <string name="pref_skip_settings_title">SKIP SETTINGS</string>
     <string name="pref_skip_title">Change your skip (time and button) settings</string>
     <string name="pref_skip_sum">Fast Forward Skip time, rewind skip time and forward button skips.</string>
@@ -780,7 +780,7 @@
     <string name="selected_not_queued_label">Selected not queued Episodes</string>
     <string name="has_media">Has media</string>
     <string name="selected_has_media_label">Selected episodes with media</string>
-
+    <string name="folder_label">Add to Folder</string>
     <!-- Sort  -->
     <string name="sort_title_a_z">Title (A \u2192 Z)</string>
     <string name="sort_title_z_a">Title (Z \u2192 A)</string>
