@@ -1,5 +1,6 @@
 package de.danoeh.antennapod.fragment;
 
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.FoldersAdapter;
 import de.danoeh.antennapod.core.asynctask.FolderRemover;
 import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
-import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.preferences.PlaybackPreferences;
 import de.danoeh.antennapod.core.service.playback.PlaybackService;

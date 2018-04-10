@@ -1,9 +1,14 @@
 package de.test.antennapod.discovery;
 
 import android.test.ActivityInstrumentationTestCase2;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.feed.Feed;
+import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.fragment.DiscoveryFragment;
 
@@ -35,33 +40,34 @@ public class DiscoveryTest extends ActivityInstrumentationTestCase2<MainActivity
     }
 
 
-     //TODO: Crashes in circleCI, but works on local machines ¯\_(ツ)_/¯
-//    //Test Discovery loadCategories
-//    public void testLoadCategories() throws InterruptedException {
-//
-//        // Create new List for User preferences
-//        List<Integer> newCategories = new ArrayList<>();
-//        newCategories.add(6);
-//        newCategories.add(8);
-//        newCategories.add(9);
-//
-//        //Assign List to new values for Buttons
-//        UserPreferences.setPrefDiscoveryButtons(newCategories);
-//
-//        //onStartDiscovery Page
-//
-//        discoveryFragment.onStart();
-//
-//        List<Integer> test = discoveryFragment.getIds();
-//
-//        assertEquals(test, newCategories);
-//        assertTrue(discoveryFragment.getCategoryId().contains(1309));
-//        assertTrue(discoveryFragment.getCategoryId().contains(1311));
-//        assertTrue(!discoveryFragment.getCategoryId().contains(1310));
-//        assertTrue(discoveryFragment.getCategoryId().contains(1314));
-//
-//    }
+    //TODO: Crashes in circleCI, but works on local machines ¯\_(ツ)_/¯
+    //Test Discovery loadCategories
+    public void testLoadCategories() throws InterruptedException {
 
+        // Create new List for User preferences
+        List<Integer> newCategories = new ArrayList<>();
+        newCategories.add(6);
+        newCategories.add(8);
+        newCategories.add(9);
+
+        //Assign List to new values for Buttons
+        UserPreferences.setPrefDiscoveryButtons(newCategories);
+
+        //onStartDiscovery Page
+
+        discoveryFragment.onStart();
+
+        List<Integer> test = discoveryFragment.getIds();
+
+        assertEquals(test, newCategories);
+        assertTrue(discoveryFragment.getCategoryId().contains(1309));
+        assertTrue(discoveryFragment.getCategoryId().contains(1311));
+        assertTrue(!discoveryFragment.getCategoryId().contains(1310));
+        assertTrue(discoveryFragment.getCategoryId().contains(1314));
+
+    }
+
+    //TODO: Crashes in circleCI, but works on local machines ¯\_(ツ)_/¯
     public void testFindAutomaticRecommendations() throws InterruptedException {
 
         discoveryFragment.testing = true;

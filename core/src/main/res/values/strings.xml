@@ -460,8 +460,8 @@
     <string name="pref_playback_sum">Manage your playback settings.</string>
     <string name="pref_playback_settings_title">PLAYBACK SETTINGS</string>
     <string name="pref_headphones_settings_title">HEADPHONES SETTINGS</string>
-    <string name="pref_headphones_title">Change your Headphones settings</string>
-    <string name="pref_headphones_sum">Headphones reconnect or disconnect impact on playback.</string>
+    <string name="pref_headphones_title">Change your Headphones and Bluetooth settings</string>
+    <string name="pref_headphones_sum">Headphones reconnect or disconnect impact on playback. Bluetooth settings.</string>
     <string name="pref_skip_settings_title">SKIP SETTINGS</string>
     <string name="pref_skip_title">Change your skip (time and button) settings</string>
     <string name="pref_skip_sum">Fast Forward Skip time, rewind skip time and forward button skips.</string>
