@@ -444,6 +444,38 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     }
 
+    public void testAddItemsToFolder() throws Exception{
+        //Used to create a folder
+        testAddFolder();
+        //Used to show that folder is initially empty when created
+        solo.clickOnText("First folder");
+        solo.sleep(2000);
+        solo.clickOnImageButton(0);
+        //Used to create dummy Feed with dummy FeedItems
+        testAddFeed();
+        //After feed has been added, click on navigation menu and select Episodes option
+        openNavDrawer();
+        openNavDrawer();
+        solo.waitForText(solo.getString(R.string.episodes_label));
+        solo.clickOnText(solo.getString(R.string.episodes_label));
+        solo.waitForText("All");
+        solo.clickOnText("All");
+        //Used to select menu item
+        solo.clickOnScreen(1000, 150);
+        //Used to select menu option which contains folder which FeedItems should be added to
+        //By default all feeds are selected
+        solo.clickOnScreen(1000, 150);
+        solo.waitForText("First folder");
+        solo.clickOnText("First folder");
+        //Go back and verify that items where added to folder
+        openNavDrawer();
+        solo.waitForText("My Folders");
+        solo.clickOnText("My Folders");
+        solo.waitForText("First folder");
+        solo.clickOnText("First folder");
+        solo.sleep(2000);
+    }
+
     public void testDiscoveryPage(){
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.discovery_label));
