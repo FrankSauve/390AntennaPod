@@ -30,6 +30,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.twitter.sdk.android.core.TwitterSession;
 
 import java.util.Locale;
 
@@ -51,6 +52,7 @@ import de.danoeh.antennapod.core.util.playback.Playable;
 import de.danoeh.antennapod.core.util.playback.PlaybackController;
 import de.danoeh.antennapod.dialog.SleepTimerDialog;
 import de.danoeh.antennapod.dialog.VariableSpeedDialog;
+import de.danoeh.antennapod.service.TwitterService;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -666,6 +668,17 @@ public abstract class MediaplayerActivity extends CastEnabledActivity implements
         onPositionObserverUpdate();
         checkFavorite();
         updatePlaybackSpeedButton();
+
+        TwitterService twitterService = TwitterService.getInstance();
+        //If twitter session is not null
+        if(twitterService.getTwitterSession() != null){
+            //Tweet automatically
+            twitterService.tweet("I am listening to " + media.getFeedTitle() + ": " + media.getEpisodeTitle() + " on AntennaPod. " + media.getStreamUrl());
+        }
+        else{
+            System.out.println("TWITTER SESSION IS NULL");
+        }
+
         return true;
     }
 
