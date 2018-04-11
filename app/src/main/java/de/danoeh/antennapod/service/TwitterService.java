@@ -22,6 +22,7 @@ public class TwitterService {
 
     private static TwitterService instance = null;
     private TwitterSession session;
+    private boolean postOnTwitter;
 
     public static TwitterService getInstance(){
         if(instance == null){

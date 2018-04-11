@@ -375,9 +375,12 @@
                     android:summary="@string/pref_twitter_authenticate_sum">
                     <intent android:action=".activity.authentication.TwitterAuthenticationActivity" />
                 </PreferenceScreen>
-                <Preference
-                    android:key="pref_twitter_logout"
-                    android:title="@string/pref_gpodnet_logout_title"/>
+                <de.danoeh.antennapod.preferences.SwitchCompatPreference
+                    android:defaultValue="false"
+                    android:enabled="false"
+                    android:key="prefAutoTweet"
+                    android:summary="@string/pref_automatic_post_twitter_sum"
+                    android:title="@string/pref_automatic_post_twitter_title"/>
             </PreferenceScreen>
             </PreferenceCategory>
         </PreferenceScreen>

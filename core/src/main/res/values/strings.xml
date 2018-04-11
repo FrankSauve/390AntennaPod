@@ -516,8 +516,9 @@
     <string name="pref_update_interval_hours_singular">hour</string>
     <string name="pref_update_interval_hours_manual">Manual</string>
     <string name="pref_twitter_authenticate_title">Login</string>
-    <string name="pref_twitter_authenticate_sum">Login with your twitter account in order to automatically post on twitter!</string>
-    <string name="pref_twitter_logout_title">Logout</string>
+    <string name="pref_twitter_authenticate_sum">Login with your twitter account in order to automatically post on twitter.</string>
+    <string name="pref_automatic_post_twitter_title">Post on twitter automatically</string>
+    <string name="pref_automatic_post_twitter_sum">AntennaPod will automatically post the title of the podcast you are listening to.</string>
     <string name="pref_gpodnet_authenticate_title">Login</string>
     <string name="pref_gpodnet_authenticate_sum">Login with your gpodder.net account in order to sync your subscriptions.</string>
     <string name="pref_gpodnet_logout_title">Logout</string>

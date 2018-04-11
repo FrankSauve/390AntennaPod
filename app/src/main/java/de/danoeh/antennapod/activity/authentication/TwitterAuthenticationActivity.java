@@ -70,9 +70,7 @@ public class TwitterAuthenticationActivity extends AppCompatActivity {
 
     public void login(TwitterSession session)
     {
-        String username = session.getUserName();
         Intent intent = new Intent(TwitterAuthenticationActivity.this, MainActivity.class);
-        intent.putExtra("username", username);
         startActivity(intent);
     }
 

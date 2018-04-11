@@ -30,6 +30,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.Glide;
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
+import com.twitter.sdk.android.core.Twitter;
+import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterSession;
 
 import java.util.Locale;
@@ -68,6 +70,7 @@ public abstract class MediaplayerActivity extends CastEnabledActivity implements
     private static final String TAG = "MediaplayerActivity";
     private static final String PREFS = "MediaPlayerActivityPreferences";
     private static final String PREF_SHOW_TIME_LEFT = "showTimeLeft";
+    private static final String PREF_AUTO_TWEET = "prefAutoTweet";
 
     protected PlaybackController controller;
 
@@ -669,16 +672,21 @@ public abstract class MediaplayerActivity extends CastEnabledActivity implements
         checkFavorite();
         updatePlaybackSpeedButton();
 
-        TwitterService twitterService = TwitterService.getInstance();
-        //If twitter session is not null
-        if(twitterService.getTwitterSession() != null){
-            //Tweet automatically
-            twitterService.tweet("I am listening to " + media.getFeedTitle() + ": " + media.getEpisodeTitle() + " on AntennaPod. " + media.getStreamUrl());
-        }
-        else{
-            System.out.println("TWITTER SESSION IS NULL");
-        }
+        if(UserPreferences.isAutoTweet()){
+            Twitter.initialize(this);
+            TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
+            TwitterService twitterService = TwitterService.getInstance();
+            twitterService.setTwitterSession(session);
 
+            //If twitter session is not null
+            if(twitterService.getTwitterSession() != null){
+                //Tweet automatically
+                twitterService.tweet("I am listening to " + media.getFeedTitle() + ": " + media.getEpisodeTitle() + " on AntennaPod. " + media.getStreamUrl());
+            }
+            else{
+                System.out.println("TWITTER SESSION IS NULL");
+            }
+        }
         return true;
     }
 
