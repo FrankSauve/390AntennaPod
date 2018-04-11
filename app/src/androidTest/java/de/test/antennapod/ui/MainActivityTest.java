@@ -484,10 +484,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     public void testAddItemsToFolder() throws Exception{
         //Used to create a folder
-        testAddFolder();
+        String folder = testAddFolder();
 
         //Used to show that folder is initially empty when created
-        solo.clickOnText("First folder");
+        solo.clickOnText(folder);
         solo.sleep(2000);
         solo.clickOnImageButton(0);
 
@@ -508,24 +508,26 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         //Used to select menu option which contains folder which FeedItems should be added to
         //By default all feeds are selected
         solo.clickOnScreen(1000, 150);
-        solo.waitForText("First folder");
-        solo.clickOnText("First folder");
+        solo.waitForText(folder);
+        solo.clickOnText(folder);
 
         //Go back and verify that items where added to folder
-        verifyFolders("First folder");
+        verifyFolders(folder);
     }
 
     public void testAddItemsToFolders() throws Exception{
+
+
         //Create 2 different folders
         String firstFolder = testAddFolder("First folder");
         String secondFolder = testAddFolder("Second folder");
 
         //Used to show that folders are initially empty when created
-        solo.clickOnText("First folder");
+        solo.clickOnText(firstFolder);
         solo.sleep(2000);
         solo.clickOnImageButton(0);
-        solo.waitForText("Second folder");
-        solo.clickOnText("Second folder");
+        solo.waitForText(secondFolder);
+        solo.clickOnText(secondFolder);
         solo.sleep(2000);
         solo.clickOnImageButton(0);
 
