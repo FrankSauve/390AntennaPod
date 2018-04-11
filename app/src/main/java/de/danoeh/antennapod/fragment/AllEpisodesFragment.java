@@ -53,6 +53,7 @@ import de.danoeh.antennapod.core.storage.DownloadRequester;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
+import de.danoeh.antennapod.menuhandler.FeedMenuHandler;
 import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 import de.greenrobot.event.EventBus;
 import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
@@ -188,8 +189,32 @@ public class AllEpisodesFragment extends Fragment {
         if(!isAdded()) {
             return;
         }
+
         super.onCreateOptionsMenu(menu, inflater);
+
         if(episodes != null) {
+            FeedMenuHandler.onCreateOptionsMenu(inflater, menu);
+
+            MenuItem searchItem = menu.findItem(R.id.action_search);
+            final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
+            MenuItemUtils.adjustTextColor(getActivity(), sv);
+            sv.setQueryHint(getString(R.string.search_hint));
+            sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    sv.clearFocus();
+                    if (itemsLoaded) {
+                        ((MainActivity) getActivity()).loadChildFragment(SearchFragment.newInstance(s));
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    return false;
+                }
+            });
+
             inflater.inflate(R.menu.downloads_completed, menu);
             MenuItem episodeActions = menu.findItem(R.id.episode_actions);
             if(episodes.size() > 0) {
@@ -200,6 +225,7 @@ public class AllEpisodesFragment extends Fragment {
                 episodeActions.setIcon(new IconDrawable(getActivity(),
                         FontAwesomeIcons.fa_gears).color(textColor).actionBarSize());
                 episodeActions.setVisible(true);
+
             } else {
                 episodeActions.setVisible(false);
             }
