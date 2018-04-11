@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import java.util.List;
 
+import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.adapter.HomeRecyclerViewAdapter;
 import de.danoeh.antennapod.core.feed.FeedItem;
@@ -34,7 +35,7 @@ public class HomeFragment extends ItunesSearchFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        favorites = loadFavoriteData();
+//        favorites = loadFavoriteData();
 
     }
 
@@ -50,8 +51,14 @@ public class HomeFragment extends ItunesSearchFragment {
         return v;
     }
 
-    protected List<FeedItem> loadFavoriteData() {
-        return DBReader.getFavoriteItemsList();
+//    protected List<FeedItem> loadFavoriteData() {
+//        return DBReader.getFavoriteItemsList();
+//    }
+
+    public void loadFavoriteData(){
+        SectionDataModel dm = new SectionDataModel("Favorites",DBReader.getFavoriteItemsList());
+
+
     }
 
 }
