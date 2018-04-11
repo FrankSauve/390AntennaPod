@@ -526,4 +526,33 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
 
+    /**
+     * Test logging in to twitter from the settings
+     */
+    public void testLoginTwitter(){
+        //Go to settings
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.settings_label));
+
+        //Login to twitter
+        solo.clickOnText(solo.getString(R.string.pref_services_title));
+        solo.clickOnText(solo.getString(R.string.twitter_label));
+        solo.clickOnText(solo.getString(R.string.pref_twitter_authenticate_title));
+        solo.clickOnText("Log in with Twitter");
+
+        //Cannot go further because we cannot inject events into the twitter app
+    }
+
+    public void testEnableAutomaticTweets(){
+        //Go to twitter settings
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.settings_label));
+        solo.clickOnText(solo.getString(R.string.pref_services_title));
+        solo.clickOnText(solo.getString(R.string.twitter_label));
+
+        //Enable automatic tweets
+        solo.clickOnText(solo.getString(R.string.pref_automatic_post_twitter_title));
+        assertTrue(solo.isToggleButtonChecked(0));
+    }
+
 }
