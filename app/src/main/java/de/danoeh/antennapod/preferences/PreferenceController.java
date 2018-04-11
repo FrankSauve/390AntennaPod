@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -924,8 +925,7 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(String.format(context.getResources().getString(
-                R.string.pref_discovery_buttons_dialog_title), 2));
+        builder.setTitle(String.format(context.getResources().getString(R.string.pref_discovery_buttons_dialog_title), 2));
         builder.setMultiChoiceItems(allButtonNames, checked, (dialog, which, isChecked) -> {
             checked[which] = isChecked;
 
@@ -935,8 +935,24 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
                 discoveryButton.remove((Integer) which);
             }
         });
-        builder.setPositiveButton(R.string.confirm_label, (dialog, which) ->
-                UserPreferences.setPrefDiscoveryButtons(discoveryButton));
+        builder.setPositiveButton(R.string.confirm_label, (dialog, which) -> {
+            Boolean error = false;
+            for(int i = 1; i < allButtonNames.length; i++){
+                //If automatic selection is selected at the same time as another category
+                if(checked[0] && checked[i]){
+                    error = true;
+                    AlertDialog.Builder errorBuilder = new AlertDialog.Builder(context);
+                    //Show an error message
+                    errorBuilder.setMessage("ERROR: Automatic Recommendation must be selected on its own");
+                    errorBuilder.setPositiveButton(null, null);
+                    errorBuilder.setNegativeButton("Close", null);
+                    errorBuilder.create().show();
+                }
+            }
+            if(!error){
+                UserPreferences.setPrefDiscoveryButtons(discoveryButton);
+             }
+        });
         builder.setNegativeButton(R.string.cancel_label, null);
         builder.create().show();
     }

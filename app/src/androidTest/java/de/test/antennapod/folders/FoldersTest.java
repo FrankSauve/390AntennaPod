@@ -90,7 +90,8 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         //Original number of folders in foldersFragment
         foldersFragment.loadFolders();
-        int originalNumOfFolders = foldersFragment.getFolders().size();
+        folders = foldersFragment.getFolders();
+        int originalNumOfFolders = folders.size();
 
         //Assign random name
         String firstFolderName = randomAlphabet();
@@ -103,13 +104,10 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         Folder firstFolder = new Folder(firstFolderName, null);
         Folder secondFolder = new Folder(secondFolderName, null);
 
-        //Add them to database with the PodDBAdapter
-        adapter = PodDBAdapter.getInstance();
-        adapter.open();
-        adapter.addFolder(firstFolder);
-        adapter.addFolder(secondFolder);
-        adapter.addFolder(new Folder(firstFolderName, null)); //Should not add this folder as the name already exists
-        adapter.close();
+        //Create folders
+        createFolder(firstFolder);
+        createFolder(secondFolder);
+        createFolder(new Folder(firstFolderName, null)); //Should not add this folder as the name already exists
 
         //Update fragment and load folders into list of folders
         foldersFragment.loadFolders();
@@ -131,6 +129,14 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         //You might want to delete all folders from database from time to time
         //deleteAllFolders();
+        //assertEquals(0, folders.size());
+    }
+
+    private void createFolder(Folder folder){
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.addFolder(folder);
+        adapter.close();
     }
 
     public void testAddItemsToFolder() throws Exception {
@@ -165,9 +171,46 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
     }
 
     private void deleteAllFolders(){
-        PodDBAdapter.deleteAllFolders();
         folders = DBReader.getFolderList();
-        assertEquals(0, folders.size());
+
+        for(Folder folder : folders){
+            deleteFolder(folder);
+        }
+    }
+
+    private void deleteFolder(Folder folder){
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.removeFolder(folder);
+        adapter.close();
+    }
+
+    //Test folder's deletion
+    public void testRemoveFolder() throws InterruptedException {
+
+        //Original number of folders in foldersFragment
+        foldersFragment.loadFolders();
+        folders = foldersFragment.getFolders();
+        int originalNumOfFolders = folders.size();
+
+        //If there is no folder then create a random one
+        if(originalNumOfFolders == 0){
+            String newFolderName = randomAlphabet();
+            Folder newFolder = new Folder(newFolderName, null);
+            createFolder(newFolder);
+            originalNumOfFolders++;
+        }
+
+        //Update fragment and load folders into list of folders
+        foldersFragment.loadFolders();
+        folders = foldersFragment.getFolders();
+
+        //delete the last folder created
+        deleteFolder(folders.get(originalNumOfFolders - 1));
+
+        //Assertion
+        folders = DBReader.getFolderList();
+        assertEquals(originalNumOfFolders - 1, folders.size());
     }
 
 }

@@ -229,6 +229,7 @@
     </string-array>
 
     <string-array name="compact_discovery_buttons_options">
+        <item>@string/automatic_recommendations_label</item>
         <item>@string/arts_label</item>
         <item>@string/comedy_label</item>
         <item>@string/education_label</item>

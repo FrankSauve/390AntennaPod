@@ -422,7 +422,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText("OK");
     }
 
-    public void testAddFolder() {
+    public String testAddFolder() {
 
         //Folder name
         String newFolderName = "First folder";
@@ -441,6 +441,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         //Assertion
         assertTrue(solo.waitForText(newFolderName));
+
+        return newFolderName;
 
     }
 
@@ -522,6 +524,81 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.enterText(0, "cbc");
 
         assertTrue(solo.searchText("CBC Podcasts"));
+    }
+
+    public void subscribeToPodcast(String title){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+        solo.clickOnText(title);
+        solo.clickOnText(solo.getString(R.string.subscribe_label));
+        solo.clickOnScreen(80, 150); //Go back
+    }
+
+    public void testDiscoveryAutomaticRecommendation(){
+        subscribeToPodcast("The Daily - The New York Times");
+
+        //Go to settings
+        openNavDrawer();
+        solo.clickOnText("Settings");
+        solo.clickOnText("Select your Categories preferences");
+
+        //Uncheck and recheck automatic recommendations
+        solo.clickOnText("Automatic Recommendations");
+        solo.clickOnText("Automatic Recommendations");
+        solo.clickOnText("Confirm");
+
+        //Click back
+        solo.clickOnScreen(80, 150);
+
+        //Go to discovery tab
+        openNavDrawer();
+        solo.clickOnText("Discovery");
+        solo.waitForText("Similar To: The Daily");
+
+        //Check that the Actionbar title is correct and that there is a search result
+        assertEquals("Similar To:  The Daily", getActionbarTitle());
+    }
+
+    private void removeFolderContextClick(String folderName){
+        solo.clickLongOnText(folderName);
+        solo.waitForText("Remove Folder");
+        solo.clickOnText("Remove Folder");
+        solo.waitForText("Confirm");
+        solo.clickOnText("Confirm");
+        solo.sleep(1000);
+    }
+
+    private void removeFolderFromFolderMenu(String folderName){
+        solo.clickOnText(folderName);
+        solo.sleep(1000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
+        solo.waitForText("Remove Folder");
+        solo.clickOnText("Remove Folder");
+        solo.waitForText("Confirm");
+        solo.clickOnText("Confirm");
+        solo.sleep(1000);
+    }
+
+    public void testDeleteFolder() {
+
+        //Add a new folder first
+        String newFolderName = testAddFolder();
+
+        //delete the folder created with menu from a long click
+        removeFolderContextClick(newFolderName);
+
+        //Assertion
+        assertFalse(solo.waitForText(newFolderName));
+
+        //Add a new folder once again
+        newFolderName = testAddFolder();
+
+        //delete the folder created from folder menu options
+        removeFolderFromFolderMenu(newFolderName);
+
+        //Assertion
+        assertFalse(solo.waitForText(newFolderName));
+
     }
 
 
