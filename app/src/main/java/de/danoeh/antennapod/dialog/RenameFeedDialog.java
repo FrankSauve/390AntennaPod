@@ -20,7 +20,7 @@ public class RenameFeedDialog {
     public RenameFeedDialog(Activity activity, Feed feed) {
         this.activityRef = new WeakReference<>(activity);
         this.feed = feed;
-        this.folder = null
+        this.folder = null;
     }
 
     public RenameFeedDialog(Activity activity, Folder folder){
