@@ -45,6 +45,9 @@ public class UserPreferences {
 
     private static final String TAG = "UserPreferences";
 
+    //Discovery preferences
+    public static final String PREF_DISCOVERY_BUTTONS = "prefDiscoveryCategories";
+
     // User Interface
     public static final String PREF_THEME = "prefTheme";
     public static final String PREF_HIDDEN_DRAWER_ITEMS = "prefHiddenDrawerItems";
@@ -125,6 +128,22 @@ public class UserPreferences {
     private static final int NOTIFICATION_BUTTON_FAST_FORWARD = 1;
     private static final int NOTIFICATION_BUTTON_SKIP = 2;
     private static int EPISODE_CACHE_SIZE_UNLIMITED = -1;
+    private static final int DISCOVERY_AUTOMATIC_RECOMMENDATION = 0;
+    private static final int DISCOVERY_ARTS_BUTTON = 1;
+    private static final int DISCOVERY_COMEDY_BUTTON = 2;
+    private static final int DISCOVERY_EDUCATION_BUTTON = 4;
+    private static final int DISCOVERY_KIDS_AND_FAMILY_BUTTON = 5;
+    private static final int DISCOVERY_HEALTH_BUTTON = 6;
+    private static final int DISCOVERY_TV_AND_FILM_BUTTON = 7;
+    private static final int DISCOVERY_MUSIC_BUTTON = 8;
+    private static final int DISCOVERY_NEWS_AND_POLITICS_BUTTON = 9;
+    private static final int DISCOVERY_RELIGION_AND_MEDECINE_BUTTON = 10;
+    private static final int DISCOVERY_SPORTS_AND_RECREATION_BUTTON = 11;
+    private static final int DISCOVERY_TECHNOLOGY_BUTTON = 12;
+    private static final int DISCOVERY_BUSINESS_BUTTON = 13;
+    private static final int DISCOVERY_GAMES_AND_CULTURE_BUTTON = 14;
+    private static final int DISCOVERY_SOCIETY_AND_CULTURE_BUTTON = 15;
+    private static final int DISCOVERY_GOVERNMENT_AND_ORGANIZATION_BUTTON = 16;
     public static final int FEED_ORDER_COUNTER = 0;
     public static final int FEED_ORDER_ALPHABETICAL = 1;
     public static final int FEED_ORDER_LAST_UPDATE = 2;
@@ -188,6 +207,18 @@ public class UserPreferences {
         return notificationButtons;
     }
 
+    public static List<Integer> getDiscoveryCategoriesButtons() {
+        String[] buttons = TextUtils.split(
+                prefs.getString(PREF_DISCOVERY_BUTTONS,
+                        String.valueOf(DISCOVERY_AUTOMATIC_RECOMMENDATION)),
+                ",");
+        List<Integer> discoveryButtons = new ArrayList<>();
+        for (int i=0; i<buttons.length; i++) {
+            discoveryButtons.add(Integer.parseInt(buttons[i]));
+        }
+        return discoveryButtons;
+    }
+
     /**
      * Helper function to return whether the specified button should be shown on compact
      * notifications.
@@ -212,6 +243,22 @@ public class UserPreferences {
         return showButtonOnCompactNotification(NOTIFICATION_BUTTON_SKIP);
     }
 
+    private static boolean showButtonOnDiscovery(int buttonId) {
+        return getDiscoveryCategoriesButtons().contains(buttonId);
+    }
+
+    public static boolean showArtsOnDiscovery() {
+        return showButtonOnDiscovery(DISCOVERY_ARTS_BUTTON);
+    }
+
+    public static boolean showComedyOnDiscovery() {
+        return showButtonOnDiscovery(DISCOVERY_COMEDY_BUTTON);
+    }
+
+    public static boolean showEducationOnDiscovery() {
+        return showButtonOnDiscovery(DISCOVERY_EDUCATION_BUTTON);
+    }
+
     public static int getFeedOrder() {
         String value = prefs.getString(PREF_DRAWER_FEED_ORDER, "0");
         return Integer.parseInt(value);
@@ -221,6 +268,7 @@ public class UserPreferences {
         String value = prefs.getString(PREF_DRAWER_FEED_COUNTER, "0");
         return Integer.parseInt(value);
     }
+
 
     /**
      * Returns notification priority.
@@ -588,6 +636,13 @@ public class UserPreferences {
         String str = TextUtils.join(",", items);
         prefs.edit()
              .putString(PREF_COMPACT_NOTIFICATION_BUTTONS, str)
+             .apply();
+    }
+
+    public static void setPrefDiscoveryButtons(List<Integer> items) {
+        String str = TextUtils.join(",", items);
+        prefs.edit()
+             .putString(PREF_DISCOVERY_BUTTONS, str)
              .apply();
     }
 

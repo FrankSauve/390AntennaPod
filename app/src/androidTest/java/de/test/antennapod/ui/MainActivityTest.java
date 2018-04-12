@@ -20,6 +20,7 @@ import de.danoeh.antennapod.activity.PreferenceActivity;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
+import de.danoeh.antennapod.fragment.DiscoveryFragment;
 import de.danoeh.antennapod.fragment.DownloadsFragment;
 import de.danoeh.antennapod.fragment.EpisodesFragment;
 import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
@@ -122,6 +123,12 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText(solo.getString(R.string.trending_label));
         solo.waitForView(R.id.subscriptions_grid); //To Change later
         assertEquals(solo.getString(R.string.trending_label), getActionbarTitle());
+
+        // Discovery
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.discovery_label));
+        solo.waitForView(R.id.subscriptions_grid);  //To Change later
+        assertEquals(solo.getString(R.string.discovery_label), getActionbarTitle());
 
         // downloads
         openNavDrawer();
@@ -403,6 +410,163 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         subcategoryVerification("Fashion","Arts");
 
         assertTrue(true);
+    }
+
+
+    private void addNewFolder(String folderName){
+        solo.waitForText("Add Folder");
+        solo.clickOnText("Add Folder");
+        solo.waitForText("Name Your Folder");
+        solo.enterText(0, folderName);
+        solo.sleep(1000);
+        solo.clickOnText("OK");
+    }
+
+    public String testAddFolder() {
+
+        //Folder name
+        String newFolderName = "First folder";
+
+        //Try to open My Folders page (sometimes emulator is already on My Folders page so try/catch will avoid to open side nav)
+        try { //If already on My Folders page just add new folder
+            //Add a new folder and enter its name
+            addNewFolder(newFolderName);
+        } catch (junit.framework.AssertionFailedError e) {
+            //Otherwise catch error and open side navigation then open My Folders page
+            openNavDrawer();
+            solo.waitForText("My Folders");
+            solo.clickOnText("My Folders");
+            addNewFolder(newFolderName);
+        }
+
+        //Assertion
+        assertTrue(solo.waitForText(newFolderName));
+
+        return newFolderName;
+
+    }
+
+    public void testDiscoveryPage(){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.discovery_label));
+        solo.waitForView(R.id.subscriptions_grid);  //To Change later
+        assertEquals(solo.getString(R.string.discovery_label), getActionbarTitle());
+
+        assertEquals(UserPreferences.getDiscoveryCategoriesButtons(), DiscoveryFragment.getIds());
+    }
+
+    public void testAutocompleteRegular(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(882, 151);
+        solo.sleep(1000);
+        solo.enterText(0, "daily");
+
+        assertTrue(solo.searchText("The Daily"));
+    }
+
+    public void testAutocompleteTitle(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(1011, 154);
+        solo.sleep(1000);
+        solo.clickOnText("Advanced Search");
+        solo.sleep(1000);
+        solo.clickOnText("Title");
+        solo.enterText(0, "daily");
+
+        assertTrue(solo.searchText("The Daily"));
+    }
+
+    public void testAutocompleteArtist(){
+        openNavDrawer();
+        solo.clickOnText("Trending");
+        solo.sleep(1000);
+        solo.clickOnScreen(1011, 154);
+        solo.sleep(1000);
+        solo.clickOnText("Advanced Search");
+        solo.sleep(1000);
+        solo.clickOnText("Artist");
+        solo.enterText(0, "cbc");
+
+        assertTrue(solo.searchText("CBC Podcasts"));
+    }
+
+    public void subscribeToPodcast(String title){
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.trending_label));
+        solo.clickOnText(title);
+        solo.clickOnText(solo.getString(R.string.subscribe_label));
+        solo.clickOnScreen(80, 150); //Go back
+    }
+
+    public void testDiscoveryAutomaticRecommendation(){
+        subscribeToPodcast("The Daily - The New York Times");
+
+        //Go to settings
+        openNavDrawer();
+        solo.clickOnText("Settings");
+        solo.clickOnText("Select your Categories preferences");
+
+        //Uncheck and recheck automatic recommendations
+        solo.clickOnText("Automatic Recommendations");
+        solo.clickOnText("Automatic Recommendations");
+        solo.clickOnText("Confirm");
+
+        //Click back
+        solo.clickOnScreen(80, 150);
+
+        //Go to discovery tab
+        openNavDrawer();
+        solo.clickOnText("Discovery");
+        solo.waitForText("Similar To: The Daily");
+
+        //Check that the Actionbar title is correct and that there is a search result
+        assertEquals("Similar To:  The Daily", getActionbarTitle());
+    }
+
+    private void removeFolderContextClick(String folderName){
+        solo.clickLongOnText(folderName);
+        solo.waitForText("Remove Folder");
+        solo.clickOnText("Remove Folder");
+        solo.waitForText("Confirm");
+        solo.clickOnText("Confirm");
+        solo.sleep(1000);
+    }
+
+    private void removeFolderFromFolderMenu(String folderName){
+        solo.clickOnText(folderName);
+        solo.sleep(1000);
+        solo.clickOnScreen(1000, 150); // Click on three dot icon for nexus 5, not sure about other devices
+        solo.waitForText("Remove Folder");
+        solo.clickOnText("Remove Folder");
+        solo.waitForText("Confirm");
+        solo.clickOnText("Confirm");
+        solo.sleep(1000);
+    }
+
+    public void testDeleteFolder() {
+
+        //Add a new folder first
+        String newFolderName = testAddFolder();
+
+        //delete the folder created with menu from a long click
+        removeFolderContextClick(newFolderName);
+
+        //Assertion
+        assertFalse(solo.waitForText(newFolderName));
+
+        //Add a new folder once again
+        newFolderName = testAddFolder();
+
+        //delete the folder created from folder menu options
+        removeFolderFromFolderMenu(newFolderName);
+
+        //Assertion
+        assertFalse(solo.waitForText(newFolderName));
+
     }
 
 

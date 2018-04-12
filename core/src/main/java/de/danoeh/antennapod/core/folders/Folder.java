@@ -69,7 +69,15 @@ public class Folder {
         return episodes;
     }
 
+    public void setEpisodes(List<FeedItem> episodes) {
+        this.episodes = episodes;
+    }
+
     public int getEpisodesNum(){
         return this.episodes.size();
+    }
+
+    public FeedItem getItemAtIndex(int position) {
+        return episodes.get(position);
     }
 }

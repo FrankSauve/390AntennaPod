@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.text.TextUtils;
@@ -125,6 +126,7 @@ public class PodDBAdapter {
     private static final String TABLE_NAME_SIMPLECHAPTERS = "SimpleChapters";
     private static final String TABLE_NAME_FAVORITES = "Favorites";
     private static final String TABLE_NAME_FOLDERS = "Folders";
+    private static final String TABLE_NAME_ITEMS_FOLDERS = "ItemsFolders";
 
     // SQL Statements for creating new tables
     private static final String TABLE_PRIMARY_KEY = KEY_ID
@@ -200,6 +202,13 @@ public class PodDBAdapter {
     public static final String CREATE_TABLE_FOLDERS = "CREATE TABLE "
             + TABLE_NAME_FOLDERS + "(" + TABLE_PRIMARY_KEY
             + KEY_FOLDER_NAME + " TEXT," + KEY_FEEDITEM + " INTEGER)";
+
+    public static final String CREATE_TABLE_ITEMS_FOLDERS = "CREATE TABLE "
+            + TABLE_NAME_ITEMS_FOLDERS + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
+            + KEY_FEEDITEM + " INTEGER,"
+            + KEY_FOLDER_NAME + " TEXT,"
+            + KEY_FEED + " INTEGER,"
+            + " FOREIGN KEY ("+ KEY_FOLDER_NAME +") REFERENCES "+TABLE_NAME_FOLDERS+"("+KEY_ID+"));";
 
     // SQL Statements for creating indexes
     public static final String CREATE_INDEX_FEEDITEMS_FEED = "CREATE INDEX "
@@ -282,7 +291,8 @@ public class PodDBAdapter {
             TABLE_NAME_FEED_ITEMS + "." + KEY_ITEM_IDENTIFIER,
             TABLE_NAME_FEED_ITEMS + "." + KEY_FLATTR_STATUS,
             TABLE_NAME_FEED_ITEMS + "." + KEY_IMAGE,
-            TABLE_NAME_FEED_ITEMS + "." + KEY_AUTO_DOWNLOAD
+            TABLE_NAME_FEED_ITEMS + "." + KEY_AUTO_DOWNLOAD,
+            TABLE_NAME_FEED_ITEMS + "." + KEY_FOLDER_NAME
     };
 
     /**
@@ -305,7 +315,8 @@ public class PodDBAdapter {
             TABLE_NAME_QUEUE,
             TABLE_NAME_SIMPLECHAPTERS,
             TABLE_NAME_FAVORITES,
-            TABLE_NAME_FOLDERS
+            TABLE_NAME_FOLDERS,
+            TABLE_NAME_ITEMS_FOLDERS
     };
 
     /**
@@ -405,11 +416,44 @@ public class PodDBAdapter {
         }
     }
 
+    public static boolean createFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.execSQL(CREATE_TABLE_FOLDERS);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean createItemsFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.execSQL(CREATE_TABLE_ITEMS_FOLDERS);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
     public static boolean deleteAllFolders() {
         PodDBAdapter adapter = getInstance();
         adapter.open();
         try {
             db.delete(TABLE_NAME_FOLDERS, null, null);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean deleteAllItemsFolder() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.delete(TABLE_NAME_ITEMS_FOLDERS, null, null);
             return true;
         } finally {
             adapter.close();
@@ -423,6 +467,31 @@ public class PodDBAdapter {
             String deleteClause = String.format("DROP TABLE %s",
                     TABLE_NAME_FOLDERS);
             db.execSQL(deleteClause);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean deleteItemsFoldersTable() {
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            String deleteClause = String.format("DROP TABLE %s",
+                    TABLE_NAME_ITEMS_FOLDERS);
+            db.execSQL(deleteClause);
+            return true;
+        } finally {
+            adapter.close();
+        }
+    }
+
+    public static boolean addFolderNameColumnToFeedItemsTable(){
+        PodDBAdapter adapter = getInstance();
+        adapter.open();
+        try {
+            db.execSQL("ALTER TABLE " + TABLE_NAME_FEED_ITEMS
+                    + " ADD COLUMN " + KEY_FOLDER_NAME + " TEXT");
             return true;
         } finally {
             adapter.close();
@@ -855,6 +924,15 @@ public class PodDBAdapter {
         return item.getId();
     }
 
+    private long setFeedItemFolder(FeedItem item, Folder folder) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOLDER_NAME, folder.getName());
+
+        db.update(TABLE_NAME_FEED_ITEMS, values, KEY_ID + "=?", new String[]{String.valueOf(item.getId())});
+
+        return item.getId();
+    }
+
     public void setFeedItemRead(int played, long itemId, long mediaId,
                                 boolean resetMediaPosition) {
         try {
@@ -986,6 +1064,26 @@ public class PodDBAdapter {
         }
     }
 
+    public void setItemsToFolder(Folder folder, List<FeedItem> items) {
+        ContentValues values = new ContentValues();
+        try {
+            db.beginTransactionNonExclusive();
+            db.delete(TABLE_NAME_ITEMS_FOLDERS, null, null);
+            for (int i = 0; i < items.size(); i++) {
+                FeedItem item = items.get(i);
+                values.put(KEY_ID, i);
+                values.put(KEY_FEEDITEM, item.getId());
+                values.put(KEY_FOLDER_NAME, folder.getName());
+                db.insertWithOnConflict(TABLE_NAME_ITEMS_FOLDERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     //Create a new folder
     public long addFolder(Folder folder){
         // don't create a folder that has the same name as another one
@@ -1002,12 +1100,36 @@ public class PodDBAdapter {
     }
 
     //delete item from folder
-    public void removeItemFromFolder(Folder folder){
+    private void removeItemFromFolder(FeedItem item){
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOLDER_NAME, ""); //put empty string to remove folder name
 
+        //Update corresponding feeditem so it is no longer linked to a folder
+        db.update(TABLE_NAME_FEED_ITEMS, values, KEY_ID + "=?", new String[]{String.valueOf(item.getId())});
     }
 
-    //Delete folder
+    //Delete folder and its episodes
     public void removeFolder(Folder folder){
+        List<FeedItem> items = folder.getEpisodes();
+
+        //Remove all items from folder
+        if(items != null){
+            for(FeedItem item : items){
+                removeItemFromFolder(item);
+            }
+        }
+
+        try {
+            db.beginTransactionNonExclusive();
+            db.delete(TABLE_NAME_FOLDERS, KEY_ID + "=?",
+                    new String[]{String.valueOf(folder.getId())});
+            db.delete(TABLE_NAME_ITEMS_FOLDERS, KEY_FOLDER_NAME + "=?", new String[]{String.valueOf(folder.getName())});
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            db.endTransaction();
+        }
 
     }
 
@@ -1026,6 +1148,22 @@ public class PodDBAdapter {
         db.insert(TABLE_NAME_FAVORITES, null, values);
     }
 
+    public void addFolderItem(Folder folder, FeedItem item) {
+        // don't add an item that's already there...
+        if (isItemInFolder(item)) {
+            Log.d(TAG, "item already in folder");
+            return;
+        }
+        ContentValues values = new ContentValues();
+        values.put(KEY_FEEDITEM, item.getId());
+        values.put(KEY_FEED, item.getFeedId());
+        values.put(KEY_FOLDER_NAME, folder.getName());
+        db.insert(TABLE_NAME_ITEMS_FOLDERS, null, values);
+
+        //Updating the corresponding feeditem with the name of the folder
+        setFeedItemFolder(item, folder);
+    }
+
     public void removeFavoriteItem(FeedItem item) {
         String deleteClause = String.format("DELETE FROM %s WHERE %s=%s AND %s=%s",
                 TABLE_NAME_FAVORITES,
@@ -1037,6 +1175,15 @@ public class PodDBAdapter {
     public boolean isItemInFavorites(FeedItem item) {
         String query = String.format("SELECT %s from %s WHERE %s=%d",
                 KEY_ID, TABLE_NAME_FAVORITES, KEY_FEEDITEM, item.getId());
+        Cursor c = db.rawQuery(query, null);
+        int count = c.getCount();
+        c.close();
+        return count > 0;
+    }
+
+    public boolean isItemInFolder(FeedItem item) {
+        String query = String.format("SELECT %s from %s WHERE %s=%d",
+                KEY_ID, TABLE_NAME_ITEMS_FOLDERS, KEY_FEEDITEM, item.getId());
         Cursor c = db.rawQuery(query, null);
         int count = c.getCount();
         c.close();
@@ -1181,15 +1328,6 @@ public class PodDBAdapter {
      * @return The cursor of the query
      */
     public final Cursor getAllFoldersCursor() {
-
-        //Creates the table if it is not already created
-        try{
-            db.execSQL(CREATE_TABLE_FOLDERS);
-        }
-        catch(RuntimeException e){
-           //Table already created. Do nothing
-        }
-
         return db.query(TABLE_NAME_FOLDERS, FOLDER_SEL_STD, null, null, null, null,
                 KEY_FOLDER_NAME + " COLLATE NOCASE ASC");
     }
@@ -1211,6 +1349,19 @@ public class PodDBAdapter {
     public final Cursor getAllItemsOfFeedCursor(final long feedId) {
         return db.query(TABLE_NAME_FEED_ITEMS, FEEDITEM_SEL_FI_SMALL, KEY_FEED
                         + "=?", new String[]{String.valueOf(feedId)}, null, null,
+                null);
+    }
+
+    /**
+     * Returns a cursor with all FeedItems of a Folder. Uses FEEDITEM_SEL_FI_SMALL
+     */
+    public final Cursor getAllItemsOfFolderCursor(final Folder folder) {
+        return getAllItemsOfFolderCursor(folder.getName());
+    }
+
+    public final Cursor getAllItemsOfFolderCursor(final String folderName) {
+        return db.query(TABLE_NAME_FEED_ITEMS, FEEDITEM_SEL_FI_SMALL, KEY_FOLDER_NAME
+                        + "=?", new String[]{folderName}, null, null,
                 null);
     }
 
@@ -1463,6 +1614,11 @@ public class PodDBAdapter {
                 null, null, null);
     }
 
+    public final Cursor getFolderCursor(final long id) {
+        return db.query(TABLE_NAME_FOLDERS, FOLDER_SEL_STD, KEY_ID + "=" + id, null,
+                null, null, null);
+    }
+
     public final Cursor getFeedItemCursor(final String id) {
         return getFeedItemCursor(new String[]{id});
     }
@@ -1602,6 +1758,19 @@ public class PodDBAdapter {
     public final int getNumberOfDownloadedEpisodes() {
         final String query = "SELECT COUNT(DISTINCT " + KEY_ID + ") AS count FROM " + TABLE_NAME_FEED_MEDIA +
                 " WHERE " + KEY_DOWNLOADED + " > 0";
+
+        Cursor c = db.rawQuery(query, null);
+        int result = 0;
+        if (c.moveToFirst()) {
+            result = c.getInt(0);
+        }
+        c.close();
+        return result;
+    }
+
+    public int itemCount(Folder folder){
+        final String query = "SELECT COUNT(*) FROM " + TABLE_NAME_ITEMS_FOLDERS +
+                " WHERE " + KEY_FOLDER_NAME + "='" + folder.getName() + "'";
 
         Cursor c = db.rawQuery(query, null);
         int result = 0;
@@ -1813,6 +1982,7 @@ public class PodDBAdapter {
             db.execSQL(CREATE_TABLE_SIMPLECHAPTERS);
             db.execSQL(CREATE_TABLE_FAVORITES);
             db.execSQL(CREATE_TABLE_FOLDERS);
+            db.execSQL(CREATE_TABLE_ITEMS_FOLDERS);
 
             db.execSQL(CREATE_INDEX_FEEDITEMS_FEED);
             db.execSQL(CREATE_INDEX_FEEDITEMS_IMAGE);
@@ -2022,6 +2192,7 @@ public class PodDBAdapter {
             if (oldVersion < 1040001) {
                 db.execSQL(CREATE_TABLE_FAVORITES);
                 db.execSQL(CREATE_TABLE_FOLDERS);
+                db.execSQL(CREATE_TABLE_ITEMS_FOLDERS);
             }
             if (oldVersion < 1040002) {
                 db.execSQL("ALTER TABLE " + PodDBAdapter.TABLE_NAME_FEED_MEDIA

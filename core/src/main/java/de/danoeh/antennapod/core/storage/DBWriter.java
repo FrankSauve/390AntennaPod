@@ -236,6 +236,60 @@ public class DBWriter {
     }
 
     /**
+     * Deletes a Folder and all its episodes.
+     */
+    public static Future<?> deleteFolder(final Context context, final long folderId) {
+        return dbExec.submit(() -> {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(context
+                            .getApplicationContext());
+            final Folder folder = DBReader.getFolder(folderId);
+
+            if (folder != null) {
+                if (PlaybackPreferences.getCurrentlyPlayingMedia() == FeedMedia.PLAYABLE_TYPE_FEEDMEDIA
+                        && PlaybackPreferences.getLastPlayedFeedId() == folder
+                        .getId()) {
+                    context.sendBroadcast(new Intent(
+                            PlaybackService.ACTION_SHUTDOWN_PLAYBACK_SERVICE));
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putLong(
+                            PlaybackPreferences.PREF_CURRENTLY_PLAYING_FEED_ID,
+                            -1);
+                    editor.commit();
+                }
+
+                // Remove folder's items from queue
+                List<FeedItem> queue = DBReader.getQueue();
+                List<FeedItem> removed = new ArrayList<>();
+                if (folder.getEpisodes() == null) {
+                    DBReader.getFolderItemList(folder);
+                }
+
+                for (FeedItem item : folder.getEpisodes()) {
+                    if(queue.remove(item)) {
+                        removed.add(item);
+                    }
+                }
+                PodDBAdapter adapter = PodDBAdapter.getInstance();
+                adapter.open();
+                if (removed.size() > 0) {
+                    adapter.setQueue(queue);
+                    for(FeedItem item : removed) {
+                        EventBus.getDefault().post(QueueEvent.irreversibleRemoved(item));
+                    }
+                }
+                adapter.removeFolder(folder);
+                adapter.close();
+
+                EventDistributor.getInstance().sendFolderUpdateBroadcast();
+
+                BackupManager backupManager = new BackupManager(context);
+                backupManager.dataChanged();
+            }
+        });
+    }
+
+    /**
      * Deletes the entire playback history.
      *
      */
@@ -479,21 +533,15 @@ public class DBWriter {
         });
     }
 
-    public static Future<?> addFavoriteItemById(final long itemId) {
-        return dbExec.submit(() -> {
-            final FeedItem item = DBReader.getFeedItem(itemId);
-            if (item == null) {
-                Log.d(TAG, "Can't find item for itemId " + itemId);
-                return;
-            }
-            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
-            adapter.addFavoriteItem(item);
-            adapter.close();
-            item.addTag(FeedItem.TAG_FAVORITE);
-            EventBus.getDefault().post(FavoritesEvent.added(item));
-            EventBus.getDefault().post(FeedItemEvent.updated(item));
-        });
-    }
+
+
+//    public static Future<?> addFolderItem(final Folder folder, final FeedItem item) {
+//        return dbExec.submit(() -> {
+//            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+//            adapter.addFolderItem(folder,item);
+//            adapter.close();
+//        });
+//    }
 
     public static Future<?> removeFavoriteItem(final FeedItem item) {
         return dbExec.submit(() -> {
@@ -511,6 +559,35 @@ public class DBWriter {
         return dbExec.submit(() -> {
             final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
             adapter.addFolder(folder);
+            adapter.close();
+            EventDistributor.getInstance().sendFolderUpdateBroadcast();
+        });
+    }
+    public static Future<?> addFavoriteItemById(final long itemId) {
+        return dbExec.submit(() -> {
+            final FeedItem item = DBReader.getFeedItem(itemId);
+            if (item == null) {
+                Log.d(TAG, "Can't find item for itemId " + itemId);
+                return;
+            }
+            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+            adapter.addFavoriteItem(item);
+            adapter.close();
+            item.addTag(FeedItem.TAG_FAVORITE);
+            EventBus.getDefault().post(FavoritesEvent.added(item));
+            EventBus.getDefault().post(FeedItemEvent.updated(item));
+        });
+    }
+    //Add new Items to folder
+    public static Future<?> addItemsToFolderById(final Folder folder, final long itemId){
+        return dbExec.submit(() -> {
+            final FeedItem item = DBReader.getFeedItem(itemId);
+            if (item == null) {
+                Log.d(TAG, "Can't find item for itemId " + itemId);
+                return;
+            }
+            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+            adapter.addFolderItem(folder,item);
             adapter.close();
         });
     }
@@ -906,14 +983,14 @@ public class DBWriter {
         });
     }
 
-    public static Future<?> setFolder(Folder folder) {
-        return dbExec.submit(() -> {
-            PodDBAdapter adapter = PodDBAdapter.getInstance();
-            adapter.open();
-            adapter.setFolder(folder);
-            adapter.close();
-        });
-    }
+//    public static Future<?> setFolder(Folder folder) {
+//        return dbExec.submit(() -> {
+//            PodDBAdapter adapter = PodDBAdapter.getInstance();
+//            adapter.open();
+//            adapter.setFolder(folder);
+//            adapter.close();
+//        });
+//    }
 
 
     /**

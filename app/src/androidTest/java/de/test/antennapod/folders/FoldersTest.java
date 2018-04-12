@@ -1,6 +1,7 @@
 package de.test.antennapod.folders;
 
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 
 import junit.framework.Assert;
 
@@ -25,8 +26,10 @@ import static de.danoeh.antennapod.core.storage.PodDBAdapter.deleteFoldersTable;
 
 public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
+    private static final String TAG = "PodDBAdapter";
     private FoldersFragment foldersFragment;
     List<Folder> folders;
+    PodDBAdapter adapter;
 
     // Constructor
     public FoldersTest(){
@@ -40,9 +43,40 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+
+        //You can delete this whole code once your local devices have the tables and are set up properly
+        try{
+            setUpTables(); //Creates folders and itemsfolders tables in DB for local devices in case they do not have these tables already
+        }
+        catch(android.database.sqlite.SQLiteException e){
+            //Catch error: means you already have one of the tables (probably folders table so let's create itemsfolder table)
+            Log.e(TAG, "e: " + e.getMessage());
+            try{
+                PodDBAdapter.createItemsFoldersTable(); //Creates itemsfolders table in DB for local devices in case they do not have this table already
+            }
+            catch(android.database.sqlite.SQLiteException e1){
+                //Catch this error: means you already have this table
+                Log.e(TAG, "e1: " + e1.getMessage());
+                try{
+                    PodDBAdapter.addFolderNameColumnToFeedItemsTable(); //Add folder_name column to feeditems table in DB for local devices in case it is not added yet
+                }
+                catch(android.database.sqlite.SQLiteException e2){
+                    //Catch this error: last catch
+                    Log.e(TAG, "e2: " + e2.getMessage());
+                    //Do nothing in this case the device should be set up properly in this case
+                }
+            }
+        }
+
         foldersFragment = new FoldersFragment();
         getActivity().getSupportFragmentManager().beginTransaction().add(foldersFragment, FoldersFragment.class.getSimpleName()).commit();
         getInstrumentation().waitForIdleSync();
+    }
+
+    private void setUpTables(){
+        PodDBAdapter.createFoldersTable();
+        PodDBAdapter.createItemsFoldersTable();
+        PodDBAdapter.addFolderNameColumnToFeedItemsTable();
     }
 
     public String randomAlphabet(){
@@ -54,7 +88,8 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         //Original number of folders in foldersFragment
         foldersFragment.loadFolders();
-        int originalNumOfFolders = foldersFragment.getFolders().size();
+        folders = foldersFragment.getFolders();
+        int originalNumOfFolders = folders.size();
 
         //Assign random name
         String firstFolderName = randomAlphabet();
@@ -67,13 +102,10 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         Folder firstFolder = new Folder(firstFolderName, null);
         Folder secondFolder = new Folder(secondFolderName, null);
 
-        //Add them to database with the PodDBAdapter
-        PodDBAdapter adapter = PodDBAdapter.getInstance();
-        adapter.open();
-        adapter.addFolder(firstFolder);
-        adapter.addFolder(secondFolder);
-        adapter.addFolder(new Folder(firstFolderName, null)); //Should not add this folder as the name already exists
-        adapter.close();
+        //Create folders
+        createFolder(firstFolder);
+        createFolder(secondFolder);
+        createFolder(new Folder(firstFolderName, null)); //Should not add this folder as the name already exists
 
         //Update fragment and load folders into list of folders
         foldersFragment.loadFolders();
@@ -94,9 +126,58 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         }
 
         //You might want to delete all folders from database from time to time
-        /*deleteAllFolders();
+        //deleteAllFolders();
+        //assertEquals(0, folders.size());
+    }
+
+    private void createFolder(Folder folder){
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.addFolder(folder);
+        adapter.close();
+    }
+
+    private void deleteAllFolders(){
         folders = DBReader.getFolderList();
-        assertEquals(0, folders.size());*/
+
+        for(Folder folder : folders){
+            deleteFolder(folder);
+        }
+    }
+
+    private void deleteFolder(Folder folder){
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.removeFolder(folder);
+        adapter.close();
+    }
+
+    //Test folder's deletion
+    public void testRemoveFolder() throws InterruptedException {
+
+        //Original number of folders in foldersFragment
+        foldersFragment.loadFolders();
+        folders = foldersFragment.getFolders();
+        int originalNumOfFolders = folders.size();
+
+        //If there is no folder then create a random one
+        if(originalNumOfFolders == 0){
+            String newFolderName = randomAlphabet();
+            Folder newFolder = new Folder(newFolderName, null);
+            createFolder(newFolder);
+            originalNumOfFolders++;
+        }
+
+        //Update fragment and load folders into list of folders
+        foldersFragment.loadFolders();
+        folders = foldersFragment.getFolders();
+
+        //delete the last folder created
+        deleteFolder(folders.get(originalNumOfFolders - 1));
+
+        //Assertion
+        folders = DBReader.getFolderList();
+        assertEquals(originalNumOfFolders - 1, folders.size());
     }
 
 }

@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -39,6 +40,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.shredzone.flattr4j.model.User;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -231,6 +233,11 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
         ui.findPreference(UserPreferences.PREF_COMPACT_NOTIFICATION_BUTTONS)
                 .setOnPreferenceClickListener(preference -> {
                     showNotificationButtonsDialog();
+                    return true;
+                });
+        ui.findPreference(UserPreferences.PREF_DISCOVERY_BUTTONS)
+                .setOnPreferenceClickListener(preference -> {
+                    showDiscoveryButtonsDialog();
                     return true;
                 });
 
@@ -899,7 +906,53 @@ public class PreferenceController implements SharedPreferences.OnSharedPreferenc
             }
         });
         builder.setPositiveButton(R.string.confirm_label, (dialog, which) ->
-            UserPreferences.setCompactNotificationButtons(preferredButtons));
+                UserPreferences.setCompactNotificationButtons(preferredButtons));
+        builder.setNegativeButton(R.string.cancel_label, null);
+        builder.create().show();
+    }
+
+    private void showDiscoveryButtonsDialog() {
+        final Context context = ui.getActivity();
+        final List<Integer> discoveryButton = UserPreferences.getDiscoveryCategoriesButtons();
+        final String[] allButtonNames = context.getResources().getStringArray(
+                R.array.compact_discovery_buttons_options);
+        boolean[] checked = new boolean[allButtonNames.length]; // booleans default to false in java
+
+        for(int i=0; i < checked.length; i++) {
+            if(discoveryButton.contains(i)) {
+                checked[i] = true;
+            }
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(String.format(context.getResources().getString(R.string.pref_discovery_buttons_dialog_title), 2));
+        builder.setMultiChoiceItems(allButtonNames, checked, (dialog, which, isChecked) -> {
+            checked[which] = isChecked;
+
+            if (isChecked) {
+                discoveryButton.add(which);
+            } else {
+                discoveryButton.remove((Integer) which);
+            }
+        });
+        builder.setPositiveButton(R.string.confirm_label, (dialog, which) -> {
+            Boolean error = false;
+            for(int i = 1; i < allButtonNames.length; i++){
+                //If automatic selection is selected at the same time as another category
+                if(checked[0] && checked[i]){
+                    error = true;
+                    AlertDialog.Builder errorBuilder = new AlertDialog.Builder(context);
+                    //Show an error message
+                    errorBuilder.setMessage("ERROR: Automatic Recommendation must be selected on its own");
+                    errorBuilder.setPositiveButton(null, null);
+                    errorBuilder.setNegativeButton("Close", null);
+                    errorBuilder.create().show();
+                }
+            }
+            if(!error){
+                UserPreferences.setPrefDiscoveryButtons(discoveryButton);
+             }
+        });
         builder.setNegativeButton(R.string.cancel_label, null);
         builder.create().show();
     }
