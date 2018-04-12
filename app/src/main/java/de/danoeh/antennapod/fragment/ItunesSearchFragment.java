@@ -1426,7 +1426,7 @@ public class ItunesSearchFragment extends Fragment {
         this.subgenreIds = subgenreIds;
     }
 
-    public void setIsInDisvoryTab(boolean b){
+    public void setIsInDiscoveryTab(boolean b){
         this.isInDiscoveryTab = b;
     }
 

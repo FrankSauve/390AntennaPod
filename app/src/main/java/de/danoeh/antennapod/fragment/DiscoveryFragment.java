@@ -1,6 +1,7 @@
 package de.danoeh.antennapod.fragment;
 
 
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -244,42 +245,48 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     public void findAutomaticRecommendations() {
         List<Feed> feeds = navDrawerData.feeds;
 
-        super.setIsInDisvoryTab(true);
+        super.setIsInDiscoveryTab(true);
 
-        //Generate random int
-        int min = 0;
-        int max = feeds.size() - 1;
-        int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
-        String author = feeds.get(randomFeed).getAuthor();
-        String title = feeds.get(randomFeed).getTitle();
+        if(feeds.size()>0){
+            //Generate random int
+            int min = 0;
+            int max = feeds.size() - 1;
+            int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
+            String author = feeds.get(randomFeed).getAuthor();
+            String title = feeds.get(randomFeed).getTitle();
 
-        //Set action bar title to "Similar to: ...."
-        if(!testing){
-            ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
-        }
-
-        ArrayList<String> keywords = titleKeywordExtractor(title);
-        String fullTitle="";
-        for(int i=0;i<keywords.size();i++){
-            if(i<keywords.size()-1){
-                fullTitle += keywords.get(i)+" ";
+            //Set action bar title to "Similar to: ...."
+            if(!testing){
+                ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
             }
-            else{
-                fullTitle += keywords.get(i);
-            }
-        }
-        //If there are valid keywords, search and add them to the list.
-        String query="";
-        if(keywords.size()>0){
 
-            if(keywords.size()==1)
-                query = keywords.get(0);
-            else if (keywords.size()==2)
-                query =keywords.get(0)+" "+keywords.get(1);
-            else
-                query=keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2);
+            ArrayList<String> keywords = titleKeywordExtractor(title);
+            String fullTitle="";
+            for(int i=0;i<keywords.size();i++){
+                if(i<keywords.size()-1){
+                    fullTitle += keywords.get(i)+" ";
+                }
+                else{
+                    fullTitle += keywords.get(i);
+                }
+            }
+            //If there are valid keywords, search and add them to the list.
+            String query="";
+            if(keywords.size()>0){
+
+                if(keywords.size()==1)
+                    query = keywords.get(0);
+                else if (keywords.size()==2)
+                    query =keywords.get(0)+" "+keywords.get(1);
+                else
+                    query=keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2);
+            }
+            loadRecommended(author, query, fullTitle);
         }
-        loadRecommended(author, query, fullTitle);
+        else{
+            ((MainActivity)getActivity()).setActionBarTitle("Popular Podcasts");
+            super.loadToplist();
+        }
     }
 
 
