@@ -270,7 +270,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
             //If there are valid keywords, search and add them to the list.
             String query="";
             if(keywords.size()>0){
-
+                //extract the best keyword from a list, and use it to load in the recommendations
                 query = keywordEvaluator(keywords);
                 loadRecommended(author, query, fullTitle);
             }
@@ -279,6 +279,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
                 loadRecommended(author, "as1243d41324iuh1234al324iuh234awi1234ludh2134wi2143ludh432wail4123udhi4312wl423aud", fullTitle);
             }
         }
+        //if there are no currently subscribed podcasts, simply display the trending podcasts since there is no usable data to tailor the list of podcasts with
         else{
             ((MainActivity)getActivity()).setActionBarTitle("Popular Podcasts");
             super.loadToplist();
@@ -286,7 +287,7 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     }
 
     /**
-     * Method used to retrieve the number of podcasts given a title
+     * Method used to retrieve the podcasts generated from a title search
      * @param title
      * @return
      */
@@ -342,17 +343,21 @@ public class DiscoveryFragment extends ItunesSearchFragment {
      * @return bestKeyword
      */
     private String keywordEvaluator (ArrayList<String> keywords){
+        //create 2 pairs of List and String variables for the best keyword and the current one
         List<ItunesAdapter.Podcast> resultsBest = new ArrayList<>();
         List<ItunesAdapter.Podcast> resultsCurrent = new ArrayList<>();
         String bestKeyword=keywords.get(0);
         String currentKeyword="";
 
+        //retrieve the podcasts from searching with the 'best' Keyword
         resultsBest = getTitleResults(bestKeyword);
 
+        //return the 'best' keyword if it outputs more than 10 podcasts, since the earlier a keyword is in a title, the more relevant it is
         if(resultsBest.size()>10){
             return bestKeyword;
         }
 
+        //otherwise, iterate through the remaining keywords until a large enough list of podcasts is found, or until the keyword with the most results is obtained and return that
         for(int i=1;i<keywords.size();i++){
             currentKeyword=keywords.get(i);
             resultsCurrent=getTitleResults(currentKeyword);
