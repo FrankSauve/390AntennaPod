@@ -1,22 +1,38 @@
 package de.danoeh.antennapod.fragment;
 
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.util.List;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.AllEpisodesRecycleAdapter;
 import de.danoeh.antennapod.core.event.FavoritesEvent;
+import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.feed.FeedItem;
+import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.storage.DBReader;
+import de.danoeh.antennapod.core.storage.DBTasks;
 import de.danoeh.antennapod.core.storage.DBWriter;
+import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
+import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 
 
 /**
@@ -29,6 +45,8 @@ public class FavoriteEpisodesFragment extends AllEpisodesFragment {
     public static final String TAG = "FavoriteEpisodesFrag";
 
     private static final String PREF_NAME = "PrefFavoriteEpisodesFragment";
+
+    private boolean isUpdatingFeeds;
 
     @Override
     protected boolean showOnlyNewEpisodes() { return true; }
@@ -81,6 +99,33 @@ public class FavoriteEpisodesFragment extends AllEpisodesFragment {
         itemTouchHelper.attachToRecyclerView(recyclerView);
         return root;
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (!super.onOptionsItemSelected(item)) {
+            switch (item.getItemId()) {
+                case R.id.refresh_item:
+                    List<Feed> feeds = ((MainActivity) getActivity()).getFeeds();
+                    if (feeds != null) {
+                        DBTasks.refreshAllFeeds(getActivity(), feeds);
+                    }
+                    return true;
+                case R.id.episode_actions:
+                    EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
+                            .newInstance(episodes, EpisodesApplyActionFragment.ACTION_FAVORITES_PAGE);
+                    ((MainActivity) getActivity()).loadChildFragment(fragment);
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            return true;
+        }
+
+    }
+
+
 
     @Override
     protected List<FeedItem> loadData() {

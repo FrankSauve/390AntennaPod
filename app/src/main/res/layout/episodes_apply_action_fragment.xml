@@ -68,25 +68,6 @@
             tools:background="@android:color/holo_red_dark" />
 
         <Button
-            android:id="@+id/btnDownload"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:drawableTop="?attr/av_download"
-            android:text="@string/download_label"
-            android:textSize="10sp" />
-
-        <View
-            android:id="@+id/divider4"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:background="?android:attr/listDivider"
-            tools:background="@android:color/holo_red_dark" />
-
-        //create add to favorites button on the view
-        <Button
             android:id="@+id/btnAddToFavorites"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -105,6 +86,42 @@
             tools:background="@android:color/holo_red_dark" />
 
         <Button
+            android:id="@+id/btnDeleteFavorites"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="?attr/content_discard"
+            android:text="@string/remove_from_favorite_label"
+            android:textSize="10sp" />
+
+        <View
+            android:id="@+id/divider6"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:background="?android:attr/listDivider"
+            tools:background="@android:color/holo_red_dark" />
+
+        <Button
+            android:id="@+id/btnDownload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="?attr/av_download"
+            android:text="@string/download_label"
+            android:textSize="10sp" />
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:background="?android:attr/listDivider"
+            tools:background="@android:color/holo_red_dark" />
+
+        <Button
             android:id="@+id/btnDelete"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -113,6 +130,7 @@
             android:drawableTop="?attr/content_discard"
             android:text="@string/remove_episode_lable"
             android:textSize="10sp" />
+
 
     </LinearLayout>
 

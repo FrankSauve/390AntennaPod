@@ -1,9 +1,10 @@
 package de.danoeh.antennapod.fragment;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -21,11 +22,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import android.graphics.Color;
-
 import com.joanzapata.iconify.IconDrawable;
 import com.joanzapata.iconify.fonts.FontAwesomeIcons;
-
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.List;
@@ -53,10 +51,9 @@ import de.danoeh.antennapod.core.storage.DownloadRequester;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
-import de.danoeh.antennapod.menuhandler.FeedMenuHandler;
+import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 import de.greenrobot.event.EventBus;
-import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -85,7 +82,7 @@ public class AllEpisodesFragment extends Fragment {
     protected List<FeedItem> episodes;
     private List<Downloader> downloaderList;
 
-    private boolean itemsLoaded = false;
+    protected boolean itemsLoaded = false;
     private boolean viewsCreated = false;
 
     private boolean isUpdatingFeeds;
@@ -180,22 +177,21 @@ public class AllEpisodesFragment extends Fragment {
     }
 
 
-    private final MenuItemUtils.UpdateRefreshMenuItemChecker updateRefreshMenuItemChecker =
+    protected final MenuItemUtils.UpdateRefreshMenuItemChecker updateRefreshMenuItemChecker =
             () -> DownloadService.isRunning && DownloadRequester.getInstance().isDownloadingFeeds();
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         if(!isAdded()) {
             return;
         }
-
         super.onCreateOptionsMenu(menu, inflater);
-
-        if(episodes != null) {
-            FeedMenuHandler.onCreateOptionsMenu(inflater, menu);
+        if (itemsLoaded) {
+            inflater.inflate(R.menu.episodes, menu);
 
             MenuItem searchItem = menu.findItem(R.id.action_search);
+            MenuItem episodeActions = menu.findItem(R.id.episode_actions);
+
             final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
             MenuItemUtils.adjustTextColor(getActivity(), sv);
             sv.setQueryHint(getString(R.string.search_hint));
@@ -203,9 +199,7 @@ public class AllEpisodesFragment extends Fragment {
                 @Override
                 public boolean onQueryTextSubmit(String s) {
                     sv.clearFocus();
-                    if (itemsLoaded) {
-                        ((MainActivity) getActivity()).loadChildFragment(SearchFragment.newInstance(s));
-                    }
+                    ((MainActivity) getActivity()).loadChildFragment(SearchFragment.newInstance(s));
                     return true;
                 }
 
@@ -215,8 +209,6 @@ public class AllEpisodesFragment extends Fragment {
                 }
             });
 
-            inflater.inflate(R.menu.downloads_completed, menu);
-            MenuItem episodeActions = menu.findItem(R.id.episode_actions);
             if(episodes.size() > 0) {
                 int[] attrs = {R.attr.action_bar_icon_color};
                 TypedArray ta = getActivity().obtainStyledAttributes(UserPreferences.getTheme(), attrs);
@@ -225,27 +217,52 @@ public class AllEpisodesFragment extends Fragment {
                 episodeActions.setIcon(new IconDrawable(getActivity(),
                         FontAwesomeIcons.fa_gears).color(textColor).actionBarSize());
                 episodeActions.setVisible(true);
-
             } else {
                 episodeActions.setVisible(false);
             }
-        }
 
+            isUpdatingFeeds = MenuItemUtils.updateRefreshMenuItem(menu, R.id.refresh_item, updateRefreshMenuItemChecker);
+
+        }
 
 
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.episode_actions:
-                EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
-                        .newInstance(episodes, EpisodesApplyActionFragment.ACTION_DOWNLOAD_PAGE);
-                ((MainActivity) getActivity()).loadChildFragment(fragment);
-                return true;
-            default:
-                return false;
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        MenuItem markAllRead = menu.findItem(R.id.mark_all_read_item);
+        if (markAllRead != null) {
+            markAllRead.setVisible(!showOnlyNewEpisodes() && episodes != null && !episodes.isEmpty());
         }
+        MenuItem markAllSeen = menu.findItem(R.id.mark_all_seen_item);
+        if(markAllSeen != null) {
+            markAllSeen.setVisible(showOnlyNewEpisodes() && episodes != null && !episodes.isEmpty());
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (!super.onOptionsItemSelected(item)) {
+            switch (item.getItemId()) {
+                case R.id.refresh_item:
+                    List<Feed> feeds = ((MainActivity) getActivity()).getFeeds();
+                    if (feeds != null) {
+                        DBTasks.refreshAllFeeds(getActivity(), feeds);
+                    }
+                    return true;
+                case R.id.episode_actions:
+                    EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
+                            .newInstance(episodes, EpisodesApplyActionFragment.ACTION_DOWNLOAD_PAGE);
+                    ((MainActivity) getActivity()).loadChildFragment(fragment);
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            return true;
+        }
+
     }
 
     @Override
@@ -416,7 +433,7 @@ public class AllEpisodesFragment extends Fragment {
         DownloaderUpdate update = event.update;
         downloaderList = update.downloaders;
         if (isMenuInvalidationAllowed && isUpdatingFeeds != update.feedIds.length > 0) {
-                getActivity().supportInvalidateOptionsMenu();
+            getActivity().supportInvalidateOptionsMenu();
         }
         if(listAdapter != null && update.mediaIds.length > 0) {
             for(long mediaId : update.mediaIds) {
