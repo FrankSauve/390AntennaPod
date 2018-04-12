@@ -272,13 +272,6 @@ public class DiscoveryFragment extends ItunesSearchFragment {
             if(keywords.size()>0){
 
                 query = keywordEvaluator(keywords);
-//                if(keywords.size()==1)
-//                    query = keywords.get(0);
-//                else if (keywords.size()==2)
-//                    query =keywords.get(0)+" "+keywords.get(1);
-//                else
-//                    query=keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2);
-
                 loadRecommended(author, query, fullTitle);
             }
             //if there are no keywords, simply perform the algorithm with a ridiculous podcast title so that it only searches by author and category
