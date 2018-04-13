@@ -80,18 +80,35 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         getInstrumentation().waitForIdleSync();
     }
 
-    public void testAddFeed() throws Exception {
-        uiTestUtils.addHostedFeedData();
-        final Feed feed = uiTestUtils.hostedFeeds.get(0);
+    public String testAddFeed() throws Exception {
+
+        return testAddFeed(0);
+    }
+
+    //Override to add multiple feeds
+    public String testAddFeed(int index) throws Exception {
+        try{
+            uiTestUtils.addHostedFeedData();
+        }
+        catch(java.lang.IllegalStateException e){
+            //Means addHostedFeedData was alraedy called
+            //Do nothing then
+        }
+
+        final Feed feed = uiTestUtils.hostedFeeds.get(index);
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.add_feed_label));
+        solo.clearEditText(0);
         solo.enterText(0, feed.getDownload_url());
         solo.clickOnButton(solo.getString(R.string.confirm_label));
         solo.waitForActivity(OnlineFeedViewActivity.class);
         solo.waitForView(R.id.butSubscribe);
+        solo.sleep(2000); //To avoid errors because sometimes the device gets slow
         assertEquals(solo.getString(R.string.subscribe_label), solo.getButton(0).getText().toString());
         solo.clickOnButton(0);
         solo.waitForText(solo.getString(R.string.subscribed_label));
+
+        return  feed.getTitle();
     }
 
     @FlakyTest(tolerance = 3)
@@ -422,10 +439,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText("OK");
     }
 
-    public String testAddFolder() {
-
+    //Override testAddFolder to change the folder name
+    private String testAddFolder(String folderName){
         //Folder name
-        String newFolderName = "First folder";
+        String newFolderName = folderName;
 
         //Try to open My Folders page (sometimes emulator is already on My Folders page so try/catch will avoid to open side nav)
         try { //If already on My Folders page just add new folder
@@ -443,7 +460,100 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(solo.waitForText(newFolderName));
 
         return newFolderName;
+    }
 
+    public String testAddFolder() {
+
+        return testAddFolder("First folder");
+
+    }
+
+    private void addItemsToFolderFromFeed(String feed, String folder, int feedIndex){
+        openNavDrawer();
+        ListView list = (ListView) solo.getView(R.id.nav_list);
+        solo.scrollListToLine(list, feedIndex); //Scrolls to Feeds list in side navigation
+        solo.waitForText(feed);
+        solo.clickOnText(feed);
+        solo.waitForText(feed); //Wait for page to load
+        solo.clickOnScreen(700, 150); //Click gears icon
+        solo.sleep(2000);
+        solo.clickOnScreen(1000, 150);
+        solo.waitForText(folder);
+        solo.clickOnText(folder);
+    }
+
+    public void testAddItemsToFolder() throws Exception{
+        //Used to create a folder
+        String folder = testAddFolder();
+
+        //Used to show that folder is initially empty when created
+        solo.clickOnText(folder);
+        solo.sleep(2000);
+        solo.clickOnImageButton(0);
+
+        //Used to create dummy Feed with dummy FeedItems
+        testAddFeed();
+
+        //After feed has been added, click on navigation menu and select Episodes option
+        openNavDrawer();
+        openNavDrawer();
+        solo.waitForText(solo.getString(R.string.episodes_label));
+        solo.clickOnText(solo.getString(R.string.episodes_label));
+        solo.waitForText("All");
+        solo.clickOnText("All");
+
+        //Used to select menu item
+        solo.clickOnScreen(1000, 150);
+
+        //Used to select menu option which contains folder which FeedItems should be added to
+        //By default all feeds are selected
+        solo.clickOnScreen(1000, 150);
+        solo.waitForText(folder);
+        solo.clickOnText(folder);
+
+        //Go back and verify that items where added to folder
+        verifyFolders(folder);
+    }
+
+    public void testAddItemsToFolders() throws Exception{
+
+
+        //Create 2 different folders
+        String firstFolder = testAddFolder("First folder");
+        String secondFolder = testAddFolder("Second folder");
+
+        //Used to show that folders are initially empty when created
+        solo.clickOnText(firstFolder);
+        solo.sleep(2000);
+        solo.clickOnImageButton(0);
+        solo.waitForText(secondFolder);
+        solo.clickOnText(secondFolder);
+        solo.sleep(2000);
+        solo.clickOnImageButton(0);
+
+        //Used to create 2 dummy Feeds with dummy FeedItems
+        String firstFeed = testAddFeed(0);
+        String secondFeed = testAddFeed(1);
+
+        //Select feeds and add their items to folders
+        openNavDrawer(); //Needed somehow
+        addItemsToFolderFromFeed(firstFeed, firstFolder, 0);
+        addItemsToFolderFromFeed(secondFeed, secondFolder, 1);
+
+        //Go back and verify that items where added to folder and that items do not get mixed up
+        verifyFolders(firstFolder);
+        assertTrue(solo.waitForText("Feed 1: Item 1"));
+        verifyFolders(secondFolder);
+        assertTrue(solo.waitForText("Feed 2: Item 1"));
+    }
+
+    private void verifyFolders(String folder){
+        openNavDrawer();
+        solo.waitForText("My Folders");
+        solo.clickOnText("My Folders");
+        solo.waitForText(folder);
+        solo.clickOnText(folder);
+        solo.sleep(2000);
     }
 
     public void testDiscoveryPage(){

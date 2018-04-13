@@ -5,17 +5,21 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import de.danoeh.antennapod.activity.MainActivity;
+import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.fragment.FoldersFragment;
+import de.test.antennapod.storage.DBTestUtils;
 
 import static de.danoeh.antennapod.core.storage.PodDBAdapter.deleteAllFolders;
 import static de.danoeh.antennapod.core.storage.PodDBAdapter.deleteFoldersTable;
@@ -26,7 +30,7 @@ import static de.danoeh.antennapod.core.storage.PodDBAdapter.deleteFoldersTable;
 
 public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
-    private static final String TAG = "PodDBAdapter";
+    private static final String TAG = "FoldersTest";
     private FoldersFragment foldersFragment;
     List<Folder> folders;
     PodDBAdapter adapter;
@@ -125,16 +129,18 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
             assertEquals(foldersName.get(i), folders.get(i).getName());
         }
 
-        //You might want to delete all folders from database from time to time
-        //deleteAllFolders();
-        //assertEquals(0, folders.size());
+        //Clear database
+        deleteFolder(firstFolder);
+        deleteFolder(secondFolder);
     }
 
-    private void createFolder(Folder folder){
+    private long createFolder(Folder folder){
         adapter = PodDBAdapter.getInstance();
         adapter.open();
-        adapter.addFolder(folder);
+        long id = adapter.addFolder(folder);
         adapter.close();
+
+        return id;
     }
 
     private void deleteAllFolders(){
@@ -178,6 +184,79 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         //Assertion
         folders = DBReader.getFolderList();
         assertEquals(originalNumOfFolders - 1, folders.size());
+    }
+
+    private void addFeedItemToFolder(Folder folder, FeedItem item){
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.addFolderItem(folder,item);
+        adapter.close();
+    }
+
+    private void addFeedItemsToFolder(Folder folder, List<FeedItem> items){
+        for(FeedItem item : items){
+            addFeedItemToFolder(folder, item);
+        }
+    }
+
+    public void testAddItemsToFolder() throws Exception {
+        //Loading 1 Feed
+        List<Feed> feeds = DBTestUtils.saveFeedlist(1, 4, false, false, 0);
+
+        //List of FeedItems for the folders
+        List<FeedItem> firstFolderItems = new ArrayList<>();
+        List<FeedItem> secondFolderItems = new ArrayList<>();
+
+        //Create FeedItems from the loaded Feed
+        FeedItem item1 = feeds.get(0).getItems().get(0);
+        FeedItem item2 = feeds.get(0).getItems().get(1);
+        FeedItem item3 = feeds.get(0).getItems().get(2);
+        FeedItem item4 = feeds.get(0).getItems().get(3);
+
+        //Add FeedItems to ArrayLists
+        firstFolderItems.add(item1);
+        firstFolderItems.add(item2);
+        secondFolderItems.add(item3);
+        secondFolderItems.add(item4);
+
+        //Assign random name
+        String firstFolderName = randomAlphabet();
+        String secondFolderName = randomAlphabet();
+
+        //Creating folders containing no episodes
+        Folder firstFolder = new Folder(firstFolderName, null);
+        Folder secondFolder = new Folder(secondFolderName, null);
+
+        //Create folders
+        long firstFolderId = createFolder(firstFolder);
+        long secondFolderId = createFolder(secondFolder);
+
+        //Add items to the folders(2 in firstFolder and 2 in secondFolder)
+        addFeedItemsToFolder(firstFolder, firstFolderItems);
+        addFeedItemsToFolder(secondFolder, secondFolderItems);
+
+        //Updating folders and and loading episodes inside folders
+        firstFolder = DBReader.getFolder(firstFolderId);
+        assertNotNull(firstFolder.getEpisodes());
+        secondFolder = DBReader.getFolder(secondFolderId);
+        assertNotNull(secondFolder.getEpisodes());
+
+        //Assertions
+        assertEquals(2, firstFolder.getEpisodesNum());
+        assertEquals(2, secondFolder.getEpisodesNum());
+
+        //Clear database
+        deleteFolder(firstFolder);
+        deleteFolder(secondFolder);
+        removeFeed(feeds.get(0));
+    }
+
+    //Delete feed from database
+    public void removeFeed(Feed feed){
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.removeFeed(feed);
+        adapter.close();
     }
 
 }
