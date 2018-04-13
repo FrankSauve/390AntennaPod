@@ -12,7 +12,7 @@ repositories {
 
 buildscript {
     repositories {
-       jcenter()
+        jcenter()
     }
     dependencies {
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.1'
@@ -180,6 +180,8 @@ dependencies {
 
     compile 'com.github.mfietz:fyydlin:v0.3'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    // CardView
+    compile 'com.android.support:cardview-v7:23.3.+'
 
 }
 

@@ -6,31 +6,32 @@ import de.danoeh.antennapod.core.feed.FeedItem;
 
 public class SectionDataModel {
 
-    private String headerTitle;
-    private List<FeedItem> allItemsInSection;
+    private String title;
+    private List<FeedItem> feedItem;
 
     public SectionDataModel() {
 
     }
-
-    public SectionDataModel(String headerTitle, List<FeedItem> allItemsInSection) {
-        this.headerTitle = headerTitle;
-        this.allItemsInSection = allItemsInSection;
+    public SectionDataModel(String title, List<FeedItem> feedItem) {
+        this.title = title;
+        this.feedItem = feedItem;
     }
 
-    public String getHeaderTitle() {
-        return headerTitle;
+
+
+    public String getTitle() {
+        return title;
     }
 
-    public void setHeaderTitle(String headerTitle) {
-        this.headerTitle = headerTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public List<FeedItem> getAllItemsInSection() {
-        return allItemsInSection;
+    public List<FeedItem> getFeedItem() {
+        return feedItem;
     }
 
-    public void setAllItemsInSection(List<FeedItem> allItemsInSection) {
-        this.allItemsInSection = allItemsInSection;
+    public void setFeedItem(List<FeedItem> feedItem) {
+        this.feedItem = feedItem;
     }
 }
