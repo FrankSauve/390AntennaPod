@@ -454,7 +454,7 @@ public class AllEpisodesActionFragment extends Fragment {
         for(long id : checkedIds.toArray()) {
             FeedItem episode = idMap.get(id);
             if(episode.hasMedia()) {
-                DBWriter.deleteFeed(getActivity(), episode.getMedia().getId());
+                DBWriter.deleteFeedMediaOfItem(getActivity(), episode.getMedia().getId());
             }
         }
         close();

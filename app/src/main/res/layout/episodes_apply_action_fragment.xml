@@ -110,7 +110,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:drawableTop="?attr/content_discard"
-            android:text="@string/remove_episode_lable"
+            android:text="@string/remove_download_lable"
             android:textSize="10sp" />
 
 
