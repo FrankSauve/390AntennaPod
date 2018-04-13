@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -50,8 +51,8 @@ import de.danoeh.antennapod.core.storage.DownloadRequestException;
 import de.danoeh.antennapod.core.storage.DownloadRequester;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
+import de.danoeh.antennapod.dialog.AllEpisodesActionFragment;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
-import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 import de.greenrobot.event.EventBus;
 import rx.Observable;
@@ -76,6 +77,7 @@ public class AllEpisodesFragment extends Fragment {
     private static final String PREF_SCROLL_OFFSET = "scroll_offset";
 
     protected RecyclerView recyclerView;
+    protected ListView listView;
     protected AllEpisodesRecycleAdapter listAdapter;
     private ProgressBar progLoading;
 
@@ -252,8 +254,8 @@ public class AllEpisodesFragment extends Fragment {
                     }
                     return true;
                 case R.id.episode_actions:
-                    EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
-                            .newInstance(episodes, EpisodesApplyActionFragment.ACTION_DOWNLOAD_PAGE);
+                    AllEpisodesActionFragment fragment = AllEpisodesActionFragment
+                            .newInstance(episodes, AllEpisodesActionFragment.ACTION_ALL);
                     ((MainActivity) getActivity()).loadChildFragment(fragment);
                     return true;
                 default:
@@ -309,6 +311,7 @@ public class AllEpisodesFragment extends Fragment {
         View root = inflater.inflate(fragmentResource, container, false);
 
         recyclerView = (RecyclerView) root.findViewById(android.R.id.list);
+
         RecyclerView.ItemAnimator animator = recyclerView.getItemAnimator();
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false);

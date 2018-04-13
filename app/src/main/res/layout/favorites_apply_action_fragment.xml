@@ -67,23 +67,6 @@
             android:background="?android:attr/listDivider"
             tools:background="@android:color/holo_red_dark" />
 
-        <Button
-            android:id="@+id/btnAddToFavorites"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:drawableTop="?attr/ic_fav"
-            android:text="@string/add_to_favorite_label"
-            android:textSize="10sp" />
-
-        <View
-            android:id="@+id/divider5"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:background="?android:attr/listDivider"
-            tools:background="@android:color/holo_red_dark" />
 
         <Button
             android:id="@+id/btnDownload"
@@ -104,13 +87,13 @@
             tools:background="@android:color/holo_red_dark" />
 
         <Button
-            android:id="@+id/btnDelete"
+            android:id="@+id/btnDeleteFavorites"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:drawableTop="?attr/content_discard"
-            android:text="@string/remove_episode_lable"
+            android:text="@string/remove_from_favorite_label"
             android:textSize="10sp" />
 
 
