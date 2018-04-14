@@ -19,23 +19,18 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.core.dialog.DownloadRequestErrorDialogCreator;
 import de.danoeh.antennapod.core.feed.FeedItem;
-import de.danoeh.antennapod.core.folders.Folder;
-import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DBTasks;
 import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.core.storage.DownloadRequestException;
 import de.danoeh.antennapod.core.util.LongList;
 
-public class EpisodesApplyActionFragment extends Fragment {
+public class AllEpisodesActionFragment extends Fragment {
 
     public String TAG = "EpisodeActionFragment";
 
@@ -43,30 +38,25 @@ public class EpisodesApplyActionFragment extends Fragment {
     public static final int ACTION_MARK_PLAYED = 2;
     public static final int ACTION_MARK_UNPLAYED = 4;
     public static final int ACTION_DOWNLOAD = 8;
-    public static final int ACTION_REMOVE = 16;
+    public static final int ACTION_REMOVE_EPISODE = 16;
+   // public static final int ACTION_DELETE_FAVORITES = 22;
 
     //will verify if int 20 conclficts with anything else
     public static final int ACTION_ADD_TO_FAVORITES = 20;
 
 
     public static final int ACTION_ALL = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
-            | ACTION_DOWNLOAD | ACTION_REMOVE  | ACTION_ADD_TO_FAVORITES;
-    //add ACTION_ADD_TO_FAVORITES to icon list
-    public static final int ACTION_DOWNLOAD_PAGE = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
-            | ACTION_ADD_TO_FAVORITES | ACTION_REMOVE;
+            | ACTION_DOWNLOAD | ACTION_REMOVE_EPISODE | ACTION_ADD_TO_FAVORITES;
 
 
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
-    List<String> listItems;
-    List<Folder> folders;
-    Map<Integer, String> hmap;
 
     private Button btnAddToQueue;
     private Button btnMarkAsPlayed;
     private Button btnMarkAsUnplayed;
     private Button btnDownload;
-    private Button btnDelete;
+    private Button btnDeleteEpisode;
     private Button btnAddToFavorites;
 
 
@@ -78,12 +68,12 @@ public class EpisodesApplyActionFragment extends Fragment {
 
     private MenuItem mSelectToggle;
 
-    public static EpisodesApplyActionFragment newInstance(List<FeedItem> items) {
+    public static AllEpisodesActionFragment newInstance(List<FeedItem> items) {
         return newInstance(items, ACTION_ALL);
     }
 
-    public static EpisodesApplyActionFragment newInstance(List<FeedItem> items, int actions) {
-        EpisodesApplyActionFragment f = new EpisodesApplyActionFragment();
+    public static AllEpisodesActionFragment newInstance(List<FeedItem> items, int actions) {
+        AllEpisodesActionFragment f = new AllEpisodesActionFragment();
         f.episodes.addAll(items);
         for(FeedItem episode : items) {
             f.idMap.put(episode.getId(), episode);
@@ -101,7 +91,7 @@ public class EpisodesApplyActionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.episodes_apply_action_fragment, container, false);
+        View view = inflater.inflate(R.layout.all_episodes_apply_action_fragment, container, false);
 
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -165,11 +155,11 @@ public class EpisodesApplyActionFragment extends Fragment {
             btnAddToFavorites.setVisibility(View.GONE);
             view.findViewById(R.id.divider5).setVisibility(View.GONE);
         }
-        btnDelete = (Button) view.findViewById(R.id.btnDelete);
-        if((actions & ACTION_REMOVE) != 0) {
-            btnDelete.setOnClickListener(v -> deleteChecked());
+        btnDeleteEpisode = (Button) view.findViewById(R.id.btnDelete);
+        if((actions & ACTION_REMOVE_EPISODE) != 0) {
+            btnDeleteEpisode.setOnClickListener(v -> deleteEpisodeChecked());
         } else {
-            btnDelete.setVisibility(View.GONE);
+            btnDeleteEpisode.setVisibility(View.GONE);
             if(lastVisibleDiv > 0) {
                 view.findViewById(lastVisibleDiv).setVisibility(View.GONE);
             }
@@ -182,9 +172,6 @@ public class EpisodesApplyActionFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.episodes_apply_action_options, menu);
-        folders();
-        for(String item : listItems)
-        {menu.add(R.id.sort,getPosition(item),2,item);}
 
         mSelectToggle = menu.findItem(R.id.select_toggle);
         mSelectToggle.setOnMenuItemClickListener(item -> {
@@ -219,50 +206,46 @@ public class EpisodesApplyActionFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(hmap.containsKey(item.getItemId())){
-            //testing to see if proper id is found
-            addToFolder(folders.get(getPosition(item.toString())));
-        }
         int resId = 0;
         switch(item.getItemId()) {
             case R.id.select_options:
                 return true;
-//            case R.id.check_all:
-//                checkAll();
-//                resId = R.string.selected_all_label;
-//                break;
-//            case R.id.check_none:
-//                checkNone();
-//                resId = R.string.deselected_all_label;
-//                break;
-//            case R.id.check_played:
-//                checkPlayed(true);
-//                resId = R.string.selected_played_label;
-//                break;
-//            case R.id.check_unplayed:
-//                checkPlayed(false);
-//                resId = R.string.selected_unplayed_label;
-//                break;
-//            case R.id.check_downloaded:
-//                checkDownloaded(true);
-//                resId = R.string.selected_downloaded_label;
-//                break;
-//            case R.id.check_not_downloaded:
-//                checkDownloaded(false);
-//                resId = R.string.selected_not_downloaded_label;
-//                break;
-//            case R.id.check_queued:
-//                checkQueued(true);
-//                resId = R.string.selected_queued_label;
-//                break;
-//            case R.id.check_not_queued:
-//                checkQueued(false);
-//                resId = R.string.selected_not_queued_label;
-//                break;
-//            case R.id.check_has_media:
-//                checkWithMedia();
-//                resId = R.string.selected_has_media_label;
-//                break;
+            case R.id.check_all:
+                checkAll();
+                resId = R.string.selected_all_label;
+                break;
+            case R.id.check_none:
+                checkNone();
+                resId = R.string.deselected_all_label;
+                break;
+            case R.id.check_played:
+                checkPlayed(true);
+                resId = R.string.selected_played_label;
+                break;
+            case R.id.check_unplayed:
+                checkPlayed(false);
+                resId = R.string.selected_unplayed_label;
+                break;
+            case R.id.check_downloaded:
+                checkDownloaded(true);
+                resId = R.string.selected_downloaded_label;
+                break;
+            case R.id.check_not_downloaded:
+                checkDownloaded(false);
+                resId = R.string.selected_not_downloaded_label;
+                break;
+            case R.id.check_queued:
+                checkQueued(true);
+                resId = R.string.selected_queued_label;
+                break;
+            case R.id.check_not_queued:
+                checkQueued(false);
+                resId = R.string.selected_not_queued_label;
+                break;
+            case R.id.check_has_media:
+                checkWithMedia();
+                resId = R.string.selected_has_media_label;
+                break;
             case R.id.sort_title_a_z:
                 sortByTitle(false);
                 return true;
@@ -290,27 +273,6 @@ public class EpisodesApplyActionFragment extends Fragment {
         }
     }
 
-    public int getPosition(String item){
-        int  position = 0;
-        for (Map.Entry entry : hmap.entrySet()) {
-            if (item.equals(entry.getValue())) {
-                position = (int)entry.getKey();
-            }
-        }
-        return position;
-    }
-    public void folders(){
-        hmap = new Hashtable<Integer, String>();
-        folders= new ArrayList<>();
-        listItems = new ArrayList<>();
-        folders = DBReader.getFolderList();
-        int position = 0;
-        for (Folder folder : folders){
-            listItems.add(folder.getName());
-            hmap.put(position, folder.getName());
-            position++;
-        }
-    }
     private void sortByTitle(final boolean reverse) {
         Collections.sort(episodes, (lhs, rhs) -> {
             if (reverse) {
@@ -351,12 +313,12 @@ public class EpisodesApplyActionFragment extends Fragment {
             } else {
                 ordering = lhs.getMedia().getDuration() - rhs.getMedia().getDuration();
             }
-            if(reverse) {
-                return -1 * ordering;
-            } else {
-                return ordering;
-            }
-        });
+        if(reverse) {
+            return -1 * ordering;
+        } else {
+            return ordering;
+        }
+    });
         refreshTitles();
         refreshCheckboxes();
     }
@@ -441,7 +403,7 @@ public class EpisodesApplyActionFragment extends Fragment {
             boolean checked = checkedIds.contains(episode.getId());
             mListView.setItemChecked(i, checked);
         }
-        ActivityCompat.invalidateOptionsMenu(EpisodesApplyActionFragment.this.getActivity());
+        ActivityCompat.invalidateOptionsMenu(AllEpisodesActionFragment.this.getActivity());
     }
 
     private void queueChecked() {
@@ -460,16 +422,6 @@ public class EpisodesApplyActionFragment extends Fragment {
             FeedItem episode = idMap.get(id);
             if(episode.hasMedia()) {
                 DBWriter.addFavoriteItemById(episode.getMedia().getId());
-            }
-        }
-        close();
-    }
-
-    private void addToFolder(Folder folder) {
-        for(long id : checkedIds.toArray()) {
-            FeedItem episode = idMap.get(id);
-            if(episode.hasMedia()) {
-                DBWriter.addItemsToFolderById(folder,episode.getMedia().getId());
             }
         }
         close();
@@ -498,7 +450,7 @@ public class EpisodesApplyActionFragment extends Fragment {
     }
 
 
-    private void deleteChecked() {
+    private void deleteEpisodeChecked() {
         for(long id : checkedIds.toArray()) {
             FeedItem episode = idMap.get(id);
             if(episode.hasMedia()) {
