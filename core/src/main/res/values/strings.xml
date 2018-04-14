@@ -23,6 +23,7 @@
     <string name="trending_label">Trending</string>
     <string name="discovery_label">Discovery</string>
     <string name="folders_label">My Folders</string>
+    <string name="home_label">Home</string>
     <string name="subscriptions_list_label">Subscriptions List</string>
     <string name="cancel_download_label">Cancel\nDownload</string>
     <string name="playback_history_label">Playback History</string>
