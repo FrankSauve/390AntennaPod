@@ -5,6 +5,7 @@ task findbugs(type: FindBugs) {
     classes = fileTree("$project.buildDir/intermediates/classes/free/debug/de/danoeh/antennapod")
     source = fileTree("src/main/java")
     classpath = files()
+    ignoreFailures = true
 
     reports {
         xml.enabled = false
