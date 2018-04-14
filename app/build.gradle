@@ -4,6 +4,7 @@ apply plugin: "com.android.application"
 apply plugin: "me.tatarka.retrolambda"
 apply plugin: 'com.github.triplet.play'
 apply plugin: 'com.getkeepsafe.dexcount'
+apply from: "$project.rootDir/ci/script-findbugs.gradle"
 
 repositories {
     maven { url "https://jitpack.io" }

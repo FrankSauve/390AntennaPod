@@ -19,10 +19,15 @@ test:
         parallel: true
     # wait for it to have booted
     - circle-android wait-for-boot
-    # run tests  against the emulator.
+    # build the project
     - ./gradlew assembleDebug
+    # run tests
     - ./gradlew connectedFreeDebugAndroidTest
+    # findbugs
+    - ./gradlew findbugs
 
   post:
       - mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - find . -type f -regex ".*/build/reports/.*" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - mkdir -p $CIRCLE_TEST_REPORTS/findbugs/
+      - find . -type f -regex ".*/outputs/findbugs/.*" -exec cp {} $CIRCLE_TEST_REPORTS/findbugs/ \;
