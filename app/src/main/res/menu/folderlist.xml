@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/episode_actions"
+        android:menuCategory="container"
+        android:title="@string/episode_actions"
+        custom:showAsAction="always">
+    </item>
+
+    <item
+        android:id="@+id/rename_item"
+        android:menuCategory="container"
+        android:title="@string/rename_folder_label"
+        custom:showAsAction="never" />
+
+    <item
+        android:id="@+id/remove_item"
+        android:icon="?attr/content_discard"
+        android:menuCategory="container"
+        android:title="@string/remove_folder_label"
+        android:visible="true"
+        custom:showAsAction="collapseActionView">
+    </item>
+
+</menu>

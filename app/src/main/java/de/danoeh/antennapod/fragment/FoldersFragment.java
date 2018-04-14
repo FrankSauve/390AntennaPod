@@ -1,5 +1,8 @@
 package de.danoeh.antennapod.fragment;
 
+
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,11 +20,15 @@ import java.util.List;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.FoldersAdapter;
-import de.danoeh.antennapod.core.feed.Feed;
+import de.danoeh.antennapod.core.asynctask.FolderRemover;
+import de.danoeh.antennapod.core.dialog.ConfirmationDialog;
 import de.danoeh.antennapod.core.folders.Folder;
+import de.danoeh.antennapod.core.preferences.PlaybackPreferences;
+import de.danoeh.antennapod.core.service.playback.PlaybackService;
 import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.core.feed.EventDistributor;
+import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.dialog.RenameFeedDialog;
 
 /**
@@ -128,12 +135,12 @@ public class FoldersFragment extends Fragment {
             return;
         }
 
-        Feed feed = (Feed)selectedObject;
+        Folder folder = (Folder)selectedObject;
 
         MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.nav_feed_context, menu);
+        inflater.inflate(R.menu.nav_folder_context, menu);
 
-        menu.setHeaderTitle(feed.getTitle());
+        menu.setHeaderTitle(folder.getName());
 
         mPosition = position;
     }
@@ -153,16 +160,41 @@ public class FoldersFragment extends Fragment {
             return false;
         }
 
-        Feed feed = (Feed)selectedObject;
+        Folder folder = (Folder)selectedObject;
         switch(item.getItemId()) {
-            case R.id.mark_all_seen_item:
-                return true;
-            case R.id.mark_all_read_item:
-                return true;
             case R.id.rename_item:
-                new RenameFeedDialog(getActivity(), feed).show();
+                //new RenameFeedDialog(getActivity(), feed).show();
                 return true;
             case R.id.remove_item:
+                final FolderRemover remover = new FolderRemover(getContext(), folder) {
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+                        loadFolders();
+                    }
+                };
+                ConfirmationDialog conDialog = new ConfirmationDialog(getContext(),
+                        R.string.remove_folder_label,
+                        getString(R.string.folder_delete_confirmation_msg, folder.getName())) {
+                    @Override
+                    public void onConfirmButtonPressed(
+                            DialogInterface dialog) {
+                        dialog.dismiss();
+                        long mediaId = PlaybackPreferences.getCurrentlyPlayingFeedMediaId();
+                        if (mediaId > 0 &&
+                                FeedItemUtil.indexOfItemWithMediaId(folder.getEpisodes(), mediaId) >= 0) {
+                            Log.d(TAG, "Currently playing episode is about to be deleted, skipping");
+                            remover.skipOnCompletion = true;
+                            int playerStatus = PlaybackPreferences.getCurrentPlayerStatus();
+                            if(playerStatus == PlaybackPreferences.PLAYER_STATUS_PLAYING) {
+                                getActivity().sendBroadcast(new Intent(
+                                        PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE));
+                            }
+                        }
+                        remover.executeAsync();
+                    }
+                };
+                conDialog.createNewDialog().show();
                 return true;
             default:
                 return super.onContextItemSelected(item);

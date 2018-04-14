@@ -128,6 +128,8 @@
     <string name="show_info_label">Show information</string>
     <string name="rename_feed_label">Rename Podcast</string>
     <string name="remove_feed_label">Remove Podcast</string>
+    <string name="rename_folder_label">Rename Folder</string>
+    <string name="remove_folder_label">Remove Folder</string>
     <string name="share_label">Share&#8230;</string>
     <string name="share_link_label">Share Link</string>
     <string name="share_file_label">Share File</string>
@@ -136,7 +138,9 @@
     <string name="share_item_url_label">Share Episode File URL</string>
     <string name="share_item_url_with_position_label">Share Episode File URL with Position</string>
     <string name="feed_delete_confirmation_msg">Please confirm that you want to delete the feed \"%1$s\" and ALL episodes of this feed that you have downloaded.</string>
+    <string name="folder_delete_confirmation_msg">Please confirm that you want to delete the folder \"%1$s\" and ALL episodes of this folder that you have downloaded.</string>
     <string name="feed_remover_msg">Removing Feed</string>
+    <string name="folder_remover_msg">Removing Folder</string>
     <string name="load_complete_feed">Refresh complete Feed</string>
     <string name="hide_episodes_title">Hide Episodes</string>
     <string name="episode_actions">Apply actions</string>
