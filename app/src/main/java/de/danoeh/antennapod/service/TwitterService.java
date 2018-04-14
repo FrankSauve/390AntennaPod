@@ -22,7 +22,7 @@ public class TwitterService {
 
     private static TwitterService instance = null;
     private TwitterSession session;
-    private boolean postOnTwitter;
+    private String resultString;
 
     public static TwitterService getInstance(){
         if(instance == null){
@@ -41,6 +41,7 @@ public class TwitterService {
         call.enqueue(new Callback<Tweet>() {
             @Override
             public void success(Result<Tweet> result) {
+                TwitterService.getInstance().setResultString(result.data.text);
             }
             @Override
             public void failure(TwitterException e) {
@@ -56,5 +57,13 @@ public class TwitterService {
 
     public TwitterSession getTwitterSession(){
         return this.session;
+    }
+
+    public void setResultString(String resultString) {
+        this.resultString = resultString;
+    }
+
+    public String getResultString() {
+        return resultString;
     }
 }
