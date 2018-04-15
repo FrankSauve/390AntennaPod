@@ -4,4 +4,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="com.twitter.sdk.android.CONSUMER_KEY">nRTooU2vfcsnCnz2TDLzs1n7H</string>
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET">w21LdAFQwezAZ8OIlYB3mAFX9jQqdGccQshsFgD2qSpWc7NZwF</string>
+
+
 </resources>
