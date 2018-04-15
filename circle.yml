@@ -24,7 +24,8 @@ test:
         parallel: true
     # wait for it to have booted
     - circle-android wait-for-boot
-    
+    # build the project
+    - ./gradlew assembleDebug
     # run tests
     - ./gradlew connectedFreeDebugAndroidTest
   
