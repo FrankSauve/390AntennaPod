@@ -99,6 +99,7 @@ public class UserPreferences {
     public static final String PREF_AUTO_FLATTR = "pref_auto_flattr";
     public static final String PREF_AUTO_FLATTR_PLAYED_DURATION_THRESHOLD = "prefAutoFlattrPlayedDurationThreshold";
     public static final String PREF_GPODNET_NOTIFICATIONS = "pref_gpodnet_notifications";
+    public static final String PREF_AUTO_TWEET = "prefAutoTweet";
 
     // Other
     public static final String PREF_DATA_FOLDER = "prefDataFolder";
@@ -132,18 +133,6 @@ public class UserPreferences {
     private static final int DISCOVERY_ARTS_BUTTON = 1;
     private static final int DISCOVERY_COMEDY_BUTTON = 2;
     private static final int DISCOVERY_EDUCATION_BUTTON = 4;
-    private static final int DISCOVERY_KIDS_AND_FAMILY_BUTTON = 5;
-    private static final int DISCOVERY_HEALTH_BUTTON = 6;
-    private static final int DISCOVERY_TV_AND_FILM_BUTTON = 7;
-    private static final int DISCOVERY_MUSIC_BUTTON = 8;
-    private static final int DISCOVERY_NEWS_AND_POLITICS_BUTTON = 9;
-    private static final int DISCOVERY_RELIGION_AND_MEDECINE_BUTTON = 10;
-    private static final int DISCOVERY_SPORTS_AND_RECREATION_BUTTON = 11;
-    private static final int DISCOVERY_TECHNOLOGY_BUTTON = 12;
-    private static final int DISCOVERY_BUSINESS_BUTTON = 13;
-    private static final int DISCOVERY_GAMES_AND_CULTURE_BUTTON = 14;
-    private static final int DISCOVERY_SOCIETY_AND_CULTURE_BUTTON = 15;
-    private static final int DISCOVERY_GOVERNMENT_AND_ORGANIZATION_BUTTON = 16;
     public static final int FEED_ORDER_COUNTER = 0;
     public static final int FEED_ORDER_ALPHABETICAL = 1;
     public static final int FEED_ORDER_LAST_UPDATE = 2;
@@ -359,6 +348,10 @@ public class UserPreferences {
 
     public static boolean isAutoFlattr() {
         return prefs.getBoolean(PREF_AUTO_FLATTR, false);
+    }
+
+    public static boolean isAutoTweet() {
+        return prefs.getBoolean(PREF_AUTO_TWEET, false);
     }
 
     public static String getPlaybackSpeed() {

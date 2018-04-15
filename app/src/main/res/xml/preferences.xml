@@ -340,7 +340,7 @@
                     android:key="pref_gpodnet_authenticate"
                     android:title="@string/pref_gpodnet_authenticate_title"
                     android:summary="@string/pref_gpodnet_authenticate_sum">
-                    <intent android:action=".activity.gpoddernet.GpodnetAuthenticationActivity"/>
+                    <intent android:action=".activity.authentication.GpodnetAuthenticationActivity"/>
                 </PreferenceScreen>
                 <Preference
                     android:key="pref_gpodnet_setlogin_information"
@@ -365,6 +365,22 @@
                     android:title="@string/pref_gpodnet_notifications_title"
                     android:summary="@string/pref_gpodnet_notifications_sum"
                     android:defaultValue="true"/>
+            </PreferenceScreen>
+            <PreferenceScreen
+                android:key="prefTwitterSettings"
+                android:title="@string/twitter_label">
+                <PreferenceScreen
+                    android:key="pref_twitter_authenticate"
+                    android:title="@string/pref_twitter_authenticate_title"
+                    android:summary="@string/pref_twitter_authenticate_sum">
+                    <intent android:action=".activity.authentication.TwitterAuthenticationActivity" />
+                </PreferenceScreen>
+                <de.danoeh.antennapod.preferences.SwitchCompatPreference
+                    android:defaultValue="false"
+                    android:enabled="true"
+                    android:key="prefAutoTweet"
+                    android:summary="@string/pref_automatic_post_twitter_sum"
+                    android:title="@string/pref_automatic_post_twitter_title"/>
             </PreferenceScreen>
             </PreferenceCategory>
         </PreferenceScreen>

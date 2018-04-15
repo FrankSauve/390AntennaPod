@@ -409,6 +409,7 @@
     <string name="queue_label">Queue</string>
     <string name="services_label">Services</string>
     <string name="flattr_label">Flattr</string>
+    <string name="twitter_label">Twitter</string>
     <string name="pref_episode_cleanup_title">Episode Cleanup</string>
     <string name="pref_episode_cleanup_summary">Episodes that aren\'t in the queue and aren\'t favorites should be eligible for removal if Auto Download needs space for new episodes</string>
     <string name="pref_pauseOnDisconnect_sum">Pause playback when headphones or bluetooth are disconnected</string>
@@ -520,6 +521,10 @@
     <string name="pref_update_interval_hours_plural">hours</string>
     <string name="pref_update_interval_hours_singular">hour</string>
     <string name="pref_update_interval_hours_manual">Manual</string>
+    <string name="pref_twitter_authenticate_title">Login</string>
+    <string name="pref_twitter_authenticate_sum">Login with your twitter account in order to automatically post on twitter.</string>
+    <string name="pref_automatic_post_twitter_title">Post on twitter automatically</string>
+    <string name="pref_automatic_post_twitter_sum">AntennaPod will automatically post the title of the podcast you are listening to.</string>
     <string name="pref_gpodnet_authenticate_title">Login</string>
     <string name="pref_gpodnet_authenticate_sum">Login with your gpodder.net account in order to sync your subscriptions.</string>
     <string name="pref_gpodnet_logout_title">Logout</string>
