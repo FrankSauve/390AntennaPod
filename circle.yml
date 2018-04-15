@@ -3,7 +3,7 @@ general:
     - app/build/outputs/apk
 machine:
   environment:
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
   java:
     version: oraclejdk8
   pre:
@@ -12,6 +12,9 @@ machine:
     - echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
 
 test:
+  pre:
+    # findbugs
+    - ./gradlew findbugs
   override:
     # start the emulator
     - emulator -avd circleci-android24 -no-window:
@@ -23,8 +26,7 @@ test:
     - ./gradlew assembleDebug
     # run tests
     - ./gradlew connectedFreeDebugAndroidTest
-    # findbugs
-    - ./gradlew findbugs
+  
 
   post:
       - mkdir -p $CIRCLE_TEST_REPORTS/junit/
