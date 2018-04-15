@@ -2,7 +2,6 @@ package de.danoeh.antennapod.fragment;
 
 
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 
 import org.json.JSONArray;
@@ -19,7 +18,6 @@ import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
-import de.danoeh.antennapod.core.event.QueueEvent;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
@@ -244,42 +242,136 @@ public class DiscoveryFragment extends ItunesSearchFragment {
     public void findAutomaticRecommendations() {
         List<Feed> feeds = navDrawerData.feeds;
 
-        super.setIsInDisvoryTab(true);
+        super.setIsInDiscoveryTab(true);
 
-        //Generate random int
-        int min = 0;
-        int max = feeds.size() - 1;
-        int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
-        String author = feeds.get(randomFeed).getAuthor();
-        String title = feeds.get(randomFeed).getTitle();
+        if(feeds.size()>0){
+            //Generate random int
+            int min = 0;
+            int max = feeds.size() - 1;
+            int randomFeed = min + (int)(Math.random() * ((max - min) + 1));
+            String author = feeds.get(randomFeed).getAuthor();
+            String title = feeds.get(randomFeed).getTitle();
 
-        //Set action bar title to "Similar to: ...."
-        if(!testing){
-            ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
-        }
-
-        ArrayList<String> keywords = titleKeywordExtractor(title);
-        String fullTitle="";
-        for(int i=0;i<keywords.size();i++){
-            if(i<keywords.size()-1){
-                fullTitle += keywords.get(i)+" ";
+            //Set action bar title to "Similar to: ...."
+            if(!testing){
+                ((MainActivity)getActivity()).setActionBarTitle("Similar To:  " + title);
             }
+
+            ArrayList<String> keywords = titleKeywordExtractor(title);
+            String fullTitle="";
+            for(int i=0;i<keywords.size();i++){
+                if(i<keywords.size()-1){
+                    fullTitle += keywords.get(i)+" ";
+                }
+                else{
+                    fullTitle += keywords.get(i);
+                }
+            }
+            //If there are valid keywords, search and add them to the list.
+            String query="";
+            if(keywords.size()>0){
+                //extract the best keyword from a list, and use it to load in the recommendations
+                query = keywordEvaluator(keywords);
+                loadRecommended(author, query, fullTitle);
+            }
+            //if there are no keywords, simply perform the algorithm with a ridiculous podcast title so that it only searches by author and category
             else{
-                fullTitle += keywords.get(i);
+                loadRecommended(author, "as1243d41324iuh1234al324iuh234awi1234ludh2134wi2143ludh432wail4123udhi4312wl423aud", fullTitle);
             }
         }
-        //If there are valid keywords, search and add them to the list.
-        String query="";
-        if(keywords.size()>0){
-
-            if(keywords.size()==1)
-                query = keywords.get(0);
-            else if (keywords.size()==2)
-                query =keywords.get(0)+" "+keywords.get(1);
-            else
-                query=keywords.get(0)+" "+keywords.get(1)+" "+keywords.get(2);
+        //if there are no currently subscribed podcasts, simply display the trending podcasts since there is no usable data to tailor the list of podcasts with
+        else{
+            ((MainActivity)getActivity()).setActionBarTitle("Popular Podcasts");
+            super.loadToplist();
         }
-        loadRecommended(author, query, fullTitle);
+    }
+
+    /**
+     * Method used to retrieve the podcasts generated from a title search
+     * @param title
+     * @return
+     */
+    private List<ItunesAdapter.Podcast> getTitleResults(String title){
+        List<ItunesAdapter.Podcast> results = new ArrayList<>();
+
+        String url = String.format(API_URL_TITLE_SEARCH, title.toLowerCase());
+
+        OkHttpClient client = AntennapodHttpClient.getHttpClient();
+        Request.Builder httpReq = new Request.Builder()
+                .url(url)
+                .header("User-Agent", ClientConfig.USER_AGENT);
+        try {
+            Response response = client.newCall(httpReq.build()).execute();
+
+            if (response.isSuccessful()) {
+                String resultString = response.body().string();
+                //System.out.println(resultString);
+                JSONObject result = new JSONObject(resultString);
+
+                JSONArray j = result.getJSONArray("results");
+
+                int limit = 14;
+                for (int i = 0; i < limit && i<j.length(); i++) {
+                    JSONObject json = j.getJSONObject(i);
+                    ItunesAdapter.Podcast podcast;
+                    podcast = ItunesAdapter.Podcast.fromSearch(json);
+
+
+                    String temp1="";
+                    ArrayList<String> temp2 = titleKeywordExtractor(podcast.title);
+                    for(int count = 0; count<temp2.size();count++){
+                        if(count!=temp2.size()-1){
+                            temp1 += temp2.get(count)+" ";
+                        }
+                        else{
+                            temp1 += temp2.get(count);
+                        }
+
+                    }
+                    results.add(podcast);
+                }
+
+            }
+        } catch(Exception ex){}
+
+        return results;
+    }
+
+    /**
+     * Method used to evaluate each of the extracted keywords to find the first keyword which will yield at least 11 results (11 is used in the case that one of the results might be itself)
+     * @param keywords
+     * @return bestKeyword
+     */
+    private String keywordEvaluator (ArrayList<String> keywords){
+        //create 2 pairs of List and String variables for the best keyword and the current one
+        List<ItunesAdapter.Podcast> resultsBest = new ArrayList<>();
+        List<ItunesAdapter.Podcast> resultsCurrent = new ArrayList<>();
+        String bestKeyword=keywords.get(0);
+        String currentKeyword="";
+
+        //retrieve the podcasts from searching with the 'best' Keyword
+        resultsBest = getTitleResults(bestKeyword);
+
+        //return the 'best' keyword if it outputs more than 10 podcasts, since the earlier a keyword is in a title, the more relevant it is
+        if(resultsBest.size()>10){
+            return bestKeyword;
+        }
+
+        //otherwise, iterate through the remaining keywords until a large enough list of podcasts is found, or until the keyword with the most results is obtained and return that
+        for(int i=1;i<keywords.size();i++){
+            currentKeyword=keywords.get(i);
+            resultsCurrent=getTitleResults(currentKeyword);
+
+            if(resultsCurrent.size()>10){
+                return currentKeyword;
+            }
+            else if(resultsCurrent.size()>resultsBest.size()){
+                bestKeyword = currentKeyword;
+                resultsBest = resultsCurrent;
+            }
+        }
+
+        return bestKeyword;
     }
 
 
