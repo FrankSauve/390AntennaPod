@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.feed.FeedItem;
@@ -19,8 +20,10 @@ import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.fragment.FoldersFragment;
+import de.danoeh.antennapod.fragment.HomeFragment;
 import de.test.antennapod.storage.DBTestUtils;
 
+import static de.danoeh.antennapod.core.storage.PodDBAdapter.CREATE_INDEX_FEEDITEMS_FEED;
 import static de.danoeh.antennapod.core.storage.PodDBAdapter.deleteAllFolders;
 import static de.danoeh.antennapod.core.storage.PodDBAdapter.deleteFoldersTable;
 
@@ -32,6 +35,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
     private static final String TAG = "FoldersTest";
     private FoldersFragment foldersFragment;
+    private HomeFragment homeFragment;
     List<Folder> folders;
     PodDBAdapter adapter;
 
@@ -74,6 +78,8 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         foldersFragment = new FoldersFragment();
         getActivity().getSupportFragmentManager().beginTransaction().add(foldersFragment, FoldersFragment.class.getSimpleName()).commit();
+        homeFragment = new HomeFragment();
+        getActivity().getSupportFragmentManager().beginTransaction().add(homeFragment, HomeFragment.class.getSimpleName()).commit();
         getInstrumentation().waitForIdleSync();
     }
 
@@ -252,11 +258,53 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
     }
 
     //Delete feed from database
-    public void removeFeed(Feed feed){
+    private void removeFeed(Feed feed){
         adapter = PodDBAdapter.getInstance();
         adapter.open();
         adapter.removeFeed(feed);
         adapter.close();
+    }
+
+    public void testFoldersHomePage() throws Exception {
+        //Original number of folders in foldersFragment
+        foldersFragment.loadFolders();
+        folders = foldersFragment.getFolders();
+        int originalNumOfFolders = folders.size();
+
+        //Assign random name
+        String firstFolderName = randomAlphabet();
+        String secondFolderName = randomAlphabet();
+
+        //Creating folders containing no episodes
+        Folder firstFolder = new Folder(firstFolderName, null);
+        Folder secondFolder = new Folder(secondFolderName, null);
+
+        //Create folders
+        createFolder(firstFolder);
+        createFolder(secondFolder);
+
+        //Add items to the folders(2 in firstFolder and 2 in secondFolder)
+        List<SectionDataModel> allData = homeFragment.loadData();
+
+        //Assertions
+        assertNotNull(allData);
+        for(SectionDataModel data : allData){
+            List<Folder> folders = data.getFolders();
+            List<String> foldersName = new ArrayList<>();
+            if(folders != null){ //get the folders section
+                assertEquals(originalNumOfFolders + 2, folders.size());//Verify if created folders have been added to the folders section in home page
+                for (Folder folder : folders){
+                    foldersName.add(folder.getName()); //Updates list of folders name
+                }
+                //Verify if the list of folders name contains both folders name
+                assertTrue(foldersName.contains(firstFolderName));
+                assertTrue(foldersName.contains(secondFolderName));
+            }
+        }
+
+        //Clear database
+        deleteFolder(firstFolder);
+        deleteFolder(secondFolder);
     }
 
 }
