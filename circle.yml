@@ -20,7 +20,7 @@ test:
     # wait for it to have booted
     - circle-android wait-for-boot
     # build the project
-    - ./gradlew assembleDebug
+    #- ./gradlew assembleDebug
     # run tests
     - ./gradlew connectedFreeDebugAndroidTest
     # findbugs
