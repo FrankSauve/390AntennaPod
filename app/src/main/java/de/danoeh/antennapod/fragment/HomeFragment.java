@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.adapter.HomeRecyclerViewAdapter;
 import de.danoeh.antennapod.core.feed.FeedItem;
+import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBReader;
 
 public class HomeFragment extends Fragment {
@@ -28,7 +30,8 @@ public class HomeFragment extends Fragment {
     public static final String TAG = "HomeFragment";
     List<SectionDataModel> allData;
 
-    Map<String, List<FeedItem>> dataList;
+    Map<String, List<FeedItem>> dataListItems;
+    Map<String, List<Folder>> dataListFolders;
 
     /**
      * Constructor
@@ -56,36 +59,50 @@ public class HomeFragment extends Fragment {
     }
 
     public List<SectionDataModel> loadData() {
-        dataList = new HashMap<>();
+        dataListItems = new HashMap<>();
+        dataListFolders = new HashMap<>();
         allData = new ArrayList<>();
         List<FeedItem> favorites = DBReader.getFavoriteItemsList();
         List<FeedItem> queued = DBReader.getQueue();
         List<FeedItem> latest = DBReader.getNewItemsList();
         List<FeedItem> recent = DBReader.getRecentlyPublishedEpisodes(10);
         List<FeedItem> history = DBReader.getPlaybackHistory();
+        List<Folder> folders = DBReader.getFolderList();
         if (!queued.isEmpty()) {
-            dataList.put("Queued", queued);
+            dataListItems.put("Queued", queued);
         }
         if (!favorites.isEmpty()) {
-            dataList.put("Favorites", favorites);
+            dataListItems.put("Favorites", favorites);
         }
         if (!latest.isEmpty()) {
-            dataList.put("Recently Added", latest);
+            dataListItems.put("Recently Added", latest);
         }
         if (!recent.isEmpty()) {
-            dataList.put("Newest", recent);
+            dataListItems.put("Newest", recent);
         }
         if (!history.isEmpty()) {
-            dataList.put("Playback History", history);
+            dataListItems.put("Playback History", history);
+        }
+        if (!folders.isEmpty()) {
+            dataListFolders.put("Folders", folders);
         }
 
-
-        for (String name : dataList.keySet()) {
+        //Adds feed items data
+        for (String name : dataListItems.keySet()) {
             SectionDataModel data = new SectionDataModel();
             data.setTitle(name.toString());
-            data.setFeedItem(dataList.get(name));
+            data.setFeedItem(dataListItems.get(name));
             allData.add(data);
         }
+
+        //Adds folders data for folders section
+        for (String name : dataListFolders.keySet()) {
+            SectionDataModel data = new SectionDataModel();
+            data.setTitle(name.toString());
+            data.setFolders(dataListFolders.get(name));
+            allData.add(data);
+        }
+
         return allData;
     }
 }
