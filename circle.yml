@@ -3,7 +3,7 @@ general:
     - app/build/outputs/apk
 machine:
   environment:
-    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError"'
   java:
     version: oraclejdk8
   pre:
@@ -20,7 +20,7 @@ test:
     # wait for it to have booted
     - circle-android wait-for-boot
     # build the project
-    #- ./gradlew assembleDebug
+    - ./gradlew assembleDebug
     # run tests
     - ./gradlew connectedFreeDebugAndroidTest
     # findbugs
