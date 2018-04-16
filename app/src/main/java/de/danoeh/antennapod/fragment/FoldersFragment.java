@@ -163,7 +163,7 @@ public class FoldersFragment extends Fragment {
         Folder folder = (Folder)selectedObject;
         switch(item.getItemId()) {
             case R.id.rename_item:
-                //new RenameFeedDialog(getActivity(), feed).show();
+                new RenameFeedDialog(getActivity(), folder).show();
                 return true;
             case R.id.remove_item:
                 final FolderRemover remover = new FolderRemover(getContext(), folder) {

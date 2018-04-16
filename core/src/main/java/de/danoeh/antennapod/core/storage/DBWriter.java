@@ -983,6 +983,17 @@ public class DBWriter {
         });
     }
 
+
+    public static Future<?> setFolderCustomTitle(Folder folder) {
+        return dbExec.submit(() -> {
+            PodDBAdapter adapter = PodDBAdapter.getInstance();
+            adapter.open();
+            adapter.setFolderCustomTitle(folder.getId(), folder.getName());
+            adapter.close();
+            EventDistributor.getInstance().sendFeedUpdateBroadcast();
+        });
+    }
+
 //    public static Future<?> setFolder(Folder folder) {
 //        return dbExec.submit(() -> {
 //            PodDBAdapter adapter = PodDBAdapter.getInstance();

@@ -1009,6 +1009,12 @@ public class PodDBAdapter {
         db.update(TABLE_NAME_FEEDS, values, KEY_ID + "=?", new String[]{String.valueOf(feedId)});
     }
 
+    void setFolderCustomTitle(long folderId, String newName) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOLDER_NAME, newName);
+        db.update(TABLE_NAME_FOLDERS, values, KEY_ID + "=?", new String[]{String.valueOf(folderId)});
+    }
+
     /**
      * Inserts or updates a download status.
      */
