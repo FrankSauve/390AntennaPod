@@ -657,6 +657,35 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.sleep(1000);
     }
 
+    private void renameFolderLongClick(String name, String newName){
+
+        solo.clickLongOnText(name);
+        solo.waitForText("Rename Folder");
+        solo.clickOnText("Rename Folder");
+        solo.clearEditText(0);
+        solo.enterText(0, newName);
+        solo.waitForText("OK");
+        solo.clickOnText("OK");
+
+    }
+
+    private void renameFolderFromOptions(String name, String newName){
+
+
+        //Rename
+        solo.clickOnText(name);
+        solo.sleep(1000);
+        solo.clickOnScreen(1000, 150);
+        solo.waitForText("Rename Folder");
+        solo.clickOnText("Rename Folder");
+        solo.clearEditText(0);
+        solo.enterText(0, newName);
+        solo.waitForText("OK");
+        solo.clickOnText("OK");
+        solo.sleep(1000);
+
+    }
+
     public void testDeleteFolder() {
 
         //Add a new folder first
@@ -676,6 +705,32 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
         //Assertion
         assertFalse(solo.waitForText(newFolderName));
+
+    }
+
+    public void testRenameFolder(){
+        //Test rename from My Folders
+        //Name variables
+        String folderName = testAddFolder();
+        String updateFolderName = "New Name";
+        String updateFolderName2 = "More Testing";
+
+        //Rename folder
+        renameFolderLongClick(folderName, updateFolderName);
+
+        //Check if correctly changed visually
+        assertTrue(solo.waitForText(updateFolderName));
+
+        /*
+        //Test rename from inside folder
+        solo.clickOnText(updateFolderName);
+
+        //Rename folder from options menu
+        renameFolderFromOptions(updateFolderName, updateFolderName2);
+
+        //Check if correctly changed visually
+        assertTrue(solo.waitForText(updateFolderName2));
+        */
 
     }
 
