@@ -96,14 +96,19 @@ public class ObjectListDataAdapter extends RecyclerView.Adapter<ObjectListDataAd
 
             // On click listener for homepage items
             view.setOnClickListener(v -> {
+                MainActivity activity = ((MainActivity)fragment.getActivity());
+                int position = getAdapterPosition();
                 // Open ItemFragment if a feed is clicked
-                long[] ids = FeedItemUtil.getIds(itemsList);
-                ((MainActivity)fragment.getActivity()).loadChildFragment(ItemFragment.newInstance(ids, getAdapterPosition()));
+                if(itemsList != null){
+                    long[] ids = FeedItemUtil.getIds(itemsList);
+                    activity.loadChildFragment(ItemFragment.newInstance(ids, position));
+                    activity.setActionBarTitle(itemsList.get(position).getTitle());
+                }
 
                 // Open FolderItemListFragment if a folder is clicked
                 if(foldersList != null){
-                    ((MainActivity)fragment.getActivity()).loadChildFragment(FolderItemListFragment.newInstance(foldersList.get(0).getId()));
-                    ((MainActivity)fragment.getActivity()).setActionBarTitle(foldersList.get(0).getName());
+                    activity.loadChildFragment(FolderItemListFragment.newInstance(foldersList.get(position).getId()));
+                    activity.setActionBarTitle(foldersList.get(position).getName());
                 }
             });
         }

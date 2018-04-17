@@ -15,6 +15,7 @@ import java.util.Map;
 
 import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.HomeRecyclerViewAdapter;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
@@ -54,6 +55,7 @@ public class HomeFragment extends Fragment {
         adapter = new HomeRecyclerViewAdapter(getContext(), allData, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        ((MainActivity)getActivity()).setActionBarTitle("Home");
         return v;
     }
 
