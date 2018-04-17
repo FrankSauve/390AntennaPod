@@ -1240,6 +1240,7 @@ public final class DBReader {
         PodDBAdapter adapter = PodDBAdapter.getInstance();
         adapter.open();
         List<Feed> feeds = getFeedList(adapter);
+        List<Folder> folders = getFolderList();
         long[] feedIds = new long[feeds.size()];
         for (int i = 0; i < feeds.size(); i++) {
             feedIds[i] = feeds.get(i).getId();
@@ -1315,7 +1316,7 @@ public final class DBReader {
         int numNewItems = adapter.getNumberOfNewItems();
         int numDownloadedItems = adapter.getNumberOfDownloadedEpisodes();
 
-        NavDrawerData result = new NavDrawerData(feeds, queueSize, numNewItems, numDownloadedItems,
+        NavDrawerData result = new NavDrawerData(feeds, folders, queueSize, numNewItems, numDownloadedItems,
                 feedCounters, UserPreferences.getEpisodeCleanupAlgorithm().getReclaimableItems());
         adapter.close();
         return result;
@@ -1323,6 +1324,7 @@ public final class DBReader {
 
     public static class NavDrawerData {
         public List<Feed> feeds;
+        public List<Folder> folders;
         public int queueSize;
         public int numNewItems;
         public int numDownloadedItems;
@@ -1330,12 +1332,14 @@ public final class DBReader {
         public int reclaimableSpace;
 
         public NavDrawerData(List<Feed> feeds,
+                             List<Folder> folders,
                              int queueSize,
                              int numNewItems,
                              int numDownloadedItems,
                              LongIntMap feedIndicatorValues,
                              int reclaimableSpace) {
             this.feeds = feeds;
+            this.folders = folders;
             this.queueSize = queueSize;
             this.numNewItems = numNewItems;
             this.numDownloadedItems = numDownloadedItems;

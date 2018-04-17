@@ -19,6 +19,7 @@ import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.itunes.ItunesAdapter;
 import de.danoeh.antennapod.core.ClientConfig;
+import de.danoeh.antennapod.core.event.QueueEvent;
 import de.danoeh.antennapod.core.feed.Feed;
 import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.service.download.AntennapodHttpClient;
@@ -531,5 +532,9 @@ public class DiscoveryFragment extends ItunesSearchFragment {
             case "Shopping": return SHOPPING_GENRE_ID;
             default: return ARTS_GENRE_ID;
         }
+    }
+
+    public List<Integer> getCategoryId() {
+        return this.CategoryId;
     }
 }
