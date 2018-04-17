@@ -12,6 +12,11 @@ machine:
     - echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
 
 test:
+  pre:
+    # build the project
+    - ./gradlew assembleDebug
+    # findbugs
+    - ./gradlew findbugs
   override:
     # start the emulator
     - emulator -avd circleci-android24 -no-window:
@@ -19,10 +24,14 @@ test:
         parallel: true
     # wait for it to have booted
     - circle-android wait-for-boot
-    # run tests  against the emulator.
+    # build the project
     - ./gradlew assembleDebug
+    # run tests
     - ./gradlew connectedFreeDebugAndroidTest
+  
 
   post:
       - mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - find . -type f -regex ".*/build/reports/.*" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - mkdir -p $CIRCLE_TEST_REPORTS/findbugs/
+      - find . -type f -regex ".*/outputs/findbugs/.*" -exec cp {} $CIRCLE_TEST_REPORTS/findbugs/ \;
