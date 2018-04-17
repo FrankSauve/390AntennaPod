@@ -31,14 +31,14 @@ public class MenuItemUtils extends de.danoeh.antennapod.core.menuhandler.MenuIte
     @SuppressWarnings("ResourceType")
     public static void refreshLockItem(Context context, Menu menu) {
         final MenuItem queueLock = menu.findItem(de.danoeh.antennapod.R.id.queue_lock);
-        int[] lockIcons = new int[] { de.danoeh.antennapod.R.attr.ic_lock_open, de.danoeh.antennapod.R.attr.ic_lock_closed };
+        int[] lockIcons = new int[] { de.danoeh.antennapod.R.attr.ic_lock_closed, de.danoeh.antennapod.R.attr.ic_lock_open };
         TypedArray ta = context.obtainStyledAttributes(lockIcons);
-        if (UserPreferences.isQueueLocked()) {
-            queueLock.setTitle(de.danoeh.antennapod.R.string.unlock_queue);
-            queueLock.setIcon(ta.getDrawable(0));
-        } else {
+        if (!UserPreferences.isQueueLocked()) {
             queueLock.setTitle(de.danoeh.antennapod.R.string.lock_queue);
             queueLock.setIcon(ta.getDrawable(1));
+        } else {
+            queueLock.setTitle(de.danoeh.antennapod.R.string.unlock_queue);
+            queueLock.setIcon(ta.getDrawable(0));
         }
         ta.recycle();
     }
