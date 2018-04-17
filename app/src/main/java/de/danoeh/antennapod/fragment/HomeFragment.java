@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +51,7 @@ public class HomeFragment extends Fragment {
         v = inflater.inflate(R.layout.activity_main, container, false);
         recyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        adapter = new HomeRecyclerViewAdapter(getContext(), allData);
+        adapter = new HomeRecyclerViewAdapter(getContext(), allData, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         return v;
