@@ -222,17 +222,6 @@ public class FolderItemListFragment extends Fragment {
                         public void onConfirmButtonPressed(
                                 DialogInterface dialog) {
                             dialog.dismiss();
-                            long mediaId = PlaybackPreferences.getCurrentlyPlayingFeedMediaId();
-                            if (mediaId > 0 &&
-                                    FeedItemUtil.indexOfItemWithMediaId(folder.getEpisodes(), mediaId) >= 0) {
-                                Log.d(TAG, "Currently playing episode is about to be deleted, skipping");
-                                remover.skipOnCompletion = true;
-                                int playerStatus = PlaybackPreferences.getCurrentPlayerStatus();
-                                if(playerStatus == PlaybackPreferences.PLAYER_STATUS_PLAYING) {
-                                    getActivity().sendBroadcast(new Intent(
-                                            PlaybackService.ACTION_PAUSE_PLAY_CURRENT_EPISODE));
-                                }
-                            }
                             remover.executeAsync();
                         }
                     };
