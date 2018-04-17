@@ -19,6 +19,7 @@ import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.glide.ApGlideSettings;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
+import de.danoeh.antennapod.fragment.FolderItemListFragment;
 import de.danoeh.antennapod.fragment.HomeFragment;
 import de.danoeh.antennapod.fragment.ItemFragment;
 
@@ -93,9 +94,17 @@ public class ObjectListDataAdapter extends RecyclerView.Adapter<ObjectListDataAd
             title.setMovementMethod(new ScrollingMovementMethod());
             this.itemImage = (ImageView) view.findViewById(R.id.cover);
 
+            // On click listener for homepage items
             view.setOnClickListener(v -> {
+                // Open ItemFragment if a feed is clicked
                 long[] ids = FeedItemUtil.getIds(itemsList);
                 ((MainActivity)fragment.getActivity()).loadChildFragment(ItemFragment.newInstance(ids, getAdapterPosition()));
+
+                // Open FolderItemListFragment if a folder is clicked
+                if(foldersList != null){
+                    ((MainActivity)fragment.getActivity()).loadChildFragment(FolderItemListFragment.newInstance(foldersList.get(0).getId()));
+                    ((MainActivity)fragment.getActivity()).setActionBarTitle(foldersList.get(0).getName());
+                }
             });
         }
     }
