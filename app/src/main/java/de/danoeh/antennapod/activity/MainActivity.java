@@ -70,6 +70,7 @@ import de.danoeh.antennapod.fragment.QueueFragment;
 import de.danoeh.antennapod.fragment.SubscriptionFragment;
 import de.danoeh.antennapod.fragment.TrendingFragment;
 import de.danoeh.antennapod.fragment.DiscoveryFragment;
+import de.danoeh.antennapod.fragment.HomeFragment;
 import de.danoeh.antennapod.menuhandler.NavDrawerActivity;
 import de.greenrobot.event.EventBus;
 import rx.Observable;
@@ -102,6 +103,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
     public static final String SAVE_TITLE = "title";
 
     public static final String[] NAV_DRAWER_TAGS = {
+            HomeFragment.TAG,
             QueueFragment.TAG,
             EpisodesFragment.TAG,
             SubscriptionFragment.TAG,
@@ -313,6 +315,10 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         Log.d(TAG, "loadFragment(tag: " + tag + ", args: " + args + ")");
         Fragment fragment = null;
         switch (tag) {
+            case HomeFragment.TAG:
+                HomeFragment homeFragment = new HomeFragment();
+                fragment = homeFragment;
+                break;
             case QueueFragment.TAG:
                 fragment = new QueueFragment();
                 break;
@@ -570,6 +576,7 @@ public class MainActivity extends CastEnabledActivity implements NavDrawerActivi
         boolean retVal = super.onCreateOptionsMenu(menu);
         if (Flavors.FLAVOR == Flavors.PLAY) {
             switch (getLastNavFragment()) {
+                case HomeFragment.TAG:
                 case QueueFragment.TAG:
                 case EpisodesFragment.TAG:
                     requestCastButton(MenuItem.SHOW_AS_ACTION_IF_ROOM);

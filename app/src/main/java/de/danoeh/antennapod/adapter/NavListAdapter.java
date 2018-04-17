@@ -38,6 +38,7 @@ import de.danoeh.antennapod.fragment.AllEpisodesFragment;
 import de.danoeh.antennapod.fragment.DownloadsFragment;
 import de.danoeh.antennapod.fragment.EpisodesFragment;
 import de.danoeh.antennapod.fragment.FoldersFragment;
+import de.danoeh.antennapod.fragment.HomeFragment;
 import de.danoeh.antennapod.fragment.NewEpisodesFragment;
 import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
 import de.danoeh.antennapod.fragment.QueueFragment;
@@ -127,6 +128,9 @@ public class NavListAdapter extends BaseAdapter
         }
         int icon;
         switch (tag) {
+            case HomeFragment.TAG:
+                icon = R.attr.ic_home;
+                break;
             case QueueFragment.TAG:
                 icon = R.attr.stat_playlist;
                 break;

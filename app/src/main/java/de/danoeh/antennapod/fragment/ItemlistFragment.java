@@ -193,6 +193,7 @@ public class ItemlistFragment extends ListFragment {
         if(!isAdded()) {
             return;
         }
+
         super.onCreateOptionsMenu(menu, inflater);
 
         if (itemsLoaded) {
