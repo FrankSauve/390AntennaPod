@@ -46,6 +46,7 @@ import de.danoeh.antennapod.core.storage.DownloadRequestException;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
+import de.danoeh.antennapod.dialog.ItemsInFolderFragment;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
 import de.danoeh.antennapod.menuhandler.FeedMenuHandler;
 
@@ -200,8 +201,8 @@ public class FolderItemListFragment extends Fragment {
         if (!super.onOptionsItemSelected(item)) {
             switch (item.getItemId()) {
                 case R.id.episode_actions:
-                    EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
-                            .newInstance(folder.getEpisodes());
+                    ItemsInFolderFragment fragment = ItemsInFolderFragment
+                            .newInstance(episodes, ItemsInFolderFragment.ACTION_ALL);
                     ((MainActivity)getActivity()).loadChildFragment(fragment);
                     return true;
                 case R.id.rename_item:

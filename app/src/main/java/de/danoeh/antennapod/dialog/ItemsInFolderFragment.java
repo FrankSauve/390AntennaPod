@@ -30,21 +30,23 @@ import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.core.storage.DownloadRequestException;
 import de.danoeh.antennapod.core.util.LongList;
 
-public class FavoritesApplyActionFragment extends Fragment {
+public class ItemsInFolderFragment extends Fragment {
 
-    public String TAG = "EpisodeActionFragment";
+    public String TAG = "ItemsInFolderFragment";
 
     public static final int ACTION_QUEUE = 1;
     public static final int ACTION_MARK_PLAYED = 2;
     public static final int ACTION_MARK_UNPLAYED = 4;
-    public static final int ACTION_DOWNLOAD = 8;;
-    public static final int ACTION_DELETE_FAVORITES = 22;
+    public static final int ACTION_DOWNLOAD = 8;
+    public static final int ACTION_REMOVE_EPISODE = 16;
 
 
+    //will verify if int 20 conclficts with anything else
+    public static final int ACTION_ADD_TO_FAVORITES = 20;
 
 
     public static final int ACTION_ALL = ACTION_QUEUE | ACTION_MARK_PLAYED | ACTION_MARK_UNPLAYED
-            | ACTION_DOWNLOAD | ACTION_DELETE_FAVORITES;
+            | ACTION_DOWNLOAD | ACTION_REMOVE_EPISODE | ACTION_ADD_TO_FAVORITES;
 
 
     private ListView mListView;
@@ -54,7 +56,9 @@ public class FavoritesApplyActionFragment extends Fragment {
     private Button btnMarkAsPlayed;
     private Button btnMarkAsUnplayed;
     private Button btnDownload;
-    private Button btnDeleteFavorites;
+    private Button btnDeleteEpisode;
+    private Button btnAddToFavorites;
+
 
     private final Map<Long,FeedItem> idMap = new ArrayMap<>();
     private final List<FeedItem> episodes = new ArrayList<>();
@@ -64,12 +68,12 @@ public class FavoritesApplyActionFragment extends Fragment {
 
     private MenuItem mSelectToggle;
 
-    public static FavoritesApplyActionFragment newInstance(List<FeedItem> items) {
+    public static ItemsInFolderFragment newInstance(List<FeedItem> items) {
         return newInstance(items, ACTION_ALL);
     }
 
-    public static FavoritesApplyActionFragment newInstance(List<FeedItem> items, int actions) {
-        FavoritesApplyActionFragment f = new FavoritesApplyActionFragment();
+    public static ItemsInFolderFragment newInstance(List<FeedItem> items, int actions) {
+        ItemsInFolderFragment f = new ItemsInFolderFragment();
         f.episodes.addAll(items);
         for(FeedItem episode : items) {
             f.idMap.put(episode.getId(), episode);
@@ -87,7 +91,7 @@ public class FavoritesApplyActionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.favorites_apply_action_fragment, container, false);
+        View view = inflater.inflate(R.layout.items_in_folder_fragment, container, false);
 
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -143,11 +147,19 @@ public class FavoritesApplyActionFragment extends Fragment {
             btnDownload.setVisibility(View.GONE);
             view.findViewById(R.id.divider4).setVisibility(View.GONE);
         }
-        btnDeleteFavorites = (Button) view.findViewById(R.id.btnDeleteFavorites);
-        if((actions & ACTION_DELETE_FAVORITES) != 0) {
-            btnDeleteFavorites.setOnClickListener(v -> deleteFavoritesChecked());
+        btnAddToFavorites = (Button) view.findViewById(R.id.btnAddToFavorites);
+        if((actions & ACTION_ADD_TO_FAVORITES) != 0) {
+            btnAddToFavorites.setOnClickListener(v -> addToFav());
+            lastVisibleDiv = R.id.divider5;
         } else {
-            btnDeleteFavorites.setVisibility(View.GONE);
+            btnAddToFavorites.setVisibility(View.GONE);
+            view.findViewById(R.id.divider5).setVisibility(View.GONE);
+        }
+        btnDeleteEpisode = (Button) view.findViewById(R.id.remove_item_from_folder);
+        if((actions & ACTION_REMOVE_EPISODE) != 0) {
+            btnDeleteEpisode.setOnClickListener(v -> removeItemFromFolder());
+        } else {
+            btnDeleteEpisode.setVisibility(View.GONE);
             if(lastVisibleDiv > 0) {
                 view.findViewById(lastVisibleDiv).setVisibility(View.GONE);
             }
@@ -301,12 +313,12 @@ public class FavoritesApplyActionFragment extends Fragment {
             } else {
                 ordering = lhs.getMedia().getDuration() - rhs.getMedia().getDuration();
             }
-        if(reverse) {
-            return -1 * ordering;
-        } else {
-            return ordering;
-        }
-    });
+            if(reverse) {
+                return -1 * ordering;
+            } else {
+                return ordering;
+            }
+        });
         refreshTitles();
         refreshCheckboxes();
     }
@@ -391,7 +403,7 @@ public class FavoritesApplyActionFragment extends Fragment {
             boolean checked = checkedIds.contains(episode.getId());
             mListView.setItemChecked(i, checked);
         }
-        ActivityCompat.invalidateOptionsMenu(FavoritesApplyActionFragment.this.getActivity());
+        ActivityCompat.invalidateOptionsMenu(ItemsInFolderFragment.this.getActivity());
     }
 
     private void queueChecked() {
@@ -401,6 +413,17 @@ public class FavoritesApplyActionFragment extends Fragment {
 
     private void markedCheckedPlayed() {
         DBWriter.markItemPlayed(FeedItem.PLAYED, checkedIds.toArray());
+        close();
+    }
+
+    //add selected items to favorites
+    private void addToFav() {
+        for(long id : checkedIds.toArray()) {
+            FeedItem episode = idMap.get(id);
+            if(episode.hasMedia()) {
+                DBWriter.addFavoriteItemById(episode.getMedia().getId());
+            }
+        }
         close();
     }
 
@@ -426,18 +449,18 @@ public class FavoritesApplyActionFragment extends Fragment {
         close();
     }
 
-    private void deleteFavoritesChecked(){
+
+    private void removeItemFromFolder(){
         for(long id : checkedIds.toArray()) {
             FeedItem episode = idMap.get(id);
             if(episode.hasMedia()) {
-                DBWriter.removeFavoriteItem(episode);
+                DBWriter.removeItemsFromFolderById(episode);
             }
         }
         close();
     }
 
-    private void close() {
-        getActivity().getSupportFragmentManager().popBackStack();
-    }
+
+    private void close() { getActivity().getSupportFragmentManager().popBackStack(); }
 
 }

@@ -24,6 +24,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import de.danoeh.antennapod.core.R;
+import de.danoeh.antennapod.core.event.FeedItemEvent;
 import de.danoeh.antennapod.core.event.ProgressEvent;
 import de.danoeh.antennapod.core.feed.Chapter;
 import de.danoeh.antennapod.core.feed.Feed;
@@ -1170,6 +1171,14 @@ public class PodDBAdapter {
                 KEY_FEEDITEM, item.getId(),
                 KEY_FEED, item.getFeedId());
         db.execSQL(deleteClause);
+    }
+
+    public void removeFolderItem(FeedItem item) {
+        String deleteClause = String.format("DELETE FROM %s WHERE %s=%s",
+                TABLE_NAME_ITEMS_FOLDERS,
+                KEY_ID, item.getId());
+        db.execSQL(deleteClause);
+        removeItemFromFolder(item);
     }
 
     public boolean isItemInFavorites(FeedItem item) {
