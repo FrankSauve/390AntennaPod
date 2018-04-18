@@ -259,4 +259,23 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         adapter.close();
     }
 
+    //Test renaming folder
+    public void testRenameFolder() throws InterruptedException {
+        adapter = PodDBAdapter.getInstance();
+        String folderName = "Old Name";
+
+        //Creating a folder with name above
+        Folder folder = new Folder(folderName, null);
+        createFolder(folder);
+        assertEquals(folderName, folder.getName());
+
+        //New name for folder
+        String newFolderName = "New Name";
+        assertFalse(newFolderName.equals(folder.getName()));
+
+        adapter.renameFolder(folder.getId(), folder.getName(), newFolderName);
+        assertEquals(newFolderName, folder.getName());
+
+    }
+
 }
