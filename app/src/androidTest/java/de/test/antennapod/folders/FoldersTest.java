@@ -281,4 +281,45 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
     }
 
+    //Test renaming folder and ensures that folder items does not change
+    public void testRenameFolderWithItems() throws InterruptedException {
+        adapter = PodDBAdapter.getInstance();
+        String folderName = "Old Name";
+        //Loading 1 Feed
+        List<Feed> feeds = DBTestUtils.saveFeedlist(1, 4, false, false, 0);
+
+        //List of FeedItems for the folders
+        List<FeedItem> episodes = new ArrayList<>();
+
+        //Create FeedItems from the loaded Feed
+        FeedItem item1 = feeds.get(0).getItems().get(0);
+        FeedItem item2 = feeds.get(0).getItems().get(1);
+        FeedItem item3 = feeds.get(0).getItems().get(2);
+        FeedItem item4 = feeds.get(0).getItems().get(3);
+
+        //Add FeedItems to ArrayLists
+        episodes.add(item1);
+        episodes.add(item2);
+        episodes.add(item3);
+        episodes.add(item4);
+
+        //Creating a folder with name above
+        Folder folder = new Folder(folderName, episodes);
+
+        createFolder(folder);
+        assertEquals(folderName, folder.getName());
+        assertEquals(4, folder.getEpisodesNum());
+
+        //New name for folder
+        String newFolderName = "New Name";
+        assertFalse(newFolderName.equals(folder.getName()));
+        adapter.open();
+        adapter.renameFolder(folder, folderName, newFolderName);
+        adapter.close();
+        assertEquals(newFolderName, folder.getName());
+        assertEquals(4, folder.getEpisodesNum());
+        deleteFolder(folder);
+
+    }
+
 }
