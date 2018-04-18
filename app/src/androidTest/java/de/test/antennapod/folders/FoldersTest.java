@@ -273,8 +273,11 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         String newFolderName = "New Name";
         assertFalse(newFolderName.equals(folder.getName()));
 
-        adapter.renameFolder(folder.getId(), folder.getName(), newFolderName);
+        adapter.open();
+        adapter.renameFolder(folder, folder.getName(), newFolderName);
+        adapter.close();
         assertEquals(newFolderName, folder.getName());
+        deleteFolder(folder);
 
     }
 

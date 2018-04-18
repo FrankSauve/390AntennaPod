@@ -988,7 +988,7 @@ public class DBWriter {
         return dbExec.submit(() -> {
             PodDBAdapter adapter = PodDBAdapter.getInstance();
             adapter.open();
-            adapter.renameFolder(folder.getId(), oldName, newName);
+            adapter.renameFolder(folder, oldName, newName);
             adapter.close();
             EventDistributor.getInstance().sendFeedUpdateBroadcast();
         });
