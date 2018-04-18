@@ -75,6 +75,8 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static android.content.Intent.getIntent;
+
 /**
  * The activity that is shown when the user launches the app.
  */

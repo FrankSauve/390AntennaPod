@@ -1,36 +1,40 @@
 package de.danoeh.antennapod.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import java.util.List;
 
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.glide.ApGlideSettings;
+import de.danoeh.antennapod.core.util.FeedItemUtil;
+import de.danoeh.antennapod.fragment.FolderItemListFragment;
+import de.danoeh.antennapod.fragment.HomeFragment;
+import de.danoeh.antennapod.fragment.ItemFragment;
 
 public class ObjectListDataAdapter extends RecyclerView.Adapter<ObjectListDataAdapter.ViewHolder> {
 
     private List<FeedItem> itemsList;
     private List<Folder> foldersList;
     private Context context;
+    private HomeFragment fragment;
 
-    public ObjectListDataAdapter(Context context, List<FeedItem> itemsList, List<Folder> foldersList) {
+    public ObjectListDataAdapter(Context context, List<FeedItem> itemsList, List<Folder> foldersList, HomeFragment fragment) {
         this.itemsList = itemsList;
         this.foldersList = foldersList;
         this.context = context;
+        this.fragment = fragment;
     }
 
     @Override
@@ -83,7 +87,6 @@ public class ObjectListDataAdapter extends RecyclerView.Adapter<ObjectListDataAd
 
         protected ImageView itemImage;
 
-
         public ViewHolder(View view) {
             super(view);
 
@@ -91,20 +94,23 @@ public class ObjectListDataAdapter extends RecyclerView.Adapter<ObjectListDataAd
             title.setMovementMethod(new ScrollingMovementMethod());
             this.itemImage = (ImageView) view.findViewById(R.id.cover);
 
+            // On click listener for homepage items
+            view.setOnClickListener(v -> {
+                MainActivity activity = ((MainActivity)fragment.getActivity());
+                int position = getAdapterPosition();
+                // Open ItemFragment if a feed is clicked
+                if(itemsList != null){
+                    long[] ids = FeedItemUtil.getIds(itemsList);
+                    activity.loadChildFragment(ItemFragment.newInstance(ids, position));
+                    activity.setActionBarTitle(itemsList.get(position).getTitle());
+                }
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    Toast.makeText(v.getContext(), title.getText(), Toast.LENGTH_SHORT).show();
-
+                // Open FolderItemListFragment if a folder is clicked
+                if(foldersList != null){
+                    activity.loadChildFragment(FolderItemListFragment.newInstance(foldersList.get(position).getId()));
+                    activity.setActionBarTitle(foldersList.get(position).getName());
                 }
             });
-
-
         }
-
-
     }
 }

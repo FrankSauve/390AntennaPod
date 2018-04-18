@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import java.util.Map;
 
 import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.HomeRecyclerViewAdapter;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
@@ -52,9 +52,10 @@ public class HomeFragment extends Fragment {
         v = inflater.inflate(R.layout.activity_main, container, false);
         recyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        adapter = new HomeRecyclerViewAdapter(getContext(), allData);
+        adapter = new HomeRecyclerViewAdapter(getContext(), allData, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        ((MainActivity)getActivity()).setActionBarTitle("Home");
         return v;
     }
 
