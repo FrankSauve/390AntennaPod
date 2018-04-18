@@ -64,6 +64,7 @@ import de.danoeh.antennapod.core.storage.DownloadRequester;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.core.util.gui.MoreContentListFooterUtil;
+import de.danoeh.antennapod.dialog.AllEpisodesActionFragment;
 import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
 import de.danoeh.antennapod.dialog.RenameFeedDialog;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
@@ -248,7 +249,7 @@ public class ItemlistFragment extends ListFragment {
                 if (!FeedMenuHandler.onOptionsItemClicked(getActivity(), item, feed)) {
                     switch (item.getItemId()) {
                         case R.id.episode_actions:
-                            EpisodesApplyActionFragment fragment = EpisodesApplyActionFragment
+                            AllEpisodesActionFragment fragment = AllEpisodesActionFragment
                                     .newInstance(feed.getItems());
                             ((MainActivity)getActivity()).loadChildFragment(fragment);
                             return true;
