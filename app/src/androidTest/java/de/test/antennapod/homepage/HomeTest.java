@@ -71,6 +71,7 @@ import de.danoeh.antennapod.fragment.HomeFragment;
         adapter.setFeed(feed);
         adapter.setFeedItemlist(feedItems);
         adapter.setFavorites(feedItems);
+        adapter.close();
 
         List<SectionDataModel> data = homeFragment.loadData();
 
@@ -93,6 +94,7 @@ import de.danoeh.antennapod.fragment.HomeFragment;
         adapter = PodDBAdapter.getInstance();
         adapter.open();
         adapter.addFolder(folder);
+        adapter.close();
 
         List<SectionDataModel> data = homeFragment.loadData();
 
