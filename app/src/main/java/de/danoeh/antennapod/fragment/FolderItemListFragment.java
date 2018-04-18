@@ -46,6 +46,8 @@ import de.danoeh.antennapod.core.storage.DownloadRequestException;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.core.util.LongList;
 import de.danoeh.antennapod.dialog.EpisodesApplyActionFragment;
+import de.danoeh.antennapod.dialog.RenameFeedDialog;
+import de.danoeh.antennapod.dialog.RenameFolderDialog;
 import de.danoeh.antennapod.menuhandler.FeedItemMenuHandler;
 import de.danoeh.antennapod.menuhandler.FeedMenuHandler;
 
@@ -205,7 +207,7 @@ public class FolderItemListFragment extends Fragment {
                     ((MainActivity)getActivity()).loadChildFragment(fragment);
                     return true;
                 case R.id.rename_item:
-                    //new RenameFeedDialog(getActivity(), feed).show();
+                    new RenameFolderDialog(getActivity(), folder).show();
                     return true;
                 case R.id.remove_item:
                     final FolderRemover remover = new FolderRemover(getContext(), folder) {
