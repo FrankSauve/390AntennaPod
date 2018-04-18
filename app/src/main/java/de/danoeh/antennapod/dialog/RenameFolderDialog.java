@@ -8,16 +8,17 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.lang.ref.WeakReference;
 
 import de.danoeh.antennapod.core.feed.Feed;
+import de.danoeh.antennapod.core.folders.Folder;
 import de.danoeh.antennapod.core.storage.DBWriter;
 
-public class RenameFeedDialog {
+public class RenameFolderDialog {
 
     private final WeakReference<Activity> activityRef;
-    private final Feed feed;
+    private final Folder folder;
 
-    public RenameFeedDialog(Activity activity, Feed feed) {
+    public RenameFolderDialog(Activity activity, Folder folder) {
         this.activityRef = new WeakReference<>(activity);
-        this.feed = feed;
+        this.folder = folder;
     }
 
     public void show() {
@@ -26,15 +27,15 @@ public class RenameFeedDialog {
             return;
         }
         new MaterialDialog.Builder(activity)
-                .title(de.danoeh.antennapod.core.R.string.rename_feed_label)
+                .title(de.danoeh.antennapod.core.R.string.rename_folder_label)
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input(feed.getTitle(), feed.getTitle(), true, (dialog, input) -> {
-                    feed.setCustomTitle(input.toString());
-                    DBWriter.setFeedCustomTitle(feed);
+                .input(folder.getName(), folder.getName(), true, (dialog, input) -> {
+                    DBWriter.setFolderName(folder, folder.getName(), input.toString());
+                    folder.setName(input.toString());
                     dialog.dismiss();
                 })
                 .neutralText(de.danoeh.antennapod.core.R.string.reset)
-                .onNeutral((dialog, which) -> dialog.getInputEditText().setText(feed.getFeedTitle()))
+                .onNeutral((dialog, which) -> dialog.getInputEditText().setText(folder.getName()))
                 .negativeText(de.danoeh.antennapod.core.R.string.cancel_label)
                 .onNegative((dialog, which) -> dialog.dismiss())
                 .autoDismiss(false)

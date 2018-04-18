@@ -984,25 +984,15 @@ public class DBWriter {
     }
 
 
-    public static Future<?> setFolderCustomTitle(Folder folder) {
+    public static Future<?> setFolderName(Folder folder, String oldName, String newName) {
         return dbExec.submit(() -> {
             PodDBAdapter adapter = PodDBAdapter.getInstance();
             adapter.open();
-            adapter.setFolderCustomTitle(folder.getId(), folder.getName());
+            adapter.renameFolder(folder.getId(), oldName, newName);
             adapter.close();
             EventDistributor.getInstance().sendFeedUpdateBroadcast();
         });
     }
-
-//    public static Future<?> setFolder(Folder folder) {
-//        return dbExec.submit(() -> {
-//            PodDBAdapter adapter = PodDBAdapter.getInstance();
-//            adapter.open();
-//            adapter.setFolder(folder);
-//            adapter.close();
-//        });
-//    }
-
 
     /**
      * format an url for querying the database
