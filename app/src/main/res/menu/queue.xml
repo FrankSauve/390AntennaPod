@@ -7,7 +7,8 @@
         android:id="@+id/queue_lock"
         android:title=""
         android:menuCategory="container"
-        custom:showAsAction="always" />
+        custom:showAsAction="always"
+        android:icon="?attr/closeIcon"/>
 
     <item
         android:id="@+id/refresh_item"

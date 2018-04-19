@@ -12,6 +12,7 @@ import com.robotium.solo.Solo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.activity.MainActivity;
@@ -25,6 +26,7 @@ import de.danoeh.antennapod.fragment.DownloadsFragment;
 import de.danoeh.antennapod.fragment.EpisodesFragment;
 import de.danoeh.antennapod.fragment.PlaybackHistoryFragment;
 import de.danoeh.antennapod.fragment.QueueFragment;
+import de.test.antennapod.folders.FoldersTest;
 
 /**
  * User interface tests for MainActivity
@@ -73,6 +75,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         prefs.edit().clear().commit();
 
         super.tearDown();
+    }
+
+    public String randomAlphabet(){
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
     private void openNavDrawer() {
@@ -762,6 +768,23 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         //Enable automatic tweets
         solo.clickOnText(solo.getString(R.string.pref_automatic_post_twitter_title));
         assertTrue(solo.isToggleButtonChecked(0));
+    }
+
+    public void testFoldersHomePage(){
+
+        //Create 2 folders
+        String firstFolder = testAddFolder(randomAlphabet());
+        String secondFolder = testAddFolder(randomAlphabet());
+
+        //Go to Home page
+        openNavDrawer();
+        solo.waitForText(solo.getString(R.string.home_label));
+        solo.clickOnText(solo.getString(R.string.home_label));
+
+        //Assertion
+        assertTrue(solo.waitForText(firstFolder));
+        assertTrue(solo.waitForText(secondFolder));
+
     }
 
 }

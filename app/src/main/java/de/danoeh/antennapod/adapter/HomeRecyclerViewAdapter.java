@@ -3,35 +3,30 @@ package de.danoeh.antennapod.adapter;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-
-import java.util.Collections;
 import java.util.List;
 
 import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.R;
-import de.danoeh.antennapod.core.feed.FeedImage;
-import de.danoeh.antennapod.core.feed.FeedItem;
-import de.danoeh.antennapod.core.glide.ApGlideSettings;
+import de.danoeh.antennapod.fragment.HomeFragment;
 
 public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerViewAdapter.ViewHolder> {
 
     private Context context;
     private List<SectionDataModel> dataList;
+    private HomeFragment fragment;
 
 
     // data is passed into the constructor
-    public HomeRecyclerViewAdapter(Context context, List<SectionDataModel> dataList) {
+    public HomeRecyclerViewAdapter(Context context, List<SectionDataModel> dataList, HomeFragment fragment) {
         this.dataList = dataList;
         this.context = context;
+        this.fragment = fragment;
     }
 
     // inflates the row layout from xml when needed
@@ -47,8 +42,16 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
     public void onBindViewHolder(ViewHolder holder, int position) {
         final String sectionName = dataList.get(position).getTitle();
         List singleSectionItems = dataList.get(position).getFeedItem();
+        List singleSectionFolders = dataList.get(position).getFolders();
         holder.itemTitle.setText(sectionName);
-        ObjectListDataAdapter itemListAdapter = new ObjectListDataAdapter(context, singleSectionItems);
+        ObjectListDataAdapter itemListAdapter = null;
+        if(singleSectionItems != null){
+            itemListAdapter = new ObjectListDataAdapter(context, singleSectionItems, null, fragment);
+        }
+        else if(singleSectionFolders != null){
+            Log.d("HomeRecycler", "INSIDE: " + singleSectionFolders);
+            itemListAdapter = new ObjectListDataAdapter(context, null, singleSectionFolders, fragment);
+        }
         holder.recycler_view_list.setHasFixedSize(true);
         holder.recycler_view_list.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         holder.recycler_view_list.setAdapter(itemListAdapter);
