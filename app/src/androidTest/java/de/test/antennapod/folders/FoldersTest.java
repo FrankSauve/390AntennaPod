@@ -328,47 +328,47 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         deleteFolder(folder);
 
 
-    public void testFoldersHomePage() throws Exception {
-        //Original number of folders in foldersFragment
-        foldersFragment.loadFolders();
-        folders = foldersFragment.getFolders();
-        int originalNumOfFolders = folders.size();
-
-        //Assign random name
-        String firstFolderName = randomAlphabet();
-        String secondFolderName = randomAlphabet();
-
-        //Creating folders containing no episodes
-        Folder firstFolder = new Folder(firstFolderName, null);
-        Folder secondFolder = new Folder(secondFolderName, null);
-
-        //Create folders
-        createFolder(firstFolder);
-        createFolder(secondFolder);
-
-        //Add items to the folders(2 in firstFolder and 2 in secondFolder)
-        List<SectionDataModel> allData = homeFragment.loadData();
-
-        //Assertions
-        assertNotNull(allData);
-        for(SectionDataModel data : allData){
-            List<Folder> folders = data.getFolders();
-            List<String> foldersName = new ArrayList<>();
-            if(folders != null){ //get the folders section
-                assertEquals(originalNumOfFolders + 2, folders.size());//Verify if created folders have been added to the folders section in home page
-                for (Folder folder : folders){
-                    foldersName.add(folder.getName()); //Updates list of folders name
-                }
-                //Verify if the list of folders name contains both folders name
-                assertTrue(foldersName.contains(firstFolderName));
-                assertTrue(foldersName.contains(secondFolderName));
-            }
-        }
-
-        //Clear database
-        deleteFolder(firstFolder);
-        deleteFolder(secondFolder);
-
-    }
+//    public void testFoldersHomePage() throws Exception {
+//        //Original number of folders in foldersFragment
+//        foldersFragment.loadFolders();
+//        folders = foldersFragment.getFolders();
+//        int originalNumOfFolders = folders.size();
+//
+//        //Assign random name
+//        String firstFolderName = randomAlphabet();
+//        String secondFolderName = randomAlphabet();
+//
+//        //Creating folders containing no episodes
+//        Folder firstFolder = new Folder(firstFolderName, null);
+//        Folder secondFolder = new Folder(secondFolderName, null);
+//
+//        //Create folders
+//        createFolder(firstFolder);
+//        createFolder(secondFolder);
+//
+//        //Add items to the folders(2 in firstFolder and 2 in secondFolder)
+//        List<SectionDataModel> allData = homeFragment.loadData();
+//
+//        //Assertions
+//        assertNotNull(allData);
+//        for(SectionDataModel data : allData){
+//            List<Folder> folders = data.getFolders();
+//            List<String> foldersName = new ArrayList<>();
+//            if(folders != null){ //get the folders section
+//                assertEquals(originalNumOfFolders + 2, folders.size());//Verify if created folders have been added to the folders section in home page
+//                for (Folder folder : folders){
+//                    foldersName.add(folder.getName()); //Updates list of folders name
+//                }
+//                //Verify if the list of folders name contains both folders name
+//                assertTrue(foldersName.contains(firstFolderName));
+//                assertTrue(foldersName.contains(secondFolderName));
+//            }
+//        }
+//
+//        //Clear database
+//        deleteFolder(firstFolder);
+//        deleteFolder(secondFolder);
+//
+//    }
 
 }
