@@ -278,19 +278,20 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     public void downloadEpisode(){
         openNavDrawer();
         solo.clickOnText(solo.getString(R.string.trending_label));
-        solo.clickOnText("Embedded - NPR"); //  To be changed if this podcast is not trending anymore
+        solo.clickOnText("Serial - This American Life"); //  To be changed if this podcast is not trending anymore
 
         //Needs to be clicked twice for some reason
         solo.clickOnText(solo.getString(R.string.subscribe_label));
-        solo.waitForText(solo.getString(R.string.subscribe_label));
-        solo.clickOnText(solo.getString(R.string.subscribe_label));
 
-        solo.waitForText(solo.getString(R.string.open_podcast));
-        solo.clickOnText(solo.getString(R.string.open_podcast));
+        openNavDrawer();
+        openNavDrawer();
+        solo.clickOnText(solo.getString(R.string.episodes_label));
+        solo.clickOnText(solo.getString(R.string.new_label));
+
 
         // To be changed if this episode does not appear anymore
-        solo.waitForText("Trump Stories: Collusion");
-        solo.clickOnText("Trump Stories: Collusion");
+        solo.waitForText("S-Town Is Live");
+        solo.clickOnText("S-Town Is Live");
 
         solo.waitForText(solo.getString(R.string.download_label));
         solo.clickOnText(solo.getString(R.string.download_label));
@@ -309,6 +310,36 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText(solo.getString(R.string.downloads_label));
     }
 
+    //Atemped to test the gear button.
+//    public void testGearButtonOnEpisodesPage(){
+//        this.downloadEpisode();
+//
+//        openNavDrawer();
+//        solo.clickOnText(solo.getString(R.string.episodes_label));
+//        solo.clickOnText(solo.getString(R.string.all_episodes_short_label));
+//        solo.clickOnMenuItem(solo.getString(R.id.episode_actions));
+//
+//        //test add to Queue
+//        solo.clickOnText("S-Town Is Live");
+//        solo.clickOnText(solo.getString(R.string.add_to_queue_label));
+//        openNavDrawer();
+//        solo.clickOnText(solo.getString(R.string.queue_label));
+//        //Assert that the podcast was added to queue
+//        assertTrue(solo.searchText("S-Town Is Live"));
+//
+//
+//        //test add to favorites
+//        openNavDrawer();
+//        solo.clickOnText(solo.getString(R.string.episodes_label));
+//        solo.clickOnText(solo.getString(R.id.episode_actions));
+//        solo.clickOnScreen(1015, 152);
+//        solo.clickOnText(solo.getString(R.string.add_to_favorite_label));
+//        openNavDrawer();
+//        solo.clickOnText(solo.getString(R.string.episodes_label));
+//        solo.clickOnText(solo.getString(R.string.favorite_episodes_label));
+//        assertTrue(solo.searchText("S-Town Is Live"));
+//    }
+
     public void testAddToQueueFromDownloads(){
         this.downloadEpisode();
 
@@ -324,8 +355,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText(solo.getString(R.string.queue_label));
 
         //Assert that the podcast was added to queue
-        assertTrue(solo.searchText("Trump Stories: Collusion"));
+        assertTrue(solo.searchText("S-Town Is Live"));
     }
+
+
 
     public void testAddToQueueFromEpisodes(){
         this.downloadEpisode();
@@ -342,7 +375,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         solo.clickOnText(solo.getString(R.string.queue_label));
 
         //Assert that the podcast was added to queue
-        assertTrue(solo.searchText("Trump Stories: Collusion"));
+        assertTrue(solo.searchText("S-Town Is Live"));
     }
 
     //method responsible for selecting a given category in the advanced search dropdown and verifying that the page has changed according to the selection
