@@ -40,12 +40,13 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
     PodDBAdapter adapter;
 
     // Constructor
-    public FoldersTest(){
+    public FoldersTest() {
         super("de.danoeh.antennapod.activity", MainActivity.class);
     }
 
     /**
      * Starts the Main activity
+     *
      * @throws Exception
      */
     @Override
@@ -53,22 +54,19 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         super.setUp();
 
         //You can delete this whole code once your local devices have the tables and are set up properly
-        try{
+        try {
             setUpTables(); //Creates folders and itemsfolders tables in DB for local devices in case they do not have these tables already
-        }
-        catch(android.database.sqlite.SQLiteException e){
+        } catch (android.database.sqlite.SQLiteException e) {
             //Catch error: means you already have one of the tables (probably folders table so let's create itemsfolder table)
             Log.e(TAG, "e: " + e.getMessage());
-            try{
+            try {
                 PodDBAdapter.createItemsFoldersTable(); //Creates itemsfolders table in DB for local devices in case they do not have this table already
-            }
-            catch(android.database.sqlite.SQLiteException e1){
+            } catch (android.database.sqlite.SQLiteException e1) {
                 //Catch this error: means you already have this table
                 Log.e(TAG, "e1: " + e1.getMessage());
-                try{
+                try {
                     PodDBAdapter.addFolderNameColumnToFeedItemsTable(); //Add folder_name column to feeditems table in DB for local devices in case it is not added yet
-                }
-                catch(android.database.sqlite.SQLiteException e2){
+                } catch (android.database.sqlite.SQLiteException e2) {
                     //Catch this error: last catch
                     Log.e(TAG, "e2: " + e2.getMessage());
                     //Do nothing in this case the device should be set up properly in this case
@@ -83,13 +81,13 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         getInstrumentation().waitForIdleSync();
     }
 
-    private void setUpTables(){
+    private void setUpTables() {
         PodDBAdapter.createFoldersTable();
         PodDBAdapter.createItemsFoldersTable();
         PodDBAdapter.addFolderNameColumnToFeedItemsTable();
     }
 
-    public String randomAlphabet(){
+    public String randomAlphabet() {
         return UUID.randomUUID().toString().substring(0, 8);
     }
 
@@ -122,16 +120,16 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         folders = foldersFragment.getFolders();
 
         //Update list of folders name
-        for(Folder folder : folders){
+        for (Folder folder : folders) {
             foldersName.add(folder.getName());
         }
 
         //Assertions
         assertEquals(foldersName.size(), folders.size()); //list of folders name should be same size as folders list in fragment
-        assertEquals(2 + originalNumOfFolders , folders.size()); //2 folders should have been added to DB
+        assertEquals(2 + originalNumOfFolders, folders.size()); //2 folders should have been added to DB
 
         //Verifying that names correspond to folders created
-        for(int i = 0; i < folders.size(); i++){
+        for (int i = 0; i < folders.size(); i++) {
             assertEquals(foldersName.get(i), folders.get(i).getName());
         }
 
@@ -140,7 +138,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         deleteFolder(secondFolder);
     }
 
-    private long createFolder(Folder folder){
+    private long createFolder(Folder folder) {
         adapter = PodDBAdapter.getInstance();
         adapter.open();
         long id = adapter.addFolder(folder);
@@ -149,15 +147,15 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         return id;
     }
 
-    private void deleteAllFolders(){
+    private void deleteAllFolders() {
         folders = DBReader.getFolderList();
 
-        for(Folder folder : folders){
+        for (Folder folder : folders) {
             deleteFolder(folder);
         }
     }
 
-    private void deleteFolder(Folder folder){
+    private void deleteFolder(Folder folder) {
         adapter = PodDBAdapter.getInstance();
         adapter.open();
         adapter.removeFolder(folder);
@@ -173,7 +171,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         int originalNumOfFolders = folders.size();
 
         //If there is no folder then create a random one
-        if(originalNumOfFolders == 0){
+        if (originalNumOfFolders == 0) {
             String newFolderName = randomAlphabet();
             Folder newFolder = new Folder(newFolderName, null);
             createFolder(newFolder);
@@ -192,15 +190,15 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         assertEquals(originalNumOfFolders - 1, folders.size());
     }
 
-    private void addFeedItemToFolder(Folder folder, FeedItem item){
+    private void addFeedItemToFolder(Folder folder, FeedItem item) {
         adapter = PodDBAdapter.getInstance();
         adapter.open();
-        adapter.addFolderItem(folder,item);
+        adapter.addFolderItem(folder, item);
         adapter.close();
     }
 
-    private void addFeedItemsToFolder(Folder folder, List<FeedItem> items){
-        for(FeedItem item : items){
+    private void addFeedItemsToFolder(Folder folder, List<FeedItem> items) {
+        for (FeedItem item : items) {
             addFeedItemToFolder(folder, item);
         }
     }
@@ -258,7 +256,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
     }
 
     //Delete feed from database
-    private void removeFeed(Feed feed){
+    private void removeFeed(Feed feed) {
         adapter = PodDBAdapter.getInstance();
         adapter.open();
         adapter.removeFeed(feed);
@@ -371,4 +369,5 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 //
 //    }
 
+    }
 }
