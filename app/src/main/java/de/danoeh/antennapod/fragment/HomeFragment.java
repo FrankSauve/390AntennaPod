@@ -1,12 +1,22 @@
 package de.danoeh.antennapod.fragment;
 
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,13 +29,16 @@ import de.danoeh.antennapod.activity.MainActivity;
 import de.danoeh.antennapod.adapter.HomeRecyclerViewAdapter;
 import de.danoeh.antennapod.core.feed.FeedItem;
 import de.danoeh.antennapod.core.folders.Folder;
+import de.danoeh.antennapod.core.preferences.UserPreferences;
 import de.danoeh.antennapod.core.storage.DBReader;
+import de.danoeh.antennapod.menuhandler.MenuItemUtils;
 
 public class HomeFragment extends Fragment {
 
     private HomeRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
     View v;
+    protected boolean itemsLoaded = false;
 
     public static final String TAG = "HomeFragment";
     List<SectionDataModel> allData;
@@ -44,6 +57,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         allData = loadData();
+        setHasOptionsMenu(true);
 
     }
 
@@ -106,4 +120,32 @@ public class HomeFragment extends Fragment {
 
         return allData;
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.only_search, menu);
+
+            MenuItem searchItem = menu.findItem(R.id.action_search);
+
+            final SearchView sv = (SearchView) MenuItemCompat.getActionView(searchItem);
+            MenuItemUtils.adjustTextColor(getActivity(), sv);
+            sv.setQueryHint(getString(R.string.search_hint));
+            sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    sv.clearFocus();
+                    ((MainActivity) getActivity()).loadChildFragment(SearchFragment.newInstance(s));
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    return false;
+                }
+            });
+
+        }
+
+
+
 }
