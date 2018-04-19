@@ -307,4 +307,62 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         deleteFolder(secondFolder);
     }
 
+    //Remove podcasts from folder
+    public void testRemoveFolderItem() throws Exception {
+        adapter = PodDBAdapter.getInstance();
+        //Loading 1 Feed
+        List<Feed> feeds = DBTestUtils.saveFeedlist(1, 4, false, false, 0);
+
+        //List of FeedItems for the folders
+        List<FeedItem> folderItems = new ArrayList<>();
+
+        //Create FeedItems from the loaded Feed
+        FeedItem item1 = feeds.get(0).getItems().get(0);
+        FeedItem item2 = feeds.get(0).getItems().get(1);
+        FeedItem item3 = feeds.get(0).getItems().get(2);
+        FeedItem item4 = feeds.get(0).getItems().get(3);
+
+        //Add FeedItems to ArrayLists
+        folderItems.add(item1);
+        folderItems.add(item2);
+        folderItems.add(item3);
+        folderItems.add(item4);
+
+        String name =  "Folder";
+        Folder folder = new Folder(name, null);
+
+        //Create folders
+        long folderId = createFolder(folder);
+
+        //Add items to the folders
+        addFeedItemsToFolder(folder, folderItems);
+
+        //Updating folders and and loading episodes inside folders
+        folder = DBReader.getFolder(folderId);
+        assertNotNull(folder.getEpisodes());
+
+        //Assertions
+        assertEquals(4, folder.getEpisodesNum());
+        //remove items from folder
+        adapter.open();
+        DBWriter.removeItemsFromFolderById(item1);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(3, folder.getEpisodesNum());
+        adapter.open();
+        DBWriter.removeItemsFromFolderById(item2);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(2, folder.getEpisodesNum());
+        adapter.open();
+        DBWriter.removeItemsFromFolderById(item3);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(1, folder.getEpisodesNum());
+        adapter.open();
+        DBWriter.removeItemsFromFolderById(item4);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(0, folder.getEpisodesNum());
+
+        deleteFolder(folder);
+        removeFeed(feeds.get(0));
+    }
+
 }
