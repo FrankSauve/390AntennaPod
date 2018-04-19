@@ -1778,7 +1778,7 @@ public class PodDBAdapter {
     }
 
     public int itemCount(Folder folder){
-        final String query = "SELECT COUNT(*) FROM " + TABLE_NAME_ITEMS_FOLDERS +
+        final String query = "SELECT COUNT(*) FROM " + TABLE_NAME_FEED_ITEMS +
                 " WHERE " + KEY_FOLDER_NAME + "='" + folder.getName() + "'";
 
         Cursor c = db.rawQuery(query, null);

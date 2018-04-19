@@ -5,6 +5,7 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -309,7 +310,6 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
     //Remove podcasts from folder
     public void testRemoveFolderItem() throws Exception {
-        adapter = PodDBAdapter.getInstance();
         //Loading 1 Feed
         List<Feed> feeds = DBTestUtils.saveFeedlist(1, 4, false, false, 0);
 
@@ -328,7 +328,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         folderItems.add(item3);
         folderItems.add(item4);
 
-        String name =  "Folder";
+        String name =  randomAlphabet();
         Folder folder = new Folder(name, null);
 
         //Create folders
@@ -343,24 +343,29 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
         //Assertions
         assertEquals(4, folder.getEpisodesNum());
+
         //remove items from folder
+        adapter = PodDBAdapter.getInstance();
         adapter.open();
-        DBWriter.removeItemsFromFolderById(item1);
+        adapter.removeFolderItem(item1);
         folder = DBReader.getFolder(folderId);
         assertEquals(3, folder.getEpisodesNum());
-        adapter.open();
-        DBWriter.removeItemsFromFolderById(item2);
-        folder = DBReader.getFolder(folderId);
-        assertEquals(2, folder.getEpisodesNum());
-        adapter.open();
-        DBWriter.removeItemsFromFolderById(item3);
-        folder = DBReader.getFolder(folderId);
-        assertEquals(1, folder.getEpisodesNum());
-        adapter.open();
-        DBWriter.removeItemsFromFolderById(item4);
-        folder = DBReader.getFolder(folderId);
-        assertEquals(0, folder.getEpisodesNum());
 
+        adapter.removeFolderItem(item2);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(2, DBReader.getNumberOfItemsInFolder(folder));
+
+        adapter.removeFolderItem(item3);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(1, DBReader.getNumberOfItemsInFolder(folder));
+
+        adapter.removeFolderItem(item4);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(0, DBReader.getNumberOfItemsInFolder(folder));
+
+        adapter.close();
+
+        //Clear Database
         deleteFolder(folder);
         removeFeed(feeds.get(0));
     }
