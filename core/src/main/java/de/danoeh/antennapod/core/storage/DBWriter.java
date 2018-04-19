@@ -27,6 +27,7 @@ import de.danoeh.antennapod.core.R;
 import de.danoeh.antennapod.core.asynctask.FlattrClickWorker;
 import de.danoeh.antennapod.core.event.FavoritesEvent;
 import de.danoeh.antennapod.core.event.FeedItemEvent;
+import de.danoeh.antennapod.core.event.FolderItemEvent;
 import de.danoeh.antennapod.core.event.MessageEvent;
 import de.danoeh.antennapod.core.event.QueueEvent;
 import de.danoeh.antennapod.core.feed.EventDistributor;
@@ -589,6 +590,16 @@ public class DBWriter {
             final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
             adapter.addFolderItem(folder,item);
             adapter.close();
+        });
+    }
+
+    public static Future<?> removeItemsFromFolderById(final FeedItem item) {
+        return dbExec.submit(() -> {
+            final PodDBAdapter adapter = PodDBAdapter.getInstance().open();
+            adapter.removeFolderItem(item);
+            adapter.close();
+            EventBus.getDefault().post(FolderItemEvent.removed(item));
+            EventBus.getDefault().post(FeedItemEvent.updated(item));
         });
     }
 

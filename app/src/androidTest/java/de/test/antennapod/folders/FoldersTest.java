@@ -5,6 +5,7 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -286,10 +287,14 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 
     }
 
+
+
+  
     //Test renaming folder and ensures that folder items does not change
     public void testRenameFolderWithItems() throws InterruptedException {
         adapter = PodDBAdapter.getInstance();
         String folderName = "Old Name";
+
         //Loading 1 Feed
         List<Feed> feeds = DBTestUtils.saveFeedlist(1, 4, false, false, 0);
 
@@ -301,8 +306,7 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         FeedItem item2 = feeds.get(0).getItems().get(1);
         FeedItem item3 = feeds.get(0).getItems().get(2);
         FeedItem item4 = feeds.get(0).getItems().get(3);
-
-        //Add FeedItems to ArrayLists
+      
         episodes.add(item1);
         episodes.add(item2);
         episodes.add(item3);
@@ -324,6 +328,58 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         assertEquals(newFolderName, folder.getName());
         assertEquals(4, folder.getEpisodesNum());
         deleteFolder(folder);
+    }
+
+      //Remove podcasts from folder
+    public void testRemoveFolderItem() throws Exception {
+        folderItems.add(item1);
+        folderItems.add(item2);
+        folderItems.add(item3);
+        folderItems.add(item4);
+
+        String name =  randomAlphabet();
+        Folder folder = new Folder(name, null);
+
+        //Create folders
+        long folderId = createFolder(folder);
+
+        //Add items to the folders
+        addFeedItemsToFolder(folder, folderItems);
+
+        //Updating folders and and loading episodes inside folders
+        folder = DBReader.getFolder(folderId);
+        assertNotNull(folder.getEpisodes());
+
+        //Assertions
+        assertEquals(4, folder.getEpisodesNum());
+
+        //remove items from folder
+        adapter = PodDBAdapter.getInstance();
+        adapter.open();
+        adapter.removeFolderItem(item1);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(3, folder.getEpisodesNum());
+
+        adapter.removeFolderItem(item2);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(2, DBReader.getNumberOfItemsInFolder(folder));
+
+        adapter.removeFolderItem(item3);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(1, DBReader.getNumberOfItemsInFolder(folder));
+
+        adapter.removeFolderItem(item4);
+        folder = DBReader.getFolder(folderId);
+        assertEquals(0, DBReader.getNumberOfItemsInFolder(folder));
+
+        adapter.close();
+
+        //Clear Database
+        deleteFolder(folder);
+        removeFeed(feeds.get(0));
+    }
+
+       
 
 
 //    public void testFoldersHomePage() throws Exception {
@@ -368,6 +424,4 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
 //        deleteFolder(secondFolder);
 //
 //    }
-
-    }
 }
