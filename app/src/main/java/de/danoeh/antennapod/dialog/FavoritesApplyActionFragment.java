@@ -19,12 +19,15 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import de.danoeh.antennapod.R;
 import de.danoeh.antennapod.core.dialog.DownloadRequestErrorDialogCreator;
 import de.danoeh.antennapod.core.feed.FeedItem;
+import de.danoeh.antennapod.core.folders.Folder;
+import de.danoeh.antennapod.core.storage.DBReader;
 import de.danoeh.antennapod.core.storage.DBTasks;
 import de.danoeh.antennapod.core.storage.DBWriter;
 import de.danoeh.antennapod.core.storage.DownloadRequestException;
@@ -49,6 +52,7 @@ public class FavoritesApplyActionFragment extends Fragment {
 
     private ListView mListView;
     private ArrayAdapter<String> mAdapter;
+    List<String> listItems;
 
     private Button btnAddToQueue;
     private Button btnMarkAsPlayed;
@@ -61,6 +65,8 @@ public class FavoritesApplyActionFragment extends Fragment {
     private int actions;
     private final List<String> titles = new ArrayList<>();
     private final LongList checkedIds = new LongList();
+    List<Folder> folders;
+    Map<Integer, String> hmap;
 
     private MenuItem mSelectToggle;
 
@@ -159,7 +165,11 @@ public class FavoritesApplyActionFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.episodes_apply_action_options, menu);
+        inflater.inflate(R.menu.favorites_all_episodes_apply_action_options, menu);
+        folders();
+        for(String item : listItems)
+        {menu.add(R.id.sort,getPosition(item),2,item);}
+
 
         mSelectToggle = menu.findItem(R.id.select_toggle);
         mSelectToggle.setOnMenuItemClickListener(item -> {
@@ -198,14 +208,6 @@ public class FavoritesApplyActionFragment extends Fragment {
         switch(item.getItemId()) {
             case R.id.select_options:
                 return true;
-            case R.id.check_all:
-                checkAll();
-                resId = R.string.selected_all_label;
-                break;
-            case R.id.check_none:
-                checkNone();
-                resId = R.string.deselected_all_label;
-                break;
             case R.id.check_played:
                 checkPlayed(true);
                 resId = R.string.selected_played_label;
@@ -434,6 +436,39 @@ public class FavoritesApplyActionFragment extends Fragment {
             }
         }
         close();
+    }
+
+    private void addToFolder(Folder folder) {
+        for(long id : checkedIds.toArray()) {
+            FeedItem episode = idMap.get(id);
+            if(episode.hasMedia()) {
+                DBWriter.addItemsToFolderById(folder,episode.getMedia().getId());
+            }
+        }
+        close();
+    }
+
+    public int getPosition(String item){
+        int  position = 0;
+        for (Map.Entry entry : hmap.entrySet()) {
+            if (item.equals(entry.getValue())) {
+                position = (int)entry.getKey();
+            }
+        }
+        return position;
+    }
+
+    public void folders(){
+        hmap = new Hashtable<Integer, String>();
+        folders= new ArrayList<>();
+        listItems = new ArrayList<>();
+        folders = DBReader.getFolderList();
+        int position = 0;
+        for (Folder folder : folders){
+            listItems.add(folder.getName());
+            hmap.put(position, folder.getName());
+            position++;
+        }
     }
 
 

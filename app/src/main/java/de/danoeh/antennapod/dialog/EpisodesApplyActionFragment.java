@@ -186,6 +186,7 @@ public class EpisodesApplyActionFragment extends Fragment {
         for(String item : listItems)
         {menu.add(R.id.sort,getPosition(item),2,item);}
 
+
         mSelectToggle = menu.findItem(R.id.select_toggle);
         mSelectToggle.setOnMenuItemClickListener(item -> {
             if (checkedIds.size() == episodes.size()) {
@@ -227,42 +228,34 @@ public class EpisodesApplyActionFragment extends Fragment {
         switch(item.getItemId()) {
             case R.id.select_options:
                 return true;
-//            case R.id.check_all:
-//                checkAll();
-//                resId = R.string.selected_all_label;
-//                break;
-//            case R.id.check_none:
-//                checkNone();
-//                resId = R.string.deselected_all_label;
-//                break;
-//            case R.id.check_played:
-//                checkPlayed(true);
-//                resId = R.string.selected_played_label;
-//                break;
-//            case R.id.check_unplayed:
-//                checkPlayed(false);
-//                resId = R.string.selected_unplayed_label;
-//                break;
-//            case R.id.check_downloaded:
-//                checkDownloaded(true);
-//                resId = R.string.selected_downloaded_label;
-//                break;
-//            case R.id.check_not_downloaded:
-//                checkDownloaded(false);
-//                resId = R.string.selected_not_downloaded_label;
-//                break;
-//            case R.id.check_queued:
-//                checkQueued(true);
-//                resId = R.string.selected_queued_label;
-//                break;
-//            case R.id.check_not_queued:
-//                checkQueued(false);
-//                resId = R.string.selected_not_queued_label;
-//                break;
-//            case R.id.check_has_media:
-//                checkWithMedia();
-//                resId = R.string.selected_has_media_label;
-//                break;
+            case R.id.check_played:
+                checkPlayed(true);
+                resId = R.string.selected_played_label;
+                break;
+            case R.id.check_unplayed:
+                checkPlayed(false);
+                resId = R.string.selected_unplayed_label;
+                break;
+            case R.id.check_downloaded:
+                checkDownloaded(true);
+                resId = R.string.selected_downloaded_label;
+                break;
+            case R.id.check_not_downloaded:
+                checkDownloaded(false);
+                resId = R.string.selected_not_downloaded_label;
+                break;
+            case R.id.check_queued:
+                checkQueued(true);
+                resId = R.string.selected_queued_label;
+                break;
+            case R.id.check_not_queued:
+                checkQueued(false);
+                resId = R.string.selected_not_queued_label;
+                break;
+            case R.id.check_has_media:
+                checkWithMedia();
+                resId = R.string.selected_has_media_label;
+                break;
             case R.id.sort_title_a_z:
                 sortByTitle(false);
                 return true;
@@ -299,6 +292,8 @@ public class EpisodesApplyActionFragment extends Fragment {
         }
         return position;
     }
+
+
     public void folders(){
         hmap = new Hashtable<Integer, String>();
         folders= new ArrayList<>();
@@ -311,6 +306,7 @@ public class EpisodesApplyActionFragment extends Fragment {
             position++;
         }
     }
+
     private void sortByTitle(final boolean reverse) {
         Collections.sort(episodes, (lhs, rhs) -> {
             if (reverse) {
