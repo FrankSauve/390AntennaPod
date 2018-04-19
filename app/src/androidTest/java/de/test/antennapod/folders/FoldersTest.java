@@ -330,8 +330,21 @@ public class FoldersTest extends ActivityInstrumentationTestCase2<MainActivity> 
         deleteFolder(folder);
     }
 
-      //Remove podcasts from folder
+    //Remove podcasts from folder
     public void testRemoveFolderItem() throws Exception {
+        //Loading 1 Feed
+        List<Feed> feeds = DBTestUtils.saveFeedlist(1, 4, false, false, 0);
+
+        //List of FeedItems for the folders
+        List<FeedItem> folderItems = new ArrayList<>();
+
+        //Create FeedItems from the loaded Feed
+        FeedItem item1 = feeds.get(0).getItems().get(0);
+        FeedItem item2 = feeds.get(0).getItems().get(1);
+        FeedItem item3 = feeds.get(0).getItems().get(2);
+        FeedItem item4 = feeds.get(0).getItems().get(3);
+
+        //Add FeedItems to ArrayLists
         folderItems.add(item1);
         folderItems.add(item2);
         folderItems.add(item3);
