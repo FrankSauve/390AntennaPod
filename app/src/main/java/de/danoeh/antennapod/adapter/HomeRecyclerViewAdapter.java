@@ -13,17 +13,20 @@ import java.util.List;
 
 import de.danoeh.antennapod.Model.SectionDataModel;
 import de.danoeh.antennapod.R;
+import de.danoeh.antennapod.fragment.HomeFragment;
 
 public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerViewAdapter.ViewHolder> {
 
     private Context context;
     private List<SectionDataModel> dataList;
+    private HomeFragment fragment;
 
 
     // data is passed into the constructor
-    public HomeRecyclerViewAdapter(Context context, List<SectionDataModel> dataList) {
+    public HomeRecyclerViewAdapter(Context context, List<SectionDataModel> dataList, HomeFragment fragment) {
         this.dataList = dataList;
         this.context = context;
+        this.fragment = fragment;
     }
 
     // inflates the row layout from xml when needed
@@ -43,11 +46,11 @@ public class HomeRecyclerViewAdapter extends RecyclerView.Adapter<HomeRecyclerVi
         holder.itemTitle.setText(sectionName);
         ObjectListDataAdapter itemListAdapter = null;
         if(singleSectionItems != null){
-            itemListAdapter = new ObjectListDataAdapter(context, singleSectionItems, null);
+            itemListAdapter = new ObjectListDataAdapter(context, singleSectionItems, null, fragment);
         }
         else if(singleSectionFolders != null){
             Log.d("HomeRecycler", "INSIDE: " + singleSectionFolders);
-            itemListAdapter = new ObjectListDataAdapter(context, null, singleSectionFolders);
+            itemListAdapter = new ObjectListDataAdapter(context, null, singleSectionFolders, fragment);
         }
         holder.recycler_view_list.setHasFixedSize(true);
         holder.recycler_view_list.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));

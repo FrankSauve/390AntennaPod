@@ -30,6 +30,7 @@ import de.danoeh.antennapod.core.storage.PodDBAdapter;
 import de.danoeh.antennapod.core.feed.EventDistributor;
 import de.danoeh.antennapod.core.util.FeedItemUtil;
 import de.danoeh.antennapod.dialog.RenameFeedDialog;
+import de.danoeh.antennapod.dialog.RenameFolderDialog;
 
 /**
  * Fragment for displaying folders created and add podcasts to these folders
@@ -163,7 +164,7 @@ public class FoldersFragment extends Fragment {
         Folder folder = (Folder)selectedObject;
         switch(item.getItemId()) {
             case R.id.rename_item:
-                //new RenameFeedDialog(getActivity(), feed).show();
+                new RenameFolderDialog(getActivity(), folder).show();
                 return true;
             case R.id.remove_item:
                 final FolderRemover remover = new FolderRemover(getContext(), folder) {
